@@ -19,10 +19,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
+    const isLoginEndpoint =
+      err.config?.url?.includes('/auth/login') ||
+      err.config?.url?.includes('/auth/parent-login');
+
     if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      if (!isLoginEndpoint) {
+        // Session expired — redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+      // For login endpoints, let the login page handle the error
       return Promise.reject(err);
     }
 
