@@ -21,14 +21,13 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Grid pattern signature */
+  /* Grid pattern — covers full viewport via fixed attachment */
   .bg-grid-pattern {
     background-size: 50px 50px;
     background-image:
-      linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
-    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+      linear-gradient(to right, rgba(30, 41, 59, 0.35) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
+    background-attachment: fixed;
   }
 
   .holographic-gradient {

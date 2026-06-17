@@ -42,7 +42,7 @@ export default function Layout() {
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="min-h-screen bg-void text-pure font-body flex">
+    <div className="min-h-screen bg-void text-pure font-body flex overflow-x-hidden bg-grid-pattern">
       {/* Mobile overlay */}
       <div
         className={cn(
@@ -119,7 +119,7 @@ export default function Layout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 md:pl-60 min-h-screen flex flex-col bg-grid-pattern relative">
+      <div className="flex-1 md:pl-60 min-h-screen flex flex-col relative">
         <header className="sticky top-0 h-16 bg-void/50 backdrop-blur-md border-b border-white/10 z-30 flex items-center justify-between px-6">
           <button
             className="text-pure bg-white/5 hover:bg-white/10 border border-white/10 hover:border-bitcoin/30 p-2 rounded-xl transition-all duration-200 md:hidden flex items-center justify-center"
@@ -140,7 +140,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-6 w-full">
           <Outlet />
         </main>
       </div>

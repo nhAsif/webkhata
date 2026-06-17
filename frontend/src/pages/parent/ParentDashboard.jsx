@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import StatCard from '../../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
+import { CheckSquare, Calendar, BookOpen } from 'lucide-react';
 
 export default function ParentDashboard() {
   const [profile, setProfile] = useState(null);
@@ -73,19 +74,19 @@ export default function ParentDashboard() {
         <StatCard
           label="Attendance Rate"
           value={attendance ? `${attendance.summary.attendance_rate}%` : '—'}
-          icon="✅"
+          icon={<CheckSquare className="w-5 h-5" />}
           color={attendance?.summary.attendance_rate >= 75 ? '#10b981' : '#ef4444'}
         />
         <StatCard
           label="Classes Present"
           value={attendance?.summary.present ?? '—'}
-          icon="📅"
+          icon={<Calendar className="w-5 h-5" />}
           color="#6366f1"
         />
         <StatCard
           label="Batches Enrolled"
           value={profile?.batches?.length ?? '—'}
-          icon="🏫"
+          icon={<BookOpen className="w-5 h-5" />}
           color="#f59e0b"
         />
       </div>
