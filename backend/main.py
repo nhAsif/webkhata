@@ -28,6 +28,17 @@ async def lifespan(app: FastAPI):
     # Create all tables
     models.Base.metadata.create_all(bind=engine)
 
+    # --- Safe column migrations (ALTER TABLE for existing DBs) ---
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # Add weekly_timetable column to batches if it doesn't exist
+        try:
+            conn.execute(text("ALTER TABLE batches ADD COLUMN weekly_timetable TEXT"))
+            conn.commit()
+            logger.info("Migrated: added weekly_timetable column to batches")
+        except Exception:
+            pass  # Column already exists
+
     # Seed default tutor account on first run
     from auth import init_default_tutor
     db = SessionLocal()

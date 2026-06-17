@@ -144,15 +144,20 @@ def get_routine(
         models.BatchStudent.batch_id == models.Batch.id
     ).filter(models.BatchStudent.student_id == student.id).all()
 
-    weekly_timetable = {
-        "Sat": {"subjects": ["Math", "English", "Science", "Bangla"]},
-        "Sun": {"subjects": ["Math", "English", "BGS", "Religion"]},
-        "Mon": {"subjects": ["Math", "English", "Science", "Bangla"]},
-        "Tue": {"subjects": ["Math", "English", "BGS", "Religion"]},
-        "Wed": {"subjects": ["Math", "English", "Science", "Bangla"]},
-        "Thu": {"subjects": ["Math", "English", "BGS", "Religion"]},
-        "Fri": {"subjects": []},
-    }
+    ALL_DAYS = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
+
+    # Build merged timetable from all enrolled batches
+    # Each day's subjects = union across all batches that have that day in their timetable
+    merged_timetable = {day: [] for day in ALL_DAYS}
+    for batch in batches:
+        if not batch.weekly_timetable:
+            continue
+        bt = json.loads(batch.weekly_timetable) if isinstance(batch.weekly_timetable, str) else batch.weekly_timetable
+        for day, subjects in bt.items():
+            if day in merged_timetable and isinstance(subjects, list):
+                for subj in subjects:
+                    if subj not in merged_timetable[day]:
+                        merged_timetable[day].append(subj)
 
     batch_details = []
     for batch in batches:
@@ -167,8 +172,9 @@ def get_routine(
     return {
         "student_name": student.name,
         "batches": batch_details,
-        "weekly_timetable": weekly_timetable,
+        "weekly_timetable": merged_timetable,
     }
+
 
 
 @router.get("/homework")

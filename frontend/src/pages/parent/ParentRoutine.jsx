@@ -3,16 +3,6 @@ import api from '../../api/client';
 
 const DAYS_ORDER = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-const DAY_SUBJECTS = {
-  Sat: ['Math', 'English', 'Science', 'Bangla'],
-  Sun: ['Math', 'English', 'BGS', 'Religion'],
-  Mon: ['Math', 'English', 'Science', 'Bangla'],
-  Tue: ['Math', 'English', 'BGS', 'Religion'],
-  Wed: ['Math', 'English', 'Science', 'Bangla'],
-  Thu: ['Math', 'English', 'BGS', 'Religion'],
-  Fri: [],
-};
-
 export default function ParentRoutine() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +21,10 @@ export default function ParentRoutine() {
   }
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
+  const timetable = data?.weekly_timetable || {};
+
+  // Check if any batch has timetable data saved
+  const hasTimetable = DAYS_ORDER.some((d) => (timetable[d] || []).length > 0);
 
   return (
     <div>
@@ -78,51 +72,60 @@ export default function ParentRoutine() {
       {/* Weekly timetable */}
       <div className="card">
         <div className="card-header"><h2 className="card-title">📅 Weekly Timetable</h2></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {DAYS_ORDER.map((day) => {
-            const subjects = DAY_SUBJECTS[day];
-            const isToday = today === day;
-            const isOff = subjects.length === 0;
 
-            return (
-              <div
-                key={day}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '0.875rem 1rem',
-                  background: isToday ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-surface-2)',
-                  borderRadius: 'var(--radius-md)',
-                  border: isToday ? '1px solid var(--border-brand)' : '1px solid var(--border)',
-                }}
-              >
-                <div style={{
-                  width: 40,
-                  fontWeight: 700,
-                  fontSize: 'var(--font-size-sm)',
-                  color: isToday ? 'var(--color-brand-light)' : 'var(--text-secondary)',
-                  flexShrink: 0,
-                }}>
-                  {day}
-                  {isToday && <div style={{ fontSize: '9px', color: 'var(--color-brand)' }}>Today</div>}
-                </div>
+        {!hasTimetable ? (
+          <div className="empty-state" style={{ padding: '2.5rem' }}>
+            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-title">No timetable set yet</div>
+            <div className="empty-state-desc">Your tutor hasn't configured the weekly subjects yet.</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {DAYS_ORDER.map((day) => {
+              const subjects = timetable[day] || [];
+              const isToday = today === day;
+              const isOff = subjects.length === 0;
 
-                {isOff ? (
-                  <span style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', fontStyle: 'italic' }}>
-                    🏖️ Off Day
-                  </span>
-                ) : (
-                  <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-                    {subjects.map((sub) => (
-                      <span key={sub} className="badge badge-info">{sub}</span>
-                    ))}
+              return (
+                <div
+                  key={day}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '0.875rem 1rem',
+                    background: isToday ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-surface-2)',
+                    borderRadius: 'var(--radius-md)',
+                    border: isToday ? '1px solid var(--border-brand)' : '1px solid var(--border)',
+                  }}
+                >
+                  <div style={{
+                    width: 40,
+                    fontWeight: 700,
+                    fontSize: 'var(--font-size-sm)',
+                    color: isToday ? 'var(--color-brand-light)' : 'var(--text-secondary)',
+                    flexShrink: 0,
+                  }}>
+                    {day}
+                    {isToday && <div style={{ fontSize: '9px', color: 'var(--color-brand)' }}>Today</div>}
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+
+                  {isOff ? (
+                    <span style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', fontStyle: 'italic' }}>
+                      🏖️ Off Day
+                    </span>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+                      {subjects.map((sub) => (
+                        <span key={sub} className="badge badge-info">{sub}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

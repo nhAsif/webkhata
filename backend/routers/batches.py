@@ -173,20 +173,44 @@ def get_batch_routine(
         raise HTTPException(status_code=404, detail="Batch not found")
 
     schedule = json.loads(batch.schedule) if isinstance(batch.schedule, str) else batch.schedule
+
+    # Use stored timetable if available, otherwise build defaults from schedule days
+    if batch.weekly_timetable:
+        weekly_timetable = json.loads(batch.weekly_timetable) if isinstance(batch.weekly_timetable, str) else batch.weekly_timetable
+    else:
+        all_days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
+        weekly_timetable = {day: [] for day in all_days}
+
     routine = {
         "batch_id": batch.id,
         "batch_name": batch.name,
         "subject": batch.subject,
         "time_slot": batch.time_slot,
         "schedule": schedule,
-        "weekly_timetable": {
-            "Sat": ["Math", "English", "Science", "Bangla"] if "Sat" in schedule else [],
-            "Sun": ["Math", "English", "BGS", "Religion"] if "Sun" in schedule else [],
-            "Mon": ["Math", "English", "Science", "Bangla"] if "Mon" in schedule else [],
-            "Tue": ["Math", "English", "BGS", "Religion"] if "Tue" in schedule else [],
-            "Wed": ["Math", "English", "Science", "Bangla"] if "Wed" in schedule else [],
-            "Thu": ["Math", "English", "BGS", "Religion"] if "Thu" in schedule else [],
-            "Fri": [],
-        }
+        "weekly_timetable": weekly_timetable,
     }
     return routine
+
+
+@router.put("/{batch_id}/timetable")
+def update_batch_timetable(
+    batch_id: int,
+    body: schemas.BatchTimetableUpdate,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+
+    valid_days = {"Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"}
+    for day in body.weekly_timetable:
+        if day not in valid_days:
+            raise HTTPException(status_code=400, detail=f"Invalid day: {day}")
+        if not isinstance(body.weekly_timetable[day], list):
+            raise HTTPException(status_code=400, detail=f"Subjects for {day} must be a list")
+
+    batch.weekly_timetable = json.dumps(body.weekly_timetable)
+    db.commit()
+    db.refresh(batch)
+    return {"message": "Timetable updated", "weekly_timetable": body.weekly_timetable}

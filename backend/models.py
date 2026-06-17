@@ -65,6 +65,7 @@ class Batch(Base):
     subject = Column(String, nullable=False)
     schedule = Column(Text, nullable=False)  # JSON array of days
     time_slot = Column(String, nullable=False)
+    weekly_timetable = Column(Text, nullable=True)  # JSON object: {day: [subjects]}
     status = Column(String, default="active")
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

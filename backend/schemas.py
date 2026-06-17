@@ -147,6 +147,7 @@ class BatchResponse(BaseModel):
     schedule: Any
     time_slot: str
     status: str
+    weekly_timetable: Optional[Any] = None
     created_at: datetime
     updated_at: datetime
     student_count: Optional[int] = 0
@@ -154,13 +155,22 @@ class BatchResponse(BaseModel):
     model_config = {"from_attributes": True}
 
     @model_validator(mode="after")
-    def parse_schedule(self):
+    def parse_fields(self):
         if isinstance(self.schedule, str):
             try:
                 self.schedule = json.loads(self.schedule)
             except Exception:
                 self.schedule = []
+        if isinstance(self.weekly_timetable, str):
+            try:
+                self.weekly_timetable = json.loads(self.weekly_timetable)
+            except Exception:
+                self.weekly_timetable = None
         return self
+
+
+class BatchTimetableUpdate(BaseModel):
+    weekly_timetable: dict  # e.g. {"Sat": ["Math", "English"], "Sun": ["Science"]}
 
 
 # ─── Sessions ───────────────────────────────────────────────────────────────
