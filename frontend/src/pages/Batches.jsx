@@ -3,6 +3,9 @@ import toast from 'react-hot-toast';
 import api from '../api/client';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import { Input, Select } from '../components/Input';
+import Button from '../components/Button';
+import { Calendar, Trash2, Edit2, Users, BookOpen, Clock, AlertTriangle, Plus, X } from 'lucide-react';
 
 const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
@@ -36,30 +39,26 @@ const SUBJECTS = [
   'Hindu Religion and Moral Education',
   'Buddhist Religion and Moral Education',
   'Christian Religion and Moral Education',
-  // SSC Compulsory
   'Bangla First Paper',
   'Bangla Second Paper',
   'English First Paper',
   'English Second Paper',
   'Religion and Moral Education',
-  // Science Group
   'Physics',
   'Chemistry',
   'Biology',
   'Higher Mathematics',
-  // Business Studies Group
   'Accounting',
   'Finance and Banking',
   'Business Entrepreneurship',
-  // Humanities Group
   'History of Bangladesh and World Civilization',
   'Geography and Environment',
   'Civics and Citizenship',
   'Economics',
-  // Optional
   'Arabic',
   'Sanskrit',
   'Pali',
+  'Christianity',
 ];
 
 const EMPTY_FORM = {
@@ -158,7 +157,6 @@ export default function Batches() {
     try {
       const res = await api.get(`/batches/${batch.id}/routine`);
       const saved = res.data.weekly_timetable || {};
-      // Merge with empty defaults to ensure all 7 days exist
       const merged = buildEmptyTimetable();
       for (const day of DAYS) {
         if (Array.isArray(saved[day])) merged[day] = [...saved[day]];
@@ -226,7 +224,6 @@ export default function Batches() {
     }));
   };
 
-  // Timetable helpers
   const addSubject = (day, val) => {
     const subject = (val ?? ttInputs[day]).trim();
     if (!subject) return;
@@ -260,7 +257,6 @@ export default function Batches() {
     const q = ttInputs[day].trim().toLowerCase();
     const already = timetable[day];
     if (!q) {
-      // Show all not yet added
       return SUBJECTS.filter((s) => !already.includes(s)).slice(0, 8);
     }
     return SUBJECTS.filter(
@@ -288,30 +284,42 @@ export default function Batches() {
     : [];
 
   const columns = [
-    { key: 'name', label: 'Batch Name' },
+    { key: 'name', label: 'Batch Name', render: (b) => (
+      <span className="font-semibold text-pure">{b.name}</span>
+    ) },
     { key: 'subject', label: 'Subject' },
-    { key: 'schedule', label: 'Schedule', render: (b) => (
-      <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+    { key: 'schedule', label: 'Schedule Days', render: (b) => (
+      <div className="flex gap-1.5 flex-wrap">
         {(Array.isArray(b.schedule) ? b.schedule : []).map((d) => (
-          <span key={d} className="badge badge-info">{d}</span>
+          <span key={d} className="inline-flex px-2 py-0.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 text-pure font-mono uppercase">
+            {d}
+          </span>
         ))}
       </div>
     )},
-    { key: 'time_slot', label: 'Time' },
+    { key: 'time_slot', label: 'Time', render: (b) => (
+      <span className="font-mono text-xs text-stardust flex items-center gap-1">
+        <Clock className="w-3.5 h-3.5 text-bitcoin" /> {b.time_slot}
+      </span>
+    ) },
     { key: 'student_count', label: 'Students', render: (b) => (
-      <span className="badge badge-default">{b.student_count ?? 0}</span>
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono">
+        <Users className="w-3.5 h-3.5" /> {b.student_count ?? 0}
+      </span>
     )},
     { key: 'status', label: 'Status', render: (b) => (
-      <span className={`badge ${b.status === 'active' ? 'badge-success' : 'badge-default'}`}>
+      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
+        b.status === 'active' ? 'bg-green-500/15 border-green-500/30 text-green-400' : 'bg-white/5 border border-white/10 text-stardust'
+      }`}>
         {b.status}
       </span>
     )},
     { key: 'actions', label: '', render: (b) => (
-      <div className="flex gap-2">
-        <button className="btn btn-secondary btn-sm" onClick={() => openStudents(b)}>Roster</button>
-        <button className="btn btn-secondary btn-sm" onClick={() => openTimetable(b)}>Timetable</button>
-        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(b)}>Edit</button>
-        <button className="btn btn-danger btn-sm" onClick={() => archiveBatch(b.id)}>Archive</button>
+      <div className="flex items-center gap-2 justify-end">
+        <Button variant="secondary" size="sm" onClick={() => openStudents(b)}>Roster</Button>
+        <Button variant="secondary" size="sm" onClick={() => openTimetable(b)}>Timetable</Button>
+        <Button variant="secondary" size="sm" onClick={() => openEdit(b)}>Edit</Button>
+        <Button variant="danger" size="sm" onClick={() => archiveBatch(b.id)}>Archive</Button>
       </div>
     )},
   ];
@@ -320,13 +328,13 @@ export default function Batches() {
   const notEnrolled = allStudents.filter((s) => !enrolledIds.has(s.id));
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-body">
         <div>
-          <h1 className="page-title">Batches</h1>
-          <p className="page-subtitle">Manage class groups and student rosters</p>
+          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">Batches</h1>
+          <p className="text-sm text-stardust mt-1">Manage class groups and student rosters</p>
         </div>
-        <button className="btn btn-primary" onClick={openAdd}>+ Create Batch</button>
+        <Button variant="primary" onClick={openAdd}>+ Create Batch</Button>
       </div>
 
       <DataTable
@@ -337,7 +345,7 @@ export default function Batches() {
         searchKeys={['name', 'subject']}
         emptyTitle="No batches yet"
         emptyDesc="Create your first batch to organize students."
-        emptyAction={<button className="btn btn-primary" onClick={openAdd}>Create Batch</button>}
+        emptyAction={<Button variant="primary" onClick={openAdd}>Create Batch</Button>}
       />
 
       {/* Add/Edit Batch Modal */}
@@ -346,41 +354,40 @@ export default function Batches() {
         onClose={() => setModal(null)}
         title={modal === 'add' ? 'Create Batch' : 'Edit Batch'}
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setModal(null)}>Cancel</button>
-            <button className="btn btn-primary" form="batch-form" type="submit" disabled={saving}>
-              {saving ? <span className="spinner" /> : null}
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="primary" form="batch-form" type="submit" disabled={saving}>
+              {saving ? (
+                <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
+              ) : null}
               Save
-            </button>
-          </>
+            </Button>
+          </div>
         }
       >
-        <form id="batch-form" onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Batch Name *</label>
-              <input
-                className="form-input"
+        <form id="batch-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-sm font-medium text-stardust">Batch Name *</label>
+              <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
                 placeholder="e.g. SSC Math — Batch A"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Subject *</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Subject *</label>
+              <Input
                 value={form.subject}
                 onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
                 required
                 placeholder="e.g. Mathematics"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Time Slot *</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Time Slot *</label>
+              <Input
                 value={form.time_slot}
                 onChange={(e) => setForm((f) => ({ ...f, time_slot: e.target.value }))}
                 required
@@ -389,19 +396,24 @@ export default function Batches() {
             </div>
           </div>
 
-          <div className="form-group" style={{ marginTop: '0.75rem' }}>
-            <label className="form-label">Schedule Days *</label>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
-              {DAYS.map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  className={`btn btn-sm ${form.schedule.includes(day) ? 'btn-primary' : 'btn-secondary'}`}
-                  onClick={() => toggleDay(day)}
-                >
-                  {day}
-                </button>
-              ))}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Schedule Days *</label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {DAYS.map((day) => {
+                const isSelected = form.schedule.includes(day);
+                return (
+                  <Button
+                    key={day}
+                    type="button"
+                    variant={isSelected ? 'primary' : 'secondary'}
+                    size="sm"
+                    className={isSelected ? 'h-9 px-4 font-semibold' : 'h-9 px-4 opacity-80'}
+                    onClick={() => toggleDay(day)}
+                  >
+                    {day}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </form>
@@ -414,13 +426,12 @@ export default function Batches() {
         title={`Roster — ${selectedBatch?.name}`}
         size="lg"
       >
-        <div>
-          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-            <select
-              className="form-select"
+        <div className="space-y-5">
+          <div className="flex gap-3 items-center">
+            <Select
               value={addStudentId}
               onChange={(e) => setAddStudentId(e.target.value)}
-              style={{ flex: 1 }}
+              className="flex-1"
             >
               <option value="">Select student to add...</option>
               {notEnrolled.map((s) => (
@@ -428,42 +439,36 @@ export default function Batches() {
                   {s.name} ({s.class_level})
                 </option>
               ))}
-            </select>
-            <button className="btn btn-primary" onClick={addStudent} disabled={!addStudentId}>
+            </Select>
+            <Button variant="primary" onClick={addStudent} disabled={!addStudentId}>
               Add
-            </button>
+            </Button>
           </div>
 
           {batchStudents.length === 0 ? (
-            <div className="empty-state" style={{ padding: '2rem' }}>
-              <div className="empty-state-icon">👥</div>
-              <div className="empty-state-title">No students yet</div>
+            <div className="flex flex-col items-center justify-center py-10 border border-white/5 bg-void/30 rounded-2xl text-center">
+              <div className="text-3xl mb-2">👥</div>
+              <div className="text-sm font-semibold text-pure">No students yet</div>
+              <div className="text-xs text-stardust mt-1">Select a student from the dropdown above to add them.</div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
               {batchStudents.map((s) => (
                 <div
                   key={s.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0.625rem 0.875rem',
-                    background: 'var(--bg-surface-2)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border)',
-                    gap: '0.75rem',
-                  }}
+                  className="flex items-center justify-between p-3.5 bg-void/50 border border-white/5 rounded-xl gap-3 transition-colors hover:border-white/10"
                 >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>{s.name}</div>
-                    <div className="text-xs text-muted">{s.class_level} · {s.guardian_phone}</div>
+                  <div>
+                    <div className="font-semibold text-pure text-sm">{s.name}</div>
+                    <div className="text-xs text-stardust font-mono mt-0.5">{s.class_level} · {s.guardian_phone}</div>
                   </div>
-                  <button
-                    className="btn btn-danger btn-sm"
+                  <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => removeStudent(s.id)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -478,204 +483,138 @@ export default function Batches() {
         title={`Weekly Timetable — ${selectedBatch?.name}`}
         size="lg"
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setModal(null)}>Cancel</button>
-            <button className="btn btn-primary" onClick={saveTimetable} disabled={ttSaving || ttLoading}>
-              {ttSaving ? <span className="spinner" /> : null}
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="primary" onClick={saveTimetable} disabled={ttSaving || ttLoading}>
+              {ttSaving ? (
+                <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
+              ) : null}
               Save Timetable
-            </button>
-          </>
+            </Button>
+          </div>
         }
       >
         {ttLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-            <span className="spinner" />
+          <div className="flex items-center justify-center py-12">
+            <span className="w-8 h-8 border-2 border-bitcoin/30 border-t-bitcoin rounded-full animate-spin" />
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div className="space-y-4">
             {/* Active days notice */}
             {schedule.length > 0 && (
-              <div style={{
-                padding: '0.5rem 0.875rem',
-                background: 'var(--bg-surface-2)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                fontSize: '0.8rem',
-                color: 'var(--text-muted)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                flexWrap: 'wrap',
-              }}>
-                <span>📅 Active days:</span>
+              <div className="p-3 bg-white/5 border border-white/5 rounded-xl text-xs text-stardust flex items-center gap-2 flex-wrap">
+                <span className="font-mono uppercase font-bold text-bitcoin">📅 Active days:</span>
                 {schedule.map((d) => (
-                  <span key={d} className="badge badge-info">{DAY_LABELS[d] || d}</span>
+                  <span key={d} className="inline-flex px-2 py-0.5 rounded bg-bitcoin/10 border border-bitcoin/20 text-bitcoin font-mono text-[10px] uppercase font-bold">
+                    {DAY_LABELS[d] || d}
+                  </span>
                 ))}
               </div>
             )}
 
             {/* Per-day timetable editor */}
-            {DAYS.map((day) => {
-              const isActive = schedule.includes(day);
-              return (
+            <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
+              {DAYS.map((day) => {
+                const isActive = schedule.includes(day);
+                return (
                   <div
-                  key={day}
-                  style={{
-                    borderRadius: 'var(--radius-md)',
-                    border: `1px solid ${isActive ? 'var(--color-brand)' : 'var(--border)'}`,
-                    background: isActive ? 'color-mix(in srgb, var(--color-brand) 5%, var(--bg-surface))' : 'var(--bg-surface-2)',
-                    opacity: isActive ? 1 : 0.6,
-                    transition: 'opacity 0.2s',
-                  }}
-                >
-                  {/* Day header */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.5rem 0.875rem',
-                    borderBottom: timetable[day].length > 0 || isActive ? '1px solid var(--border)' : 'none',
-                    background: isActive
-                      ? 'color-mix(in srgb, var(--color-brand) 12%, var(--bg-surface))'
-                      : 'transparent',
-                    borderTopLeftRadius: 'calc(var(--radius-md) - 1px)',
-                    borderTopRightRadius: 'calc(var(--radius-md) - 1px)',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                        {DAY_LABELS[day]}
-                      </span>
-                      <span style={{
-                        fontSize: '0.7rem',
-                        color: isActive ? 'var(--color-brand)' : 'var(--text-muted)',
-                        fontWeight: 500,
-                      }}>
-                        {isActive ? '● Active' : '○ Off'}
+                    key={day}
+                    className={`rounded-xl border transition-all duration-300 overflow-hidden ${
+                      isActive 
+                        ? 'border-bitcoin/30 bg-bitcoin/[0.02]' 
+                        : 'border-white/5 bg-void/50 opacity-60'
+                    }`}
+                  >
+                    {/* Day header */}
+                    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-white/5 ${
+                      isActive ? 'bg-bitcoin/[0.06]' : 'bg-void/40'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-heading font-semibold text-sm text-pure">
+                          {DAY_LABELS[day]}
+                        </span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
+                          isActive ? 'text-bitcoin' : 'text-stardust'
+                        }`}>
+                          {isActive ? '● Active' : '○ Off'}
+                        </span>
+                      </div>
+                      <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-bold font-mono rounded bg-white/5 text-stardust border border-white/10">
+                        {timetable[day].length}
                       </span>
                     </div>
-                    <span className="badge badge-default" style={{ minWidth: '1.5rem', textAlign: 'center' }}>
-                      {timetable[day].length}
-                    </span>
-                  </div>
 
-                  {/* Subjects list + input */}
-                  <div style={{ padding: '0.625rem 0.875rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {/* Subject chips */}
-                    {timetable[day].length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-                        {timetable[day].map((subj, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.3rem',
-                              padding: '0.2rem 0.6rem',
-                              borderRadius: '99px',
-                              background: isActive
-                                ? 'color-mix(in srgb, var(--color-brand) 18%, var(--bg-surface))'
-                                : 'var(--bg-surface)',
-                              border: `1px solid ${isActive ? 'var(--color-brand)' : 'var(--border)'}`,
-                              fontSize: '0.8rem',
-                              fontWeight: 500,
-                              color: isActive ? 'var(--color-brand)' : 'var(--text-primary)',
-                              transition: 'all 0.15s',
-                            }}
-                          >
-                            {subj}
-                            <button
-                              type="button"
-                              onClick={() => removeSubject(day, idx)}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '0',
-                                lineHeight: 1,
-                                color: 'inherit',
-                                opacity: 0.6,
-                                fontSize: '0.85rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                              }}
-                              title={`Remove ${subj}`}
+                    {/* Subjects list + input */}
+                    <div className="p-4 space-y-3">
+                      {/* Subject chips */}
+                      {timetable[day].length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {timetable[day].map((subj, idx) => (
+                            <span
+                              key={idx}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold font-body ${
+                                isActive
+                                  ? 'bg-bitcoin/10 border-bitcoin/20 text-bitcoin'
+                                  : 'bg-white/5 border-white/10 text-pure/80'
+                              }`}
                             >
-                              ✕
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Input row */}
-                    <div style={{ display: 'flex', gap: '0.5rem', position: 'relative' }} ref={el => dropdownRefs.current[day] = el}>
-                      <input
-                        ref={(el) => { inputRefs.current[day] = el; }}
-                        className="form-input"
-                        style={{ flex: 1, fontSize: '0.8rem', padding: '0.3rem 0.6rem', height: '2rem' }}
-                        placeholder={`Add subject for ${day}…`}
-                        value={ttInputs[day]}
-                        onChange={(e) => setTtInputs((inp) => ({ ...inp, [day]: e.target.value }))}
-                        onKeyDown={(e) => handleTtKeyDown(e, day)}
-                        onFocus={() => setTtDropdown(dd => ({...dd, [day]: true}))}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => addSubject(day)}
-                        disabled={!ttInputs[day].trim()}
-                        style={{ whiteSpace: 'nowrap' }}
-                      >
-                        + Add
-                      </button>
-
-                      {/* Dropdown */}
-                      {ttDropdown[day] && getSuggestions(day).length > 0 && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          right: '60px',
-                          marginTop: '4px',
-                          background: 'var(--bg-surface-3)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius-sm)',
-                          boxShadow: 'var(--shadow-md)',
-                          zIndex: 10,
-                          maxHeight: '150px',
-                          overflowY: 'auto',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          padding: '0.25rem'
-                        }}>
-                          {getSuggestions(day).map(s => (
-                            <button
-                              key={s}
-                              type="button"
-                              onClick={() => addSubject(day, s)}
-                              style={{
-                                textAlign: 'left',
-                                padding: '0.4rem 0.6rem',
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--text-primary)',
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                borderRadius: '4px'
-                              }}
-                              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-surface-2)'}
-                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                            >
-                              {s}
-                            </button>
+                              {subj}
+                              <button
+                                type="button"
+                                onClick={() => removeSubject(day, idx)}
+                                className="text-[10px] opacity-60 hover:opacity-100 hover:text-red-400 transition-colors"
+                                title={`Remove ${subj}`}
+                              >
+                                ✕
+                              </button>
+                            </span>
                           ))}
                         </div>
                       )}
+
+                      {/* Input row */}
+                      <div className="flex gap-2 relative" ref={el => dropdownRefs.current[day] = el}>
+                        <input
+                          ref={(el) => { inputRefs.current[day] = el; }}
+                          className="flex h-9 flex-1 bg-black/40 border border-white/10 rounded-lg px-3 text-xs text-pure transition-all duration-200 placeholder:text-white/20 focus-visible:border-bitcoin focus-visible:shadow-[0_0_10px_rgba(247,147,26,0.15)] focus-visible:outline-none"
+                          placeholder={`Add subject for ${day}…`}
+                          value={ttInputs[day]}
+                          onChange={(e) => setTtInputs((inp) => ({ ...inp, [day]: e.target.value }))}
+                          onKeyDown={(e) => handleTtKeyDown(e, day)}
+                          onFocus={() => setTtDropdown(dd => ({...dd, [day]: true}))}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="h-9 px-3 rounded-lg text-xs"
+                          onClick={() => addSubject(day)}
+                          disabled={!ttInputs[day].trim()}
+                        >
+                          Add
+                        </Button>
+
+                        {/* Dropdown */}
+                        {ttDropdown[day] && getSuggestions(day).length > 0 && (
+                          <div className="absolute top-full left-0 right-14 mt-1 bg-matter border border-white/10 rounded-lg shadow-xl z-50 max-h-40 overflow-y-auto p-1 backdrop-blur-md">
+                            {getSuggestions(day).map(s => (
+                              <button
+                                key={s}
+                                type="button"
+                                onClick={() => addSubject(day, s)}
+                                className="w-full text-left px-3 py-1.5 text-xs text-pure hover:bg-white/5 rounded transition-colors font-body"
+                              >
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </Modal>

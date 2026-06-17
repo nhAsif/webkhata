@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import api from '../../api/client';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -10,14 +11,14 @@ const GRADE_COLORS = {
 function GradeTag({ grade }) {
   const color = GRADE_COLORS[grade] || '#8b92a8';
   return (
-    <span style={{
-      fontWeight: 700,
-      color,
-      background: color + '22',
-      padding: '2px 10px',
-      borderRadius: '999px',
-      fontSize: 'var(--font-size-sm)',
-    }}>
+    <span 
+      className="rounded-full px-2.5 py-0.5 text-xs font-mono border font-bold"
+      style={{
+        color,
+        backgroundColor: color + '22',
+        borderColor: color + '50'
+      }}
+    >
       {grade}
     </span>
   );
@@ -42,95 +43,101 @@ export default function ParentResults() {
 
   if (loading) {
     return (
-      <div>
-        <div className="page-header"><h1 className="page-title">Results</h1></div>
-        <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
+        </div>
+        <div className="h-[300px] bg-white/5 animate-pulse rounded-2xl border border-white/10" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="page-title">Results</h1>
-          <p className="page-subtitle">Exam scores and grades for {data?.student_name}</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
+          <p className="text-stardust text-sm mt-1">Exam scores and grades for {data?.student_name}</p>
         </div>
       </div>
 
       {/* Progress Chart */}
       {chartData.length > 0 && (
-        <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <div className="card-header">
-            <h2 className="card-title">📈 Performance Trend</h2>
-          </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} unit="%" />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
-              />
-              <Line
-                type="monotone"
-                dataKey="score"
-                stroke="var(--color-brand)"
-                strokeWidth={2.5}
-                dot={{ fill: 'var(--color-brand)', r: 5 }}
-                activeDot={{ r: 7 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>📈 Performance Trend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#8b92a8' }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#8b92a8' }} unit="%" />
+                <Tooltip
+                  contentStyle={{ background: '#0F1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, color: '#fff' }}
+                  itemStyle={{ color: '#F7931A' }}
+                  formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#F7931A"
+                  strokeWidth={2.5}
+                  dot={{ fill: '#F7931A', r: 5 }}
+                  activeDot={{ r: 7, fill: '#FFD600' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       )}
 
       {/* Results Table */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">All Results</h2>
-          <span className="badge badge-default">{results.length} exams</span>
-        </div>
-
-        {results.length === 0 ? (
-          <div className="empty-state" style={{ padding: '2rem' }}>
-            <div className="empty-state-icon">📊</div>
-            <div className="empty-state-title">No results yet</div>
-          </div>
-        ) : (
-          <div className="table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Exam</th>
-                  <th>Subject</th>
-                  <th>Date</th>
-                  <th>Score</th>
-                  <th>%</th>
-                  <th>Grade</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((r) => (
-                  <tr key={r.id}>
-                    <td style={{ fontWeight: 500 }}>{r.exam_name}</td>
-                    <td>{r.subject}</td>
-                    <td className="text-muted">{r.exam_date}</td>
-                    <td>{r.score} / {r.total_marks}</td>
-                    <td>
-                      <span style={{ color: r.percentage >= 80 ? 'var(--color-success)' : r.percentage >= 50 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
-                        {r.percentage}%
-                      </span>
-                    </td>
-                    <td><GradeTag grade={r.grade} /></td>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>All Results</CardTitle>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/10 text-pure border-white/20">{results.length} exams</span>
+        </CardHeader>
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          {results.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10 m-6">
+              <div className="text-4xl mb-4">📊</div>
+              <div className="text-lg font-heading text-pure">No results yet</div>
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10 text-stardust text-sm uppercase tracking-wider font-heading">
+                    <th className="p-4 font-medium">Exam</th>
+                    <th className="p-4 font-medium">Subject</th>
+                    <th className="p-4 font-medium">Date</th>
+                    <th className="p-4 font-medium">Score</th>
+                    <th className="p-4 font-medium">%</th>
+                    <th className="p-4 font-medium">Grade</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody className="text-sm font-body">
+                  {results.map((r) => (
+                    <tr key={r.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="p-4 font-medium text-pure">{r.exam_name}</td>
+                      <td className="p-4 text-stardust">{r.subject}</td>
+                      <td className="p-4 text-stardust">{r.exam_date}</td>
+                      <td className="p-4 font-mono text-pure">{r.score} / {r.total_marks}</td>
+                      <td className="p-4 font-mono">
+                        <span className={r.percentage >= 80 ? 'text-green-400' : r.percentage >= 50 ? 'text-yellow-400' : 'text-red-400'}>
+                          {r.percentage}%
+                        </span>
+                      </td>
+                      <td className="p-4"><GradeTag grade={r.grade} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

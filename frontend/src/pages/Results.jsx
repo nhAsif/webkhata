@@ -4,6 +4,9 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import api from '../api/client';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
+import Button from '../components/Button';
+import { Input, Select } from '../components/Input';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -13,14 +16,14 @@ const GRADE_COLORS = {
 function GradeTag({ grade }) {
   const color = GRADE_COLORS[grade] || '#8b92a8';
   return (
-    <span style={{
-      fontWeight: 700,
-      color,
-      background: color + '22',
-      padding: '2px 8px',
-      borderRadius: '999px',
-      fontSize: 'var(--font-size-xs)',
-    }}>
+    <span 
+      className="rounded-full px-2.5 py-0.5 text-xs font-mono border font-bold"
+      style={{
+        color,
+        backgroundColor: color + '22',
+        borderColor: color + '50'
+      }}
+    >
       {grade}
     </span>
   );
@@ -142,68 +145,72 @@ export default function Results() {
     { key: 'subject', label: 'Subject' },
     { key: 'exam_name', label: 'Exam' },
     { key: 'exam_date', label: 'Date' },
-    { key: 'score', label: 'Score', render: (r) => `${r.score} / ${r.total_marks}` },
-    { key: 'percentage', label: '%', render: (r) => `${((r.score / r.total_marks) * 100).toFixed(1)}%` },
+    { key: 'score', label: 'Score', render: (r) => <span className="font-mono">{r.score} / {r.total_marks}</span> },
+    { key: 'percentage', label: '%', render: (r) => <span className="font-mono">{((r.score / r.total_marks) * 100).toFixed(1)}%</span> },
     { key: 'grade', label: 'Grade', render: (r) => <GradeTag grade={r.grade} /> },
   ];
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="page-title">Results</h1>
-          <p className="page-subtitle">Exam scores and academic progress</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
+          <p className="text-stardust text-sm mt-1">Exam scores and academic progress</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn btn-secondary" onClick={() => setBulkModal(true)}>📋 Bulk Entry</button>
-          <button className="btn btn-primary" onClick={() => setAddModal(true)}>+ Add Result</button>
+          <Button variant="secondary" onClick={() => setBulkModal(true)}>📋 Bulk Entry</Button>
+          <Button variant="primary" onClick={() => setAddModal(true)}>+ Add Result</Button>
         </div>
       </div>
 
       {/* Student Filter */}
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="flex gap-3 items-center">
-          <label className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Select Student:</label>
-          <select
-            className="form-select"
-            value={filterStudent}
-            onChange={(e) => setFilterStudent(e.target.value)}
-            style={{ width: 'auto', minWidth: '240px' }}
-          >
-            <option value="">Choose a student...</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>{s.name} ({s.class_level})</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <Card className="mb-4">
+        <CardContent className="p-6">
+          <div className="flex gap-3 items-center flex-wrap">
+            <label className="text-sm font-medium text-stardust whitespace-nowrap">Select Student:</label>
+            <Select
+              value={filterStudent}
+              onChange={(e) => setFilterStudent(e.target.value)}
+              className="w-auto min-w-[240px]"
+            >
+              <option value="">Choose a student...</option>
+              {students.map((s) => (
+                <option key={s.id} value={s.id}>{s.name} ({s.class_level})</option>
+              ))}
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Progress Chart */}
       {filterStudent && chartData.length > 0 && (
-        <div className="card" style={{ marginBottom: '1rem' }}>
-          <div className="card-header">
-            <h2 className="card-title">📈 Progress Chart</h2>
-          </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} unit="%" />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(val) => [`${val}%`, 'Score']}
-              />
-              <Line
-                type="monotone"
-                dataKey="score"
-                stroke="var(--color-brand)"
-                strokeWidth={2}
-                dot={{ fill: 'var(--color-brand)', r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>📈 Progress Chart</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#8b92a8' }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#8b92a8' }} unit="%" />
+                <Tooltip
+                  contentStyle={{ background: '#0F1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, color: '#fff' }}
+                  itemStyle={{ color: '#F7931A' }}
+                  formatter={(val) => [`${val}%`, 'Score']}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#F7931A"
+                  strokeWidth={2}
+                  dot={{ fill: '#F7931A', r: 4 }}
+                  activeDot={{ r: 6, fill: '#FFD600' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       )}
 
       {filterStudent ? (
@@ -213,12 +220,12 @@ export default function Results() {
           loading={loading}
           emptyTitle="No results yet"
           emptyDesc="Add exam results using the button above."
-          emptyAction={<button className="btn btn-primary" onClick={() => setAddModal(true)}>Add Result</button>}
+          emptyAction={<Button variant="primary" onClick={() => setAddModal(true)}>Add Result</Button>}
         />
       ) : (
-        <div className="empty-state" style={{ padding: '3rem' }}>
-          <div className="empty-state-icon">📊</div>
-          <div className="empty-state-title">Select a student to view results</div>
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10">
+          <div className="text-4xl mb-4">📊</div>
+          <div className="text-lg font-heading text-pure">Select a student to view results</div>
         </div>
       )}
 
@@ -228,42 +235,39 @@ export default function Results() {
         onClose={() => setAddModal(false)}
         title="Add Exam Result"
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setAddModal(false)}>Cancel</button>
-            <button className="btn btn-primary" form="result-form" type="submit" disabled={saving}>
-              {saving ? <span className="spinner" /> : null} Add Result
-            </button>
-          </>
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
+            <Button variant="primary" form="result-form" type="submit" disabled={saving}>
+              {saving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null} Add Result
+            </Button>
+          </div>
         }
       >
-        <form id="result-form" onSubmit={handleAdd}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Student *</label>
-              <select
-                className="form-select"
+        <form id="result-form" onSubmit={handleAdd} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Student *</label>
+              <Select
                 value={form.student_id}
                 onChange={(e) => setForm((f) => ({ ...f, student_id: e.target.value }))}
                 required
               >
                 <option value="">Select student...</option>
                 {students.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
+              </Select>
             </div>
-            <div className="form-group">
-              <label className="form-label">Subject *</label>
-              <input
-                className="form-input"
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Subject *</label>
+              <Input
                 value={form.subject}
                 onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
                 required
                 placeholder="e.g. Mathematics"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Exam Name *</label>
-              <input
-                className="form-input"
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Exam Name *</label>
+              <Input
                 list="exam-types"
                 value={form.exam_name}
                 onChange={(e) => setForm((f) => ({ ...f, exam_name: e.target.value }))}
@@ -274,21 +278,19 @@ export default function Results() {
                 {EXAM_TYPES.map((t) => <option key={t} value={t} />)}
               </datalist>
             </div>
-            <div className="form-group">
-              <label className="form-label">Exam Date *</label>
-              <input
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Exam Date *</label>
+              <Input
                 type="date"
-                className="form-input"
                 value={form.exam_date}
                 onChange={(e) => setForm((f) => ({ ...f, exam_date: e.target.value }))}
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Score *</label>
-              <input
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Score *</label>
+              <Input
                 type="number"
-                className="form-input"
                 value={form.score}
                 onChange={(e) => setForm((f) => ({ ...f, score: e.target.value }))}
                 required
@@ -298,11 +300,10 @@ export default function Results() {
                 placeholder="0"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Total Marks *</label>
-              <input
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Total Marks *</label>
+              <Input
                 type="number"
-                className="form-input"
                 value={form.total_marks}
                 onChange={(e) => setForm((f) => ({ ...f, total_marks: e.target.value }))}
                 required
@@ -322,39 +323,36 @@ export default function Results() {
         title="Bulk Result Entry"
         size="lg"
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setBulkModal(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleBulk} disabled={bulkSaving || !bulkStudents.length}>
-              {bulkSaving ? <span className="spinner" /> : null} Save All
-            </button>
-          </>
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="secondary" onClick={() => setBulkModal(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleBulk} disabled={bulkSaving || !bulkStudents.length}>
+              {bulkSaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null} Save All
+            </Button>
+          </div>
         }
       >
-        <div className="form-grid" style={{ marginBottom: '1rem' }}>
-          <div className="form-group">
-            <label className="form-label">Batch *</label>
-            <select
-              className="form-select"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Batch *</label>
+            <Select
               value={bulkBatch}
               onChange={(e) => { setBulkBatch(e.target.value); loadBulkStudents(e.target.value); }}
             >
               <option value="">Select batch...</option>
               {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
+            </Select>
           </div>
-          <div className="form-group">
-            <label className="form-label">Subject *</label>
-            <input
-              className="form-input"
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Subject *</label>
+            <Input
               value={bulkSubject}
               onChange={(e) => setBulkSubject(e.target.value)}
               placeholder="e.g. Mathematics"
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Exam Name *</label>
-            <input
-              className="form-input"
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Exam Name *</label>
+            <Input
               list="bulk-exam-types"
               value={bulkExamName}
               onChange={(e) => setBulkExamName(e.target.value)}
@@ -364,20 +362,18 @@ export default function Results() {
               {EXAM_TYPES.map((t) => <option key={t} value={t} />)}
             </datalist>
           </div>
-          <div className="form-group">
-            <label className="form-label">Exam Date</label>
-            <input
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Exam Date</label>
+            <Input
               type="date"
-              className="form-input"
               value={bulkDate}
               onChange={(e) => setBulkDate(e.target.value)}
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Total Marks</label>
-            <input
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Total Marks</label>
+            <Input
               type="number"
-              className="form-input"
               value={bulkTotalMarks}
               onChange={(e) => setBulkTotalMarks(e.target.value)}
               min="1"
@@ -386,25 +382,16 @@ export default function Results() {
         </div>
 
         {bulkStudents.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div className="flex flex-col gap-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
             {bulkStudents.map((s) => (
               <div
                 key={s.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '0.625rem 0.875rem',
-                  background: 'var(--bg-surface-2)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border)',
-                }}
+                className="flex items-center gap-4 py-2 px-3 bg-white/5 rounded-xl border border-white/10"
               >
-                <div style={{ flex: 1, fontWeight: 500, fontSize: 'var(--font-size-sm)' }}>{s.name}</div>
-                <input
+                <div className="flex-1 font-medium text-sm text-pure">{s.name}</div>
+                <Input
                   type="number"
-                  className="form-input"
-                  style={{ width: '100px' }}
+                  className="w-24 h-10"
                   placeholder="Score"
                   value={bulkScores[s.id] || ''}
                   onChange={(e) => setBulkScores((prev) => ({ ...prev, [s.id]: e.target.value }))}
@@ -413,7 +400,7 @@ export default function Results() {
                   step="0.5"
                 />
                 {bulkScores[s.id] && bulkTotalMarks && (
-                  <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', width: '40px', textAlign: 'right' }}>
+                  <span className="text-xs font-mono text-stardust w-10 text-right">
                     {((parseFloat(bulkScores[s.id]) / parseFloat(bulkTotalMarks)) * 100).toFixed(0)}%
                   </span>
                 )}
@@ -423,9 +410,9 @@ export default function Results() {
         )}
 
         {!bulkBatch && (
-          <div className="empty-state" style={{ padding: '1.5rem' }}>
-            <div className="empty-state-icon">📝</div>
-            <div className="empty-state-title">Select a batch to enter scores</div>
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10 mt-4">
+            <div className="text-3xl mb-2">📝</div>
+            <div className="text-sm text-pure font-heading">Select a batch to enter scores</div>
           </div>
         )}
       </Modal>

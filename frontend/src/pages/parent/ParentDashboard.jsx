@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import StatCard from '../../components/StatCard';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 
 export default function ParentDashboard() {
   const [profile, setProfile] = useState(null);
@@ -19,13 +20,15 @@ export default function ParentDashboard() {
 
   if (loading) {
     return (
-      <div>
-        <div className="stats-grid">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="stat-card">
-              <div className="skeleton skeleton-text" style={{ height: '12px', width: '80px' }} />
-              <div className="skeleton skeleton-text" style={{ height: '36px', width: '60px' }} />
-            </div>
+            <Card key={i} className="animate-pulse bg-white/5 border-white/10">
+              <CardContent className="p-6">
+                <div className="h-3 bg-white/5 rounded w-20 mb-4" />
+                <div className="h-9 bg-white/5 rounded w-16" />
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -35,48 +38,38 @@ export default function ParentDashboard() {
   const student = profile?.student;
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Welcome{student ? `, ${student.name.split(' ')[0]}` : ''}!</h1>
-          <p className="page-subtitle">Your child's academic overview</p>
-        </div>
+    <div className="space-y-6">
+      <div className="mb-8">
+        <h1 className="text-2xl font-heading text-pure font-bold">Welcome{student ? `, ${student.name.split(' ')[0]}` : ''}!</h1>
+        <p className="text-stardust font-body mt-1">Your child's academic overview</p>
       </div>
 
       {student && (
-        <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--color-brand), var(--color-accent))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.75rem',
-                flexShrink: 0,
-              }}
-            >
-              👨‍🎓
-            </div>
-            <div>
-              <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700 }}>{student.name}</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>
-                Class {student.class_level} · Enrolled since {student.enrollment_date}
+        <Card className="bg-matter border-white/10 mb-6">
+          <CardContent className="p-6">
+            <div className="flex gap-6 items-center flex-wrap">
+              <div className="w-16 h-16 rounded-full bg-bitcoin/20 text-bitcoin flex items-center justify-center text-3xl flex-shrink-0 shadow-[0_0_15px_rgba(247,147,26,0.2)] border border-bitcoin/30">
+                👨‍🎓
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-                {(student.subjects || []).map((sub) => (
-                  <span key={sub} className="badge badge-info">{sub}</span>
-                ))}
+              <div>
+                <div className="text-xl font-heading text-pure font-bold">{student.name}</div>
+                <div className="text-stardust font-body text-sm mt-1">
+                  Class {student.class_level} · Enrolled since {student.enrollment_date}
+                </div>
+                <div className="flex gap-2 mt-3 flex-wrap">
+                  {(student.subjects || []).map((sub) => (
+                    <span key={sub} className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      {sub}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
-      <div className="stats-grid" style={{ marginBottom: '1.5rem' }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <StatCard
           label="Attendance Rate"
           value={attendance ? `${attendance.summary.attendance_rate}%` : '—'}
@@ -98,33 +91,29 @@ export default function ParentDashboard() {
       </div>
 
       {profile?.batches?.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">📚 Enrolled Batches</h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {profile.batches.map((b) => (
-              <div
-                key={b.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '0.75rem 1rem',
-                  background: 'var(--bg-surface-2)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>{b.name}</div>
-                  <div className="text-xs text-muted">{b.subject}</div>
+        <Card className="bg-matter border-white/10">
+          <CardHeader>
+            <CardTitle className="font-heading text-pure">📚 Enrolled Batches</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-0">
+            <div className="flex flex-col gap-3">
+              {profile.batches.map((b) => (
+                <div
+                  key={b.id}
+                  className="flex items-center gap-4 py-3 px-4 bg-white/5 rounded-lg border border-white/10 hover:border-bitcoin/30 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="font-heading text-pure font-semibold">{b.name}</div>
+                    <div className="text-xs text-stardust font-body mt-1">{b.subject}</div>
+                  </div>
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/10 text-pure border-white/20">
+                    {b.time_slot}
+                  </span>
                 </div>
-                <span className="badge badge-info">{b.time_slot}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

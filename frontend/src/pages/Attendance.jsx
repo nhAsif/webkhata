@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../api/client';
 import Modal from '../components/Modal';
+import { Card, CardContent } from '../components/Card';
+import Button from '../components/Button';
+import { Input, Select } from '../components/Input';
 
 const STATUS_OPTIONS = ['present', 'absent', 'late'];
 
 const STATUS_STYLES = {
-  present: { background: 'var(--color-success-bg)', color: 'var(--color-success)', border: '1px solid rgba(16,185,129,0.3)' },
-  absent: { background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid rgba(239,68,68,0.3)' },
-  late: { background: 'var(--color-warning-bg)', color: 'var(--color-warning)', border: '1px solid rgba(245,158,11,0.3)' },
+  present: 'bg-green-500/10 text-green-400 border-green-500/30',
+  absent: 'bg-red-500/10 text-red-400 border-red-500/30',
+  late: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
 };
 
 function today() {
@@ -118,147 +121,134 @@ export default function Attendance() {
   const lateCount = Object.values(attendance).filter((s) => s === 'late').length;
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="page-title">Attendance</h1>
-          <p className="page-subtitle">Mark and track student attendance</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Attendance</h1>
+          <p className="text-stardust text-sm mt-1">Mark and track student attendance</p>
         </div>
-        <button className="btn btn-secondary" onClick={() => setSummaryModal(true)}>
+        <Button variant="secondary" onClick={() => setSummaryModal(true)}>
           📊 Monthly Summary
-        </button>
+        </Button>
       </div>
 
       {/* Controls */}
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="form-grid">
-          <div className="form-group">
-            <label className="form-label">Batch *</label>
-            <select
-              className="form-select"
-              value={selectedBatch}
-              onChange={(e) => setSelectedBatch(e.target.value)}
-            >
-              <option value="">Select batch...</option>
-              {batches.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
+      <Card className="mb-4">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Batch *</label>
+              <Select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+              >
+                <option value="">Select batch...</option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Session Date *</label>
+              <Input
+                type="date"
+                value={sessionDate}
+                onChange={(e) => setSessionDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Topic (optional)</label>
+              <Input
+                placeholder="What was covered today?"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Session Date *</label>
-            <input
-              type="date"
-              className="form-input"
-              value={sessionDate}
-              onChange={(e) => setSessionDate(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Topic (optional)</label>
-            <input
-              className="form-input"
-              placeholder="What was covered today?"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {selectedBatch && (
-        <div className="card">
-          {/* Summary bar */}
-          {students.length > 0 && (
-            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              <span className="badge badge-success">✅ Present: {presentCount}</span>
-              <span className="badge badge-danger">❌ Absent: {absentCount}</span>
-              <span className="badge badge-warning">⏰ Late: {lateCount}</span>
-              <div style={{ flex: 1 }} />
-              <button className="btn btn-secondary btn-sm" onClick={() => markAll('present')}>Mark All Present</button>
-              <button className="btn btn-secondary btn-sm" onClick={() => markAll('absent')}>Mark All Absent</button>
-            </div>
-          )}
+        <Card>
+          <CardContent className="p-6">
+            {/* Summary bar */}
+            {students.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">✅ Present: {presentCount}</span>
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">❌ Absent: {absentCount}</span>
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">⏰ Late: {lateCount}</span>
+                <div className="flex-1" />
+                <Button variant="secondary" size="sm" onClick={() => markAll('present')}>Mark All Present</Button>
+                <Button variant="secondary" size="sm" onClick={() => markAll('absent')}>Mark All Absent</Button>
+              </div>
+            )}
 
-          {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: '56px' }} />
-              ))}
-            </div>
-          ) : students.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">👥</div>
-              <div className="empty-state-title">No students in this batch</div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {students.map((student) => {
-                const status = attendance[student.id] || 'present';
-                return (
-                  <div
-                    key={student.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '0.875rem 1rem',
-                      background: 'var(--bg-surface-2)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border)',
-                      gap: '1rem',
-                      cursor: 'pointer',
-                      transition: 'all var(--transition-fast)',
-                      ...STATUS_STYLES[status],
-                    }}
-                    onClick={() => cycleStatus(student.id)}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)' }}>{student.name}</div>
-                      <div className="text-xs" style={{ opacity: 0.7 }}>{student.class_level}</div>
+            {loading ? (
+              <div className="flex flex-col gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-14 bg-white/5 animate-pulse rounded-xl border border-white/10" />
+                ))}
+              </div>
+            ) : students.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10">
+                <div className="text-3xl mb-2">👥</div>
+                <div className="text-sm font-heading text-pure">No students in this batch</div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {students.map((student) => {
+                  const status = attendance[student.id] || 'present';
+                  return (
+                    <div
+                      key={student.id}
+                      className={`flex items-center p-3.5 rounded-xl border gap-4 cursor-pointer transition-all duration-200 ${STATUS_STYLES[status]}`}
+                      onClick={() => cycleStatus(student.id)}
+                    >
+                      <div className="flex-1">
+                        <div className="font-semibold text-sm font-body">{student.name}</div>
+                        <div className="text-xs opacity-70 font-mono mt-0.5">{student.class_level}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        {STATUS_OPTIONS.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 ${
+                              status === s
+                                ? s === 'present' ? 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.5)]' : s === 'absent' ? 'bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-yellow-500 text-white shadow-[0_0_10px_rgba(234,179,8,0.5)]'
+                                : 'bg-white/5 text-stardust hover:bg-white/10'
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setAttendance((prev) => ({ ...prev, [student.id]: s }));
+                            }}
+                          >
+                            {s === 'present' ? '✓' : s === 'absent' ? '✗' : '⏰'}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      {STATUS_OPTIONS.map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          className="btn btn-sm"
-                          style={{
-                            opacity: status === s ? 1 : 0.3,
-                            fontWeight: status === s ? 700 : 400,
-                            background: status === s ? (s === 'present' ? 'var(--color-success)' : s === 'absent' ? 'var(--color-danger)' : 'var(--color-warning)') : 'var(--bg-surface-3)',
-                            color: status === s ? 'white' : 'var(--text-muted)',
-                            border: 'none',
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setAttendance((prev) => ({ ...prev, [student.id]: s }));
-                          }}
-                        >
-                          {s === 'present' ? '✓' : s === 'absent' ? '✗' : '⏰'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
 
-          {students.length > 0 && (
-            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-                {saving ? <span className="spinner" /> : null}
-                {existingSession ? 'Update Attendance' : 'Save Attendance'}
-              </button>
-            </div>
-          )}
-        </div>
+            {students.length > 0 && (
+              <div className="mt-6 flex justify-end">
+                <Button variant="primary" onClick={handleSave} disabled={saving}>
+                  {saving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null}
+                  {existingSession ? 'Update Attendance' : 'Save Attendance'}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {!selectedBatch && (
-        <div className="empty-state" style={{ padding: '3rem' }}>
-          <div className="empty-state-icon">📋</div>
-          <div className="empty-state-title">Select a batch to mark attendance</div>
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10">
+          <div className="text-4xl mb-4">📋</div>
+          <div className="text-lg font-heading text-pure">Select a batch to mark attendance</div>
         </div>
       )}
 
@@ -269,50 +259,42 @@ export default function Attendance() {
         title="Monthly Attendance Summary"
         size="lg"
       >
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <label className="form-label">Select Month</label>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <input
+        <div className="mb-6 space-y-1.5">
+          <label className="text-sm font-medium text-stardust">Select Month</label>
+          <div className="flex gap-3">
+            <Input
               type="month"
-              className="form-input"
               value={summaryMonth}
               onChange={(e) => setSummaryMonth(e.target.value)}
+              className="max-w-[200px]"
             />
-            <button className="btn btn-primary" onClick={loadSummary}>Load</button>
+            <Button variant="primary" onClick={loadSummary}>Load</Button>
           </div>
         </div>
 
         {summary && (
           <div>
-            <div className="text-xs text-muted" style={{ marginBottom: '0.75rem' }}>
+            <div className="text-xs text-stardust mb-3 font-mono">
               {summary.total_sessions} sessions in {summary.month}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
               {summary.summary?.map((row) => (
                 <div
                   key={row.student_id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    padding: '0.625rem 0.875rem',
-                    background: 'var(--bg-surface-2)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border)',
-                  }}
+                  className="flex items-center gap-4 py-2 px-3 bg-white/5 rounded-xl border border-white/10"
                 >
-                  <div style={{ flex: 1, fontWeight: 500, fontSize: 'var(--font-size-sm)' }}>
+                  <div className="flex-1 font-medium text-sm text-pure">
                     {row.student_name}
                   </div>
-                  <span className="badge badge-success">{row.present}P</span>
-                  <span className="badge badge-danger">{row.absent}A</span>
-                  <span className="badge badge-warning">{row.late}L</span>
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">{row.present}P</span>
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">{row.absent}A</span>
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">{row.late}L</span>
                   <span
-                    className="badge"
-                    style={{
-                      background: row.attendance_rate >= 75 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-                      color: row.attendance_rate >= 75 ? 'var(--color-success)' : 'var(--color-danger)',
-                    }}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${
+                      row.attendance_rate >= 75
+                        ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                        : 'bg-red-500/20 text-red-400 border-red-500/30'
+                    }`}
                   >
                     {row.attendance_rate}%
                   </span>

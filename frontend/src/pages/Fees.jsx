@@ -3,6 +3,9 @@ import toast from 'react-hot-toast';
 import api from '../api/client';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import { Card, CardContent } from '../components/Card';
+import Button from '../components/Button';
+import { Input, Select, Textarea } from '../components/Input';
 
 const PAYMENT_METHODS = ['cash', 'bkash', 'nagad', 'bank'];
 
@@ -84,82 +87,92 @@ export default function Fees() {
 
   const statusBadge = (status) => {
     const map = {
-      paid: 'badge-success',
-      unpaid: 'badge-danger',
-      partial: 'badge-warning',
+      paid: 'bg-green-500/20 text-green-400 border-green-500/30',
+      unpaid: 'bg-red-500/20 text-red-400 border-red-500/30',
+      partial: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     };
-    return <span className={`badge ${map[status] || 'badge-default'}`}>{status}</span>;
+    return <span className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${map[status] || 'bg-white/10 text-pure border-white/20'}`}>{status}</span>;
   };
 
   const columns = [
     { key: 'student_name', label: 'Student' },
     { key: 'month', label: 'Month' },
-    { key: 'amount_due', label: 'Amount Due', render: (f) => `৳${f.amount_due.toLocaleString()}` },
+    { key: 'amount_due', label: 'Amount Due', render: (f) => <span className="font-mono">৳{f.amount_due.toLocaleString()}</span> },
     { key: 'amount_paid', label: 'Paid', render: (f) => (
-      <span style={{ color: f.amount_paid > 0 ? 'var(--color-success)' : 'var(--text-muted)' }}>
+      <span className={f.amount_paid > 0 ? 'text-green-400 font-mono' : 'text-stardust font-mono'}>
         ৳{f.amount_paid.toLocaleString()}
       </span>
     )},
     { key: 'status', label: 'Status', render: (f) => statusBadge(f.status) },
-    { key: 'payment_method', label: 'Method', render: (f) => f.payment_method || '—' },
+    { key: 'payment_method', label: 'Method', render: (f) => <span className="font-mono">{f.payment_method || '—'}</span> },
     { key: 'actions', label: '', render: (f) => (
-      <button
-        className="btn btn-primary btn-sm"
+      <Button
+        variant="primary"
+        size="sm"
         onClick={() => openPayment(f)}
       >
         Record Payment
-      </button>
+      </Button>
     )},
   ];
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="page-title">Fees</h1>
-          <p className="page-subtitle">Track monthly fee collection</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Fees</h1>
+          <p className="text-stardust text-sm mt-1">Track monthly fee collection</p>
         </div>
-        <div className="flex gap-3">
-          <input
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <Input
             type="month"
-            className="form-input"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            style={{ width: 'auto' }}
+            className="w-full sm:w-auto"
           />
-          <button className="btn btn-primary" onClick={() => setGenModal(true)}>
+          <Button variant="primary" onClick={() => setGenModal(true)}>
             ⚡ Generate Fees
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Summary Cards */}
       {summary && (
-        <div className="stats-grid" style={{ marginBottom: '1rem' }}>
-          <div className="stat-card" style={{ '--card-accent': '#10b981' }}>
-            <div className="stat-label">Collected</div>
-            <div className="stat-value" style={{ color: 'var(--color-success)' }}>
-              ৳{summary.total_collected.toLocaleString()}
-            </div>
-          </div>
-          <div className="stat-card" style={{ '--card-accent': '#ef4444' }}>
-            <div className="stat-label">Outstanding</div>
-            <div className="stat-value" style={{ color: 'var(--color-danger)' }}>
-              ৳{summary.outstanding.toLocaleString()}
-            </div>
-          </div>
-          <div className="stat-card" style={{ '--card-accent': '#6366f1' }}>
-            <div className="stat-label">Total Due</div>
-            <div className="stat-value">৳{summary.total_due.toLocaleString()}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-label">Status Breakdown</div>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
-              <span className="badge badge-success">✅ {summary.paid_count} paid</span>
-              <span className="badge badge-warning">⚡ {summary.partial_count} partial</span>
-              <span className="badge badge-danger">❌ {summary.unpaid_count} unpaid</span>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="border-green-500/30 shadow-[0_0_15px_-5px_rgba(34,197,94,0.15)] hover:border-green-500/50 hover:shadow-[0_0_20px_-5px_rgba(34,197,94,0.2)]">
+            <CardContent className="p-6">
+              <div className="text-sm text-stardust mb-1 font-body">Collected</div>
+              <div className="text-2xl font-mono font-semibold text-green-400">
+                ৳{summary.total_collected.toLocaleString()}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-red-500/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.15)] hover:border-red-500/50 hover:shadow-[0_0_20px_-5px_rgba(239,68,68,0.2)]">
+            <CardContent className="p-6">
+              <div className="text-sm text-stardust mb-1 font-body">Outstanding</div>
+              <div className="text-2xl font-mono font-semibold text-red-400">
+                ৳{summary.outstanding.toLocaleString()}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-indigo-500/30 shadow-[0_0_15px_-5px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.2)]">
+            <CardContent className="p-6">
+              <div className="text-sm text-stardust mb-1 font-body">Total Due</div>
+              <div className="text-2xl font-mono font-semibold text-indigo-400">
+                ৳{summary.total_due.toLocaleString()}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-sm text-stardust mb-2 font-body">Status Breakdown</div>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">✅ {summary.paid_count} paid</span>
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">⚡ {summary.partial_count} partial</span>
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">❌ {summary.unpaid_count} unpaid</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -171,7 +184,7 @@ export default function Fees() {
         searchKeys={['student_name']}
         emptyTitle="No fee records for this month"
         emptyDesc="Generate fees for all active students using the button above."
-        emptyAction={<button className="btn btn-primary" onClick={() => setGenModal(true)}>Generate Fees</button>}
+        emptyAction={<Button variant="primary" onClick={() => setGenModal(true)}>Generate Fees</Button>}
       />
 
       {/* Generate Modal */}
@@ -180,36 +193,34 @@ export default function Fees() {
         onClose={() => setGenModal(false)}
         title="Generate Monthly Fees"
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setGenModal(false)}>Cancel</button>
-            <button className="btn btn-primary" form="gen-form" type="submit" disabled={genSaving}>
-              {genSaving ? <span className="spinner" /> : null}
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="secondary" onClick={() => setGenModal(false)}>Cancel</Button>
+            <Button variant="primary" form="gen-form" type="submit" disabled={genSaving}>
+              {genSaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null}
               Generate
-            </button>
-          </>
+            </Button>
+          </div>
         }
       >
-        <form id="gen-form" onSubmit={handleGenerate}>
-          <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
+        <form id="gen-form" onSubmit={handleGenerate} className="space-y-4">
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-blue-400 text-sm flex gap-3">
             <span>ℹ️</span>
-            This will create fee records for all active students. Existing records will be skipped.
+            <div>This will create fee records for all active students. Existing records will be skipped.</div>
           </div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Month</label>
-              <input
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Month</label>
+              <Input
                 type="month"
-                className="form-input"
                 value={genMonth}
                 onChange={(e) => setGenMonth(e.target.value)}
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Amount Due (৳) *</label>
-              <input
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Amount Due (৳) *</label>
+              <Input
                 type="number"
-                className="form-input"
                 value={genAmount}
                 onChange={(e) => setGenAmount(e.target.value)}
                 required
@@ -227,29 +238,28 @@ export default function Fees() {
         onClose={() => setPayModal(false)}
         title={`Record Payment — ${payFee?.student_name}`}
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setPayModal(false)}>Cancel</button>
-            <button className="btn btn-primary" form="pay-form" type="submit" disabled={paySaving}>
-              {paySaving ? <span className="spinner" /> : null}
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="secondary" onClick={() => setPayModal(false)}>Cancel</Button>
+            <Button variant="primary" form="pay-form" type="submit" disabled={paySaving}>
+              {paySaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null}
               Save Payment
-            </button>
-          </>
+            </Button>
+          </div>
         }
       >
         {payFee && (
-          <form id="pay-form" onSubmit={handlePayment}>
-            <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
-              <span>💰</span>
+          <form id="pay-form" onSubmit={handlePayment} className="space-y-4">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-green-400 text-sm flex items-center gap-3">
+              <span className="text-xl">💰</span>
               <div>
-                Amount due: <strong>৳{payFee.amount_due.toLocaleString()}</strong>
+                Amount due: <strong className="font-mono">৳{payFee.amount_due.toLocaleString()}</strong>
               </div>
             </div>
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="form-label">Amount Paid (৳) *</label>
-                <input
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-stardust">Amount Paid (৳) *</label>
+                <Input
                   type="number"
-                  className="form-input"
                   value={payForm.amount_paid}
                   onChange={(e) => setPayForm((f) => ({ ...f, amount_paid: e.target.value }))}
                   required
@@ -258,32 +268,29 @@ export default function Fees() {
                   placeholder="0"
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Payment Method</label>
-                <select
-                  className="form-select"
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-stardust">Payment Method</label>
+                <Select
                   value={payForm.payment_method}
                   onChange={(e) => setPayForm((f) => ({ ...f, payment_method: e.target.value }))}
                 >
                   {PAYMENT_METHODS.map((m) => (
                     <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
                   ))}
-                </select>
+                </Select>
               </div>
-              <div className="form-group">
-                <label className="form-label">Payment Date</label>
-                <input
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-stardust">Payment Date</label>
+                <Input
                   type="date"
-                  className="form-input"
                   value={payForm.payment_date}
                   onChange={(e) => setPayForm((f) => ({ ...f, payment_date: e.target.value }))}
                 />
               </div>
             </div>
-            <div className="form-group" style={{ marginTop: '0.5rem' }}>
-              <label className="form-label">Notes</label>
-              <textarea
-                className="form-textarea"
+            <div className="space-y-1.5 pt-2">
+              <label className="text-sm font-medium text-stardust">Notes</label>
+              <Textarea
                 value={payForm.notes}
                 onChange={(e) => setPayForm((f) => ({ ...f, notes: e.target.value }))}
                 placeholder="Optional note..."

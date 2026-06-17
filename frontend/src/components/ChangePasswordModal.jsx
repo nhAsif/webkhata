@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Modal from './Modal';
+import { Input } from './Input';
+import Button from './Button';
 import api from '../api/client';
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
@@ -46,33 +48,30 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
       title="Change Password"
       size="sm"
     >
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="form-label">Current Password</label>
-          <input
+      <form onSubmit={handleSubmit} className="space-y-4 font-body">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-stardust">Current Password</label>
+          <Input
             type="password"
-            className="form-input"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label className="form-label">New Password</label>
-          <input
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-stardust">New Password</label>
+          <Input
             type="password"
-            className="form-input"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
             minLength={6}
           />
         </div>
-        <div className="form-group">
-          <label className="form-label">Confirm New Password</label>
-          <input
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-stardust">Confirm New Password</label>
+          <Input
             type="password"
-            className="form-input"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -80,13 +79,13 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           />
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1.5rem' }}>
-          <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>
+        <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+          <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          </Button>
+          <Button type="submit" variant="primary" disabled={loading}>
             {loading ? 'Saving...' : 'Change Password'}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

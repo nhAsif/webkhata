@@ -3,12 +3,15 @@ import toast from 'react-hot-toast';
 import api from '../api/client';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import { Card, CardContent } from '../components/Card';
+import Button from '../components/Button';
+import { Input, Select, Textarea } from '../components/Input';
 
 const STATUS_OPTS = ['not_submitted', 'submitted', 'late'];
 const STATUS_BADGE = {
-  submitted: 'badge-success',
-  not_submitted: 'badge-danger',
-  late: 'badge-warning',
+  submitted: 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+  not_submitted: 'bg-red-500/20 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]',
+  late: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
 };
 const STATUS_ICON = {
   submitted: '✓',
@@ -104,55 +107,67 @@ export default function Homework() {
   };
 
   const columns = [
-    { key: 'title', label: 'Title' },
+    { key: 'title', label: 'Title', render: (hw) => (
+      <span className="font-medium text-pure">{hw.title}</span>
+    ) },
     { key: 'batch_id', label: 'Batch', render: (hw) => {
       const batch = batches.find((b) => b.id === hw.batch_id);
-      return batch ? <span className="badge badge-info">{batch.name}</span> : '—';
+      return batch ? (
+        <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/10 text-blue-400 border-blue-500/30">
+          {batch.name}
+        </span>
+      ) : <span className="text-stardust">—</span>;
     }},
-    { key: 'assigned_date', label: 'Assigned' },
+    { key: 'assigned_date', label: 'Assigned', render: (hw) => (
+      <span className="text-stardust font-mono text-sm">{hw.assigned_date}</span>
+    ) },
     { key: 'due_date', label: 'Due Date', render: (hw) => {
       const overdue = new Date(hw.due_date) < new Date() && hw.due_date !== today();
       return (
-        <span style={{ color: overdue ? 'var(--color-danger)' : 'inherit' }}>
+        <span className={`font-mono text-sm ${overdue ? 'text-red-400 font-medium' : 'text-stardust'}`}>
           {hw.due_date} {overdue ? '⚠' : ''}
         </span>
       );
     }},
     { key: 'submission_count', label: 'Submissions', render: (hw) => (
-      <span className="badge badge-default">{hw.submission_count} students</span>
+      <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/5 text-stardust border-white/10">
+        {hw.submission_count} students
+      </span>
     )},
     { key: 'actions', label: '', render: (hw) => (
-      <button className="btn btn-secondary btn-sm" onClick={() => openSubmissions(hw)}>
+      <Button variant="secondary" size="sm" onClick={() => openSubmissions(hw)}>
         Track Submissions
-      </button>
+      </Button>
     )},
   ];
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="page-title">Homework</h1>
-          <p className="page-subtitle">Assign and track homework submissions</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure tracking-tight">Homework</h1>
+          <p className="text-sm text-stardust mt-1 font-body">Assign and track homework submissions</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setCreateModal(true)}>+ Assign Homework</button>
+        <Button variant="primary" onClick={() => setCreateModal(true)}>+ Assign Homework</Button>
       </div>
 
       {/* Filter */}
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="flex gap-3 items-center">
-          <label className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Filter by batch:</label>
-          <select
-            className="form-select"
-            value={filterBatch}
-            onChange={(e) => setFilterBatch(e.target.value)}
-            style={{ width: 'auto', minWidth: '200px' }}
-          >
-            <option value="">All batches</option>
-            {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4 sm:p-5 pt-4 sm:pt-5">
+          <div className="flex flex-wrap gap-4 items-center">
+            <label className="text-sm font-medium text-stardust whitespace-nowrap">Filter by batch:</label>
+            <div className="w-full sm:w-auto min-w-[200px]">
+              <Select
+                value={filterBatch}
+                onChange={(e) => setFilterBatch(e.target.value)}
+              >
+                <option value="">All batches</option>
+                {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <DataTable
         columns={columns}
@@ -162,7 +177,7 @@ export default function Homework() {
         searchKeys={['title']}
         emptyTitle="No homework assigned"
         emptyDesc="Assign homework to a batch to get started."
-        emptyAction={<button className="btn btn-primary" onClick={() => setCreateModal(true)}>Assign Homework</button>}
+        emptyAction={<Button variant="primary" onClick={() => setCreateModal(true)}>Assign Homework</Button>}
       />
 
       {/* Create Homework Modal */}
@@ -172,61 +187,56 @@ export default function Homework() {
         title="Assign Homework"
         footer={
           <>
-            <button className="btn btn-secondary" onClick={() => setCreateModal(false)}>Cancel</button>
-            <button className="btn btn-primary" form="hw-form" type="submit" disabled={saving}>
-              {saving ? <span className="spinner" /> : null} Assign
-            </button>
+            <Button variant="ghost" onClick={() => setCreateModal(false)}>Cancel</Button>
+            <Button variant="primary" form="hw-form" type="submit" disabled={saving}>
+              {saving ? 'Assigning...' : 'Assign'}
+            </Button>
           </>
         }
       >
-        <form id="hw-form" onSubmit={handleCreate}>
-          <div className="form-group">
-            <label className="form-label">Batch *</label>
-            <select
-              className="form-select"
+        <form id="hw-form" onSubmit={handleCreate} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Batch *</label>
+            <Select
               value={form.batch_id}
               onChange={(e) => setForm((f) => ({ ...f, batch_id: e.target.value }))}
               required
             >
               <option value="">Select batch...</option>
               {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
+            </Select>
           </div>
-          <div className="form-group">
-            <label className="form-label">Title *</label>
-            <input
-              className="form-input"
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Title *</label>
+            <Input
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               required
               placeholder="e.g. Chapter 3 exercises"
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Description</label>
-            <textarea
-              className="form-textarea"
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-stardust">Description</label>
+            <Textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="Additional details..."
               rows={3}
             />
           </div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Assigned Date</label>
-              <input
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Assigned Date</label>
+              <Input
                 type="date"
-                className="form-input"
                 value={form.assigned_date}
                 onChange={(e) => setForm((f) => ({ ...f, assigned_date: e.target.value }))}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Due Date *</label>
-              <input
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-stardust">Due Date *</label>
+              <Input
                 type="date"
-                className="form-input"
                 value={form.due_date}
                 onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
                 required
@@ -245,37 +255,36 @@ export default function Homework() {
         size="lg"
         footer={
           <>
-            <button className="btn btn-secondary" onClick={() => setSubmModal(false)}>Close</button>
-            <button className="btn btn-primary" onClick={handleSaveSubmissions} disabled={submSaving}>
-              {submSaving ? <span className="spinner" /> : null} Save
-            </button>
+            <Button variant="ghost" onClick={() => setSubmModal(false)}>Close</Button>
+            <Button variant="primary" onClick={handleSaveSubmissions} disabled={submSaving}>
+              {submSaving ? 'Saving...' : 'Save'}
+            </Button>
           </>
         }
       >
-        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+        <div className="text-xs text-stardust mb-4 font-body">
           Click a student row to cycle through submission statuses. Add feedback below.
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="flex flex-col gap-3">
           {submissions.map((sub, i) => (
             <div
               key={sub.id}
-              style={{
-                padding: '0.75rem',
-                background: 'var(--bg-surface-2)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-              }}
+              className="p-4 bg-white/5 rounded-xl border border-white/10 transition-colors hover:border-white/20"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
-                <div style={{ flex: 1, fontWeight: 500, fontSize: 'var(--font-size-sm)' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div className="font-medium text-sm text-pure flex-1">
                   {sub.student_name}
                 </div>
-                <div style={{ display: 'flex', gap: '0.375rem' }}>
+                <div className="flex flex-wrap gap-1.5">
                   {STATUS_OPTS.map((s) => (
                     <button
                       key={s}
                       type="button"
-                      className={`btn btn-sm ${sub.status === s ? STATUS_BADGE[s].replace('badge-', 'btn-') : 'btn-secondary'}`}
+                      className={`rounded-full px-3 py-1 text-xs font-mono font-medium transition-all duration-200 border ${
+                        sub.status === s 
+                          ? STATUS_BADGE[s] 
+                          : 'bg-transparent text-stardust border-white/10 hover:border-white/30 hover:text-pure hover:bg-white/5'
+                      }`}
                       onClick={() => {
                         setSubmissions((prev) => {
                           const updated = [...prev];
@@ -289,9 +298,8 @@ export default function Homework() {
                   ))}
                 </div>
               </div>
-              <input
-                className="form-input"
-                style={{ fontSize: 'var(--font-size-xs)' }}
+              <Input
+                className="h-10 text-xs bg-black/30 border-white/10 focus-visible:border-bitcoin/50"
                 placeholder="Feedback (optional)..."
                 value={sub.feedback || ''}
                 onChange={(e) => {

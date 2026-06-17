@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
+import { Card, CardContent } from '../../components/Card';
 
 const STATUS_BADGE = {
-  submitted: { cls: 'badge-success', icon: '✓', label: 'Submitted' },
-  not_submitted: { cls: 'badge-danger', icon: '✗', label: 'Not Submitted' },
-  late: { cls: 'badge-warning', icon: '⚠', label: 'Late' },
+  submitted: { cls: 'bg-green-500/20 text-green-400 border-green-500/30', icon: '✓', label: 'Submitted' },
+  not_submitted: { cls: 'bg-red-500/20 text-red-400 border-red-500/30', icon: '✗', label: 'Not Submitted' },
+  late: { cls: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: '⚠', label: 'Late' },
 };
 
 export default function ParentHomework() {
@@ -19,10 +20,14 @@ export default function ParentHomework() {
 
   if (loading) {
     return (
-      <div>
-        <div className="page-header"><h1 className="page-title">Homework</h1></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '80px' }} />)}
+      <div className="space-y-6">
+        <div className="mb-8"><h1 className="text-2xl font-heading text-pure font-bold">Homework</h1></div>
+        <div className="flex flex-col gap-3">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse bg-white/5 border-white/10">
+              <CardContent className="h-20 p-6" />
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -33,78 +38,65 @@ export default function ParentHomework() {
   const submitted = homework.filter((h) => h.submission_status === 'submitted');
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="mb-8 flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 className="page-title">Homework</h1>
-          <p className="page-subtitle">Assignments and submission status</p>
+          <h1 className="text-2xl font-heading text-pure font-bold">Homework</h1>
+          <p className="text-stardust font-body mt-1">Assignments and submission status</p>
         </div>
         <div className="flex gap-2">
-          <span className="badge badge-danger">{pending.length} pending</span>
-          <span className="badge badge-success">{submitted.length} submitted</span>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">{pending.length} pending</span>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">{submitted.length} submitted</span>
         </div>
       </div>
 
       {homework.length === 0 ? (
-        <div className="card">
-          <div className="empty-state">
-            <div className="empty-state-icon">📝</div>
-            <div className="empty-state-title">No homework assigned yet</div>
-          </div>
-        </div>
+        <Card className="bg-matter border-white/10">
+          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+            <div className="text-4xl mb-4">📝</div>
+            <div className="text-pure font-heading text-lg">No homework assigned yet</div>
+          </CardContent>
+        </Card>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div className="flex flex-col gap-3">
           {homework.map((hw, i) => {
             const statusInfo = STATUS_BADGE[hw.submission_status] || STATUS_BADGE.not_submitted;
             const isOverdue = hw.due_date < today && hw.submission_status !== 'submitted';
-            const isPending = hw.due_date >= today && hw.submission_status !== 'submitted';
 
             return (
-              <div
+              <Card
                 key={i}
-                style={{
-                  padding: '1rem',
-                  background: 'var(--bg-surface)',
-                  border: `1px solid ${isOverdue ? 'rgba(239,68,68,0.2)' : 'var(--border)'}`,
-                  borderRadius: 'var(--radius-lg)',
-                  transition: 'all var(--transition-fast)',
-                }}
+                className={`bg-matter transition-colors ${isOverdue ? 'border-red-500/30' : 'border-white/10 hover:border-bitcoin/30'}`}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 'var(--font-size-base)' }}>{hw.title}</div>
-                    {hw.description && (
-                      <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', marginTop: '0.25rem' }}>
-                        {hw.description}
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-start gap-3 flex-wrap">
+                    <div className="flex-1 min-w-[200px]">
+                      <div className="font-heading text-pure font-bold text-base">{hw.title}</div>
+                      {hw.description && (
+                        <div className="text-stardust font-body text-sm mt-1">
+                          {hw.description}
+                        </div>
+                      )}
+                      <div className="flex gap-4 mt-2 flex-wrap">
+                        <span className="text-xs text-stardust font-mono">
+                          📅 Assigned: {hw.assigned_date}
+                        </span>
+                        <span className={`text-xs font-mono ${isOverdue ? 'text-red-400' : 'text-stardust'}`}>
+                          ⏰ Due: {hw.due_date} {isOverdue ? '(Overdue!)' : ''}
+                        </span>
                       </div>
-                    )}
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-                      <span className="text-xs text-muted">
-                        📅 Assigned: {hw.assigned_date}
-                      </span>
-                      <span className="text-xs" style={{ color: isOverdue ? 'var(--color-danger)' : 'var(--text-muted)' }}>
-                        ⏰ Due: {hw.due_date} {isOverdue ? '(Overdue!)' : ''}
-                      </span>
+                      {hw.feedback && (
+                        <div className="mt-3 p-3 bg-white/5 rounded-md text-sm text-pure font-body border-l-2 border-bitcoin/50">
+                          <strong className="text-bitcoin font-heading">Feedback:</strong> {hw.feedback}
+                        </div>
+                      )}
                     </div>
-                    {hw.feedback && (
-                      <div style={{
-                        marginTop: '0.5rem',
-                        padding: '0.5rem 0.75rem',
-                        background: 'var(--bg-surface-2)',
-                        borderRadius: 'var(--radius-sm)',
-                        fontSize: 'var(--font-size-xs)',
-                        color: 'var(--text-secondary)',
-                        borderLeft: '3px solid var(--color-brand)',
-                      }}>
-                        <strong>Feedback:</strong> {hw.feedback}
-                      </div>
-                    )}
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-mono border flex-shrink-0 ${statusInfo.cls}`}>
+                      {statusInfo.icon} {statusInfo.label}
+                    </span>
                   </div>
-                  <span className={`badge ${statusInfo.cls}`} style={{ fontSize: 'var(--font-size-sm)', padding: '0.3rem 0.75rem' }}>
-                    {statusInfo.icon} {statusInfo.label}
-                  </span>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

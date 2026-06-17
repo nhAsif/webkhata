@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 
 const DAYS_ORDER = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
@@ -13,9 +14,11 @@ export default function ParentRoutine() {
 
   if (loading) {
     return (
-      <div>
-        <div className="page-header"><h1 className="page-title">Weekly Routine</h1></div>
-        <div className="skeleton" style={{ height: '400px', borderRadius: 'var(--radius-lg)' }} />
+      <div className="space-y-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-heading font-bold text-pure">Weekly Routine</h1>
+        </div>
+        <div className="animate-pulse bg-white/5 h-[400px] rounded-2xl" />
       </div>
     );
   }
@@ -27,106 +30,96 @@ export default function ParentRoutine() {
   const hasTimetable = DAYS_ORDER.some((d) => (timetable[d] || []).length > 0);
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Weekly Routine</h1>
-          <p className="page-subtitle">Class schedule for {data?.student_name}</p>
-        </div>
+    <div className="space-y-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-heading font-bold text-pure">Weekly Routine</h1>
+        <p className="text-stardust font-body mt-1">Class schedule for <span className="text-bitcoin font-medium">{data?.student_name}</span></p>
       </div>
 
       {/* Batch Details */}
       {data?.batches?.length > 0 && (
-        <div className="card" style={{ marginBottom: '1rem' }}>
-          <div className="card-header"><h2 className="card-title">📚 Enrolled Batches</h2></div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <Card>
+          <CardHeader>
+            <CardTitle>📚 Enrolled Batches</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
             {data.batches.map((b, i) => (
               <div
                 key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '0.75rem 1rem',
-                  background: 'var(--bg-surface-2)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border)',
-                }}
+                className="flex items-center gap-4 p-4 bg-void rounded-xl border border-white/10"
               >
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>{b.batch_name}</div>
-                  <div className="text-xs text-muted">{b.subject}</div>
+                <div className="flex-1">
+                  <div className="font-semibold text-pure font-body">{b.batch_name}</div>
+                  <div className="text-xs text-stardust font-body">{b.subject}</div>
                 </div>
-                <span className="badge badge-info">{b.time_slot}</span>
-                <div style={{ display: 'flex', gap: '3px' }}>
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/20 text-blue-400 border-blue-500/30">
+                  {b.time_slot}
+                </span>
+                <div className="flex gap-1.5">
                   {(b.days || []).map((d) => (
-                    <span key={d} className="badge badge-default" style={{ fontSize: '10px' }}>{d}</span>
+                    <span key={d} className="rounded-full px-2 py-0.5 text-[10px] font-mono border bg-white/5 text-stardust border-white/10">
+                      {d}
+                    </span>
                   ))}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Weekly timetable */}
-      <div className="card">
-        <div className="card-header"><h2 className="card-title">📅 Weekly Timetable</h2></div>
+      <Card>
+        <CardHeader>
+          <CardTitle>📅 Weekly Timetable</CardTitle>
+        </CardHeader>
 
-        {!hasTimetable ? (
-          <div className="empty-state" style={{ padding: '2.5rem' }}>
-            <div className="empty-state-icon">📋</div>
-            <div className="empty-state-title">No timetable set yet</div>
-            <div className="empty-state-desc">Your tutor hasn't configured the weekly subjects yet.</div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {DAYS_ORDER.map((day) => {
-              const subjects = timetable[day] || [];
-              const isToday = today === day;
-              const isOff = subjects.length === 0;
+        <CardContent>
+          {!hasTimetable ? (
+            <div className="p-10 flex flex-col items-center justify-center text-center">
+              <div className="text-4xl mb-3">📋</div>
+              <div className="text-lg font-heading font-semibold text-pure">No timetable set yet</div>
+              <div className="text-sm text-stardust mt-1">Your tutor hasn't configured the weekly subjects yet.</div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {DAYS_ORDER.map((day) => {
+                const subjects = timetable[day] || [];
+                const isToday = today === day;
+                const isOff = subjects.length === 0;
 
-              return (
-                <div
-                  key={day}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    padding: '0.875rem 1rem',
-                    background: isToday ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-surface-2)',
-                    borderRadius: 'var(--radius-md)',
-                    border: isToday ? '1px solid var(--border-brand)' : '1px solid var(--border)',
-                  }}
-                >
-                  <div style={{
-                    width: 40,
-                    fontWeight: 700,
-                    fontSize: 'var(--font-size-sm)',
-                    color: isToday ? 'var(--color-brand-light)' : 'var(--text-secondary)',
-                    flexShrink: 0,
-                  }}>
-                    {day}
-                    {isToday && <div style={{ fontSize: '9px', color: 'var(--color-brand)' }}>Today</div>}
-                  </div>
-
-                  {isOff ? (
-                    <span style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', fontStyle: 'italic' }}>
-                      🏖️ Off Day
-                    </span>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-                      {subjects.map((sub) => (
-                        <span key={sub} className="badge badge-info">{sub}</span>
-                      ))}
+                return (
+                  <div
+                    key={day}
+                    className={`flex items-center gap-4 p-3.5 rounded-xl border ${
+                      isToday ? 'bg-bitcoin/10 border-bitcoin/30' : 'bg-void border-white/10'
+                    }`}
+                  >
+                    <div className={`w-10 font-bold font-mono text-sm shrink-0 ${isToday ? 'text-bitcoin' : 'text-stardust'}`}>
+                      {day}
+                      {isToday && <div className="text-[9px] text-gold mt-0.5">Today</div>}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+                    {isOff ? (
+                      <span className="text-stardust/70 text-sm italic font-body">
+                        🏖️ Off Day
+                      </span>
+                    ) : (
+                      <div className="flex gap-2 flex-wrap">
+                        {subjects.map((sub) => (
+                          <span key={sub} className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-indigo-500/20 text-indigo-400 border-indigo-500/30">
+                            {sub}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

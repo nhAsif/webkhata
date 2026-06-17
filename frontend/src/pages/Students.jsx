@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import api from '../api/client';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import { Input, Select, Textarea } from '../components/Input';
+import Button from '../components/Button';
 
 const CLASS_LEVELS = ['JSC', 'SSC'];
 const SUBJECTS_LIST = ['Math', 'English', 'Science', 'Bangla', 'BGS', 'Religion', 'Physics', 'Chemistry', 'Biology', 'ICT'];
@@ -20,8 +22,15 @@ const EMPTY_FORM = {
 };
 
 function statusBadge(status) {
+  const isActive = status === 'active';
   return (
-    <span className={`badge ${status === 'active' ? 'badge-success' : 'badge-default'}`}>
+    <span 
+      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono border capitalize ${
+        isActive 
+          ? 'bg-green-500/15 border-green-500/30 text-green-400' 
+          : 'bg-white/5 border-white/10 text-stardust'
+      }`}
+    >
       {status}
     </span>
   );
@@ -93,44 +102,49 @@ export default function Students() {
 
   const columns = [
     { key: 'name', label: 'Name', render: (s) => (
-      <button
-        className="btn btn-ghost btn-sm"
-        style={{ fontWeight: 600, color: 'var(--color-brand-light)' }}
+      <Button
+        variant="link"
+        className="font-bold text-bitcoin hover:text-gold text-left justify-start"
         onClick={() => navigate(`/students/${s.id}`)}
       >
         {s.name}
-      </button>
+      </Button>
     )},
     { key: 'class_level', label: 'Class', render: (s) => (
-      <span className="badge badge-info">{s.class_level}</span>
+      <span className="inline-flex px-2 py-0.5 rounded-lg text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono">
+        {s.class_level}
+      </span>
     )},
     { key: 'subjects', label: 'Subjects', render: (s) => (
-      <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}>
+      <span className="text-xs text-stardust font-body">
         {(Array.isArray(s.subjects) ? s.subjects : []).join(', ') || '—'}
       </span>
     )},
     { key: 'guardian_name', label: 'Guardian' },
-    { key: 'guardian_phone', label: 'Phone' },
-    { key: 'parent_code', label: 'Parent Username / Code', render: (s) => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        <code style={{ fontSize: 'var(--font-size-xs)', background: 'var(--bg-surface-3)', padding: '2px 6px', borderRadius: 4 }}>
+    { key: 'guardian_phone', label: 'Phone', render: (s) => (
+      <span className="font-mono text-sm">{s.guardian_phone}</span>
+    ) },
+    { key: 'parent_code', label: 'Parent Login / Code', render: (s) => (
+      <div className="flex flex-col gap-1">
+        <code className="text-xs bg-white/5 border border-white/10 px-2 py-0.5 rounded text-bitcoin font-mono w-max">
           {s.parent_username || '-'}
         </code>
-        <code style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+        <code className="text-[10px] text-stardust font-mono">
           Code: {s.parent_code}
         </code>
       </div>
     )},
     { key: 'status', label: 'Status', render: (s) => statusBadge(s.status) },
     { key: 'actions', label: '', render: (s) => (
-      <div className="flex gap-2">
-        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(s)}>Edit</button>
-        <button
-          className={`btn btn-sm ${s.status === 'active' ? 'btn-danger' : 'btn-success'}`}
+      <div className="flex items-center gap-2 justify-end">
+        <Button variant="secondary" size="sm" onClick={() => openEdit(s)}>Edit</Button>
+        <Button
+          size="sm"
+          variant={s.status === 'active' ? 'danger' : 'success'}
           onClick={() => toggleStatus(s)}
         >
           {s.status === 'active' ? 'Archive' : 'Activate'}
-        </button>
+        </Button>
       </div>
     )},
   ];
@@ -145,25 +159,25 @@ export default function Students() {
   };
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-body">
         <div>
-          <h1 className="page-title">Students</h1>
-          <p className="page-subtitle">{students.length} students enrolled</p>
+          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">Students</h1>
+          <p className="text-sm text-stardust mt-1">{students.length} students enrolled</p>
         </div>
-        <button className="btn btn-primary" onClick={openAdd}>+ Add Student</button>
+        <Button variant="primary" onClick={openAdd}>+ Add Student</Button>
       </div>
 
       <DataTable
         columns={columns}
         data={students}
         loading={loading}
-        searchPlaceholder="Search by name..."
+        searchPlaceholder="Search students..."
         searchKeys={['name', 'guardian_name', 'guardian_phone']}
         emptyTitle="No students yet"
         emptyDesc="Add your first student to get started."
         emptyAction={
-          <button className="btn btn-primary" onClick={openAdd}>Add Student</button>
+          <Button variant="primary" onClick={openAdd}>Add Student</Button>
         }
       />
 
@@ -172,71 +186,69 @@ export default function Students() {
         onClose={() => setModal(null)}
         title={modal === 'add' ? 'Add New Student' : 'Edit Student'}
         footer={
-          <>
-            <button className="btn btn-secondary" onClick={() => setModal(null)}>Cancel</button>
-            <button className="btn btn-primary" form="student-form" type="submit" disabled={saving}>
-              {saving ? <span className="spinner" /> : null}
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="primary" form="student-form" type="submit" disabled={saving}>
+              {saving ? (
+                <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
+              ) : null}
               {modal === 'add' ? 'Add Student' : 'Save Changes'}
-            </button>
-          </>
+            </Button>
+          </div>
         }
       >
-        <form id="student-form" onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Full Name *</label>
-              <input
-                className="form-input"
+        <form id="student-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Full Name *</label>
+              <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
                 placeholder="Student's full name"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Class Level *</label>
-              <select
-                className="form-select"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Class Level *</label>
+              <Select
                 value={form.class_level}
                 onChange={(e) => setForm((f) => ({ ...f, class_level: e.target.value }))}
               >
-                {CLASS_LEVELS.map((c) => <option key={c}>{c}</option>)}
-              </select>
+                {CLASS_LEVELS.map((c) => <option key={c} value={c}>{c}</option>)}
+              </Select>
             </div>
-            <div className="form-group">
-              <label className="form-label">Guardian Name *</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Guardian Name *</label>
+              <Input
                 value={form.guardian_name}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_name: e.target.value }))}
                 required
                 placeholder="Parent/Guardian name"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Guardian Phone *</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Guardian Phone *</label>
+              <Input
                 value={form.guardian_phone}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_phone: e.target.value }))}
                 required
                 placeholder="01XXXXXXXXX"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Parent Username *</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Parent Username *</label>
+              <Input
                 value={form.parent_username}
                 onChange={(e) => setForm((f) => ({ ...f, parent_username: e.target.value }))}
                 required
                 placeholder="Parent login username"
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Parent Password {modal === 'edit' && '(Leave blank to keep current)'}</label>
-              <input
-                className="form-input"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">
+                Parent Password {modal === 'edit' && '(Leave blank to keep current)'}
+              </label>
+              <Input
                 type="password"
                 value={form.parent_password}
                 onChange={(e) => setForm((f) => ({ ...f, parent_password: e.target.value }))}
@@ -247,26 +259,30 @@ export default function Students() {
             </div>
           </div>
 
-          <div className="form-group" style={{ marginTop: '0.75rem' }}>
-            <label className="form-label">Subjects *</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
-              {SUBJECTS_LIST.map((sub) => (
-                <button
-                  key={sub}
-                  type="button"
-                  className={`btn btn-sm ${form.subjects.includes(sub) ? 'btn-primary' : 'btn-secondary'}`}
-                  onClick={() => subjectToggle(sub)}
-                >
-                  {sub}
-                </button>
-              ))}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Subjects *</label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {SUBJECTS_LIST.map((sub) => {
+                const isSelected = form.subjects.includes(sub);
+                return (
+                  <Button
+                    key={sub}
+                    type="button"
+                    variant={isSelected ? 'primary' : 'secondary'}
+                    size="sm"
+                    className={isSelected ? 'h-9 px-3.5' : 'h-9 px-3.5 opacity-80'}
+                    onClick={() => subjectToggle(sub)}
+                  >
+                    {sub}
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="form-group" style={{ marginTop: '0.75rem' }}>
-            <label className="form-label">Address</label>
-            <textarea
-              className="form-textarea"
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Address</label>
+            <Textarea
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
               placeholder="Home address (optional)"

@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import api from '../api/client';
+import StatCard from '../components/StatCard';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
+import Button from '../components/Button';
+import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle } from 'lucide-react';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -12,7 +16,6 @@ export default function StudentProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
-  const [batches, setBatches] = useState([]);
   const [fees, setFees] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,19 +34,22 @@ export default function StudentProfile() {
 
   if (loading) {
     return (
-      <div>
-        <div className="skeleton" style={{ height: '200px', marginBottom: '1rem' }} />
-        <div className="skeleton" style={{ height: '300px' }} />
+      <div className="space-y-6 animate-pulse">
+        <div className="h-16 bg-white/5 rounded-2xl w-1/3" />
+        <div className="h-48 bg-white/5 rounded-2xl w-full" />
+        <div className="h-64 bg-white/5 rounded-2xl w-full" />
       </div>
     );
   }
 
   if (!student) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-icon">❓</div>
-        <div className="empty-state-title">Student not found</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/students')}>← Back to Students</button>
+      <div className="flex flex-col items-center justify-center py-16 text-center font-body">
+        <div className="text-4xl mb-3">❓</div>
+        <div className="text-lg font-heading font-semibold text-pure mb-4">Student not found</div>
+        <Button variant="secondary" onClick={() => navigate('/students')}>
+          <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Students
+        </Button>
       </div>
     );
   }
@@ -61,126 +67,186 @@ export default function StudentProfile() {
   const unpaidFees = fees.filter((f) => f.status !== 'paid').length;
 
   return (
-    <div>
-      <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button className="btn btn-ghost" onClick={() => navigate('/students')}>← Back</button>
-          <div>
-            <h1 className="page-title">{student.name}</h1>
-            <p className="page-subtitle">{student.class_level} · {student.status}</p>
-          </div>
+    <div className="space-y-6 font-body">
+      <div className="flex items-center gap-3">
+        <Button 
+          variant="secondary" 
+          size="sm" 
+          className="h-9 w-9 p-0 rounded-lg flex items-center justify-center"
+          onClick={() => navigate('/students')}
+        >
+          <ArrowLeft className="w-4 h-4 text-pure" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">{student.name}</h1>
+          <p className="text-xs text-stardust mt-0.5 flex items-center gap-1.5 uppercase tracking-wider font-mono">
+            <span className="inline-flex px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+              {student.class_level}
+            </span>
+            <span className={`inline-flex px-1.5 py-0.5 rounded capitalize ${
+              student.status === 'active' ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-white/5 border border-white/10 text-stardust'
+            }`}>
+              {student.status}
+            </span>
+          </p>
         </div>
       </div>
 
-      {/* Student info card */}
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="card-header">
-          <h2 className="card-title">👤 Personal Information</h2>
-          <code style={{ fontSize: 'var(--font-size-xs)', background: 'var(--bg-surface-3)', padding: '3px 8px', borderRadius: 4 }}>
+      {/* Student Personal Info */}
+      <Card hover={false}>
+        <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
+            <User className="w-5 h-5 text-bitcoin" /> Personal Information
+          </CardTitle>
+          <code className="text-xs bg-white/5 border border-white/10 px-2.5 py-0.5 rounded text-bitcoin font-mono">
             Parent Code: {student.parent_code}
           </code>
-        </div>
-        <div className="form-grid">
-          <div>
-            <div className="text-xs text-muted">Guardian Name</div>
-            <div style={{ fontWeight: 500 }}>{student.guardian_name}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted">Phone</div>
-            <div style={{ fontWeight: 500 }}>{student.guardian_phone}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted">Parent Username</div>
-            <div style={{ fontWeight: 500 }}>{student.parent_username || '—'}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted">Address</div>
-            <div>{student.address || '—'}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted">Enrolled Since</div>
-            <div>{student.enrollment_date}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted">Subjects</div>
-            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-              {(Array.isArray(student.subjects) ? student.subjects : []).map((s) => (
-                <span key={s} className="badge badge-info">{s}</span>
-              ))}
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Guardian Name</span>
+              <span className="text-sm font-medium text-pure">{student.guardian_name}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Guardian Phone</span>
+              <span className="text-sm font-medium text-pure font-mono">{student.guardian_phone}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Parent Username</span>
+              <span className="text-sm font-medium text-pure font-mono">{student.parent_username || '—'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Address</span>
+              <span className="text-sm font-medium text-pure">{student.address || '—'}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Enrolled Since</span>
+              <span className="text-sm font-medium text-pure font-mono">{student.enrollment_date}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Subjects</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {(Array.isArray(student.subjects) ? student.subjects : []).map((s) => (
+                  <span key={s} className="inline-flex px-1.5 py-0.5 rounded text-[10px] bg-white/5 border border-white/10 text-pure font-mono uppercase">
+                    {s}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Fee summary */}
-      <div className="stats-grid" style={{ marginBottom: '1rem' }}>
-        <div className="stat-card" style={{ '--card-accent': '#ef4444' }}>
-          <div className="stat-label">Unpaid Months</div>
-          <div className="stat-value" style={{ color: unpaidFees > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>{unpaidFees}</div>
-          <div className="stat-icon">💰</div>
-        </div>
-        <div className="stat-card" style={{ '--card-accent': '#10b981' }}>
-          <div className="stat-label">Total Paid</div>
-          <div className="stat-value" style={{ color: 'var(--color-success)' }}>৳{totalFeesPaid.toLocaleString()}</div>
-          <div className="stat-icon">✅</div>
-        </div>
-        <div className="stat-card" style={{ '--card-accent': '#6366f1' }}>
-          <div className="stat-label">Total Results</div>
-          <div className="stat-value">{results.length}</div>
-          <div className="stat-icon">📊</div>
-        </div>
+      {/* Fee and performance stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <StatCard
+          label="Unpaid Months"
+          value={unpaidFees}
+          icon={<DollarSign className="w-5 h-5" />}
+          color={unpaidFees > 0 ? '#ef4444' : '#10b981'}
+        />
+        <StatCard
+          label="Total Paid"
+          value={`৳${totalFeesPaid.toLocaleString()}`}
+          icon={<CheckCircle className="w-5 h-5 text-green-400" />}
+          color="#10b981"
+        />
+        <StatCard
+          label="Total Exams"
+          value={results.length}
+          icon={<Award className="w-5 h-5 text-bitcoin" />}
+          color="#F7931A"
+        />
       </div>
 
       {/* Results chart */}
       {chartData.length > 0 && (
-        <div className="card" style={{ marginBottom: '1rem' }}>
-          <div className="card-header">
-            <h2 className="card-title">📈 Academic Progress</h2>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} unit="%" />
-              <Tooltip
-                contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
-              />
-              <Line type="monotone" dataKey="score" stroke="var(--color-brand)" strokeWidth={2} dot={{ fill: 'var(--color-brand)', r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <Card hover={false}>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-bitcoin" /> Academic Progress Graph
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2">
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#94A3B8' }} stroke="rgba(255, 255, 255, 0.1)" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94A3B8' }} unit="%" stroke="rgba(255, 255, 255, 0.1)" />
+                  <Tooltip
+                    contentStyle={{ 
+                      background: '#0F1115', 
+                      border: '1px solid rgba(255, 255, 255, 0.1)', 
+                      borderRadius: '12px', 
+                      fontSize: '12px',
+                      color: '#FFFFFF'
+                    }}
+                    formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="#F7931A" 
+                    strokeWidth={2.5} 
+                    dot={{ fill: '#FFD600', stroke: '#F7931A', r: 4 }} 
+                    activeDot={{ r: 6, fill: '#FFD600', stroke: '#FFFFFF' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Fee history */}
       {fees.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">💰 Fee History</h2>
-          </div>
-          <div className="table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr><th>Month</th><th>Due</th><th>Paid</th><th>Status</th><th>Method</th></tr>
-              </thead>
-              <tbody>
-                {fees.map((f) => (
-                  <tr key={f.id}>
-                    <td>{f.month}</td>
-                    <td>৳{f.amount_due.toLocaleString()}</td>
-                    <td style={{ color: f.amount_paid > 0 ? 'var(--color-success)' : 'inherit' }}>৳{f.amount_paid.toLocaleString()}</td>
-                    <td>
-                      <span className={`badge ${f.status === 'paid' ? 'badge-success' : f.status === 'partial' ? 'badge-warning' : 'badge-danger'}`}>
-                        {f.status}
-                      </span>
-                    </td>
-                    <td>{f.payment_method || '—'}</td>
+        <Card hover={false}>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
+              <Landmark className="w-5 h-5 text-bitcoin" /> Fee History Ledger
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-void/40 border-y border-white/10">
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Month</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Due</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Paid</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Method</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {fees.map((f) => (
+                    <tr key={f.id} className="hover:bg-white/5 transition-all">
+                      <td className="px-6 py-3 text-sm text-pure/90 font-medium">{f.month}</td>
+                      <td className="px-6 py-3 text-sm text-pure font-mono">৳{f.amount_due.toLocaleString()}</td>
+                      <td className={`px-6 py-3 text-sm font-mono ${f.amount_paid > 0 ? 'text-green-400' : 'text-pure/60'}`}>
+                        ৳{f.amount_paid.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
+                          f.status === 'paid' 
+                            ? 'bg-green-500/15 border-green-500/30 text-green-400' 
+                            : f.status === 'partial' 
+                            ? 'bg-bitcoin/15 border-bitcoin/30 text-bitcoin' 
+                            : 'bg-red-500/15 border-red-500/30 text-red-400'
+                        }`}>
+                          {f.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-sm text-stardust font-mono uppercase">{f.payment_method || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

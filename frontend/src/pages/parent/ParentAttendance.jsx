@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
+import { Card, CardContent } from '../../components/Card';
+import { Input } from '../../components/Input';
 
 const STATUS_COLORS = {
-  present: { bg: 'var(--color-success-bg)', color: 'var(--color-success)', label: 'P' },
-  absent: { bg: 'var(--color-danger-bg)', color: 'var(--color-danger)', label: 'A' },
-  late: { bg: 'var(--color-warning-bg)', color: 'var(--color-warning)', label: 'L' },
+  present: { bg: 'bg-green-500/20', color: 'text-green-400', border: 'border-green-500/30', label: 'P' },
+  absent: { bg: 'bg-red-500/20', color: 'text-red-400', border: 'border-red-500/30', label: 'A' },
+  late: { bg: 'bg-yellow-500/20', color: 'text-yellow-400', border: 'border-yellow-500/30', label: 'L' },
 };
 
 function getDaysInMonth(year, month) {
@@ -33,106 +35,98 @@ export default function ParentAttendance() {
   const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="space-y-6">
+      <div className="mb-8 flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 className="page-title">Attendance</h1>
-          <p className="page-subtitle">Monthly attendance calendar</p>
+          <h1 className="text-2xl font-heading text-pure font-bold">Attendance</h1>
+          <p className="text-stardust font-body mt-1">Monthly attendance calendar</p>
         </div>
-        <input
-          type="month"
-          className="form-input"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          style={{ width: 'auto' }}
-        />
+        <div className="w-auto min-w-[150px]">
+          <Input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          />
+        </div>
       </div>
 
       {data && (
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <span className="badge badge-success">✅ Present: {data.summary.present}</span>
-          <span className="badge badge-danger">❌ Absent: {data.summary.absent}</span>
-          <span className="badge badge-warning">⏰ Late: {data.summary.late}</span>
-          <span className="badge badge-info">📅 Sessions: {data.summary.total_sessions}</span>
+        <div className="flex gap-3 mb-6 flex-wrap">
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">✅ Present: {data.summary.present}</span>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">❌ Absent: {data.summary.absent}</span>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">⏰ Late: {data.summary.late}</span>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/20 text-blue-400 border-blue-500/30">📅 Sessions: {data.summary.total_sessions}</span>
           <span
-            className="badge"
-            style={{
-              background: data.summary.attendance_rate >= 75 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-              color: data.summary.attendance_rate >= 75 ? 'var(--color-success)' : 'var(--color-danger)',
-            }}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${
+              data.summary.attendance_rate >= 75
+                ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                : 'bg-red-500/20 text-red-400 border-red-500/30'
+            }`}
           >
             📊 {data.summary.attendance_rate}%
           </span>
         </div>
       )}
 
-      <div className="card">
-        {loading ? (
-          <div className="skeleton" style={{ height: '300px' }} />
-        ) : (
-          <div>
-            {/* Day labels */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
-              {DAY_LABELS.map((d) => (
-                <div key={d} style={{ textAlign: 'center', fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', fontWeight: 600, padding: '4px' }}>
-                  {d}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
-              {/* Empty cells for first day offset */}
-              {[...Array(firstDay)].map((_, i) => (
-                <div key={`empty-${i}`} />
-              ))}
-
-              {/* Day cells */}
-              {[...Array(daysInMonth)].map((_, i) => {
-                const day = i + 1;
-                const dateStr = `${year}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const status = data?.calendar?.[dateStr];
-                const style = status ? STATUS_COLORS[status] : null;
-
-                return (
-                  <div
-                    key={day}
-                    style={{
-                      aspectRatio: '1',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 'var(--radius-sm)',
-                      background: style ? style.bg : 'var(--bg-surface-2)',
-                      color: style ? style.color : 'var(--text-muted)',
-                      fontSize: 'var(--font-size-xs)',
-                      fontWeight: status ? 700 : 400,
-                      border: `1px solid ${style ? style.color + '30' : 'transparent'}`,
-                      transition: 'all 0.15s',
-                      cursor: 'default',
-                    }}
-                    title={status ? `${dateStr}: ${status}` : dateStr}
-                  >
-                    <div>{day}</div>
-                    {status && <div style={{ fontSize: '9px', opacity: 0.8 }}>{style.label}</div>}
+      <Card className="bg-matter border-white/10">
+        <CardContent className="p-4 sm:p-6">
+          {loading ? (
+            <div className="animate-pulse bg-white/5 border border-white/10 rounded-lg h-[300px]" />
+          ) : (
+            <div>
+              {/* Day labels */}
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {DAY_LABELS.map((d) => (
+                  <div key={d} className="text-center text-xs text-stardust font-heading font-semibold p-1">
+                    {d}
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            {/* Legend */}
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              {Object.entries(STATUS_COLORS).map(([s, style]) => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--font-size-xs)' }}>
-                  <div style={{ width: 12, height: 12, borderRadius: 3, background: style.bg, border: `1px solid ${style.color}30` }} />
-                  <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{s}</span>
-                </div>
-              ))}
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                {/* Empty cells for first day offset */}
+                {[...Array(firstDay)].map((_, i) => (
+                  <div key={`empty-${i}`} />
+                ))}
+
+                {/* Day cells */}
+                {[...Array(daysInMonth)].map((_, i) => {
+                  const day = i + 1;
+                  const dateStr = `${year}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                  const status = data?.calendar?.[dateStr];
+                  const style = status ? STATUS_COLORS[status] : null;
+
+                  return (
+                    <div
+                      key={day}
+                      className={`aspect-square flex flex-col items-center justify-center rounded-md text-xs transition-all duration-150 cursor-default border ${
+                        style
+                          ? `${style.bg} ${style.color} ${style.border} font-bold`
+                          : 'bg-white/5 text-stardust border-transparent font-normal'
+                      }`}
+                      title={status ? `${dateStr}: ${status}` : dateStr}
+                    >
+                      <div className="font-mono">{day}</div>
+                      {status && <div className="text-[9px] opacity-80 mt-0.5 font-mono">{style.label}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex gap-4 mt-6 justify-center flex-wrap">
+                {Object.entries(STATUS_COLORS).map(([s, style]) => (
+                  <div key={s} className="flex items-center gap-1.5 text-xs font-mono">
+                    <div className={`w-3 h-3 rounded ${style.bg} border ${style.border}`} />
+                    <span className="text-stardust capitalize">{s}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
