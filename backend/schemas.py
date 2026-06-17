@@ -1,0 +1,381 @@
+from datetime import date, datetime
+from typing import Optional, List, Any
+from pydantic import BaseModel, field_validator, model_validator
+import json
+
+
+# ─── Auth ───────────────────────────────────────────────────────────────────
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class ParentLoginRequest(BaseModel):
+    username: str
+    parent_code: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str
+    student_id: Optional[int] = None
+
+
+# ─── Students ───────────────────────────────────────────────────────────────
+
+class StudentCreate(BaseModel):
+    name: str
+    class_level: str
+    subjects: List[str]
+    guardian_name: str
+    guardian_phone: str
+    parent_username: str
+    parent_password: str
+    address: Optional[str] = None
+    enrollment_date: Optional[date] = None
+
+    @field_validator("class_level")
+    @classmethod
+    def validate_class_level(cls, v):
+        if v not in ("JSC", "SSC"):
+            raise ValueError("class_level must be JSC or SSC")
+        return v
+
+    @field_validator("subjects")
+    @classmethod
+    def validate_subjects(cls, v):
+        if not v:
+            raise ValueError("subjects must not be empty")
+        return v
+
+
+class StudentUpdate(BaseModel):
+    name: Optional[str] = None
+    class_level: Optional[str] = None
+    subjects: Optional[List[str]] = None
+    guardian_name: Optional[str] = None
+    guardian_phone: Optional[str] = None
+    parent_username: Optional[str] = None
+    parent_password: Optional[str] = None
+    address: Optional[str] = None
+    status: Optional[str] = None
+
+    @field_validator("class_level")
+    @classmethod
+    def validate_class_level(cls, v):
+        if v is not None and v not in ("JSC", "SSC"):
+            raise ValueError("class_level must be JSC or SSC")
+        return v
+
+
+class StudentStatusUpdate(BaseModel):
+    status: str
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, v):
+        if v not in ("active", "inactive"):
+            raise ValueError("status must be active or inactive")
+        return v
+
+
+class StudentResponse(BaseModel):
+    id: int
+    name: str
+    class_level: str
+    subjects: Any  # Will be parsed from JSON string
+    guardian_name: str
+    guardian_phone: str
+    address: Optional[str]
+    enrollment_date: date
+    status: str
+    parent_code: str
+    parent_username: Optional[str] = None
+    photo_path: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+    @model_validator(mode="after")
+    def parse_subjects(self):
+        if isinstance(self.subjects, str):
+            try:
+                self.subjects = json.loads(self.subjects)
+            except Exception:
+                self.subjects = []
+        return self
+
+
+# ─── Batches ────────────────────────────────────────────────────────────────
+
+class BatchCreate(BaseModel):
+    name: str
+    subject: str
+    schedule: List[str]
+    time_slot: str
+
+    @field_validator("schedule")
+    @classmethod
+    def validate_schedule(cls, v):
+        valid_days = {"Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"}
+        for day in v:
+            if day not in valid_days:
+                raise ValueError(f"Invalid day: {day}")
+        return v
+
+
+class BatchUpdate(BaseModel):
+    name: Optional[str] = None
+    subject: Optional[str] = None
+    schedule: Optional[List[str]] = None
+    time_slot: Optional[str] = None
+    status: Optional[str] = None
+
+
+class BatchResponse(BaseModel):
+    id: int
+    name: str
+    subject: str
+    schedule: Any
+    time_slot: str
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    student_count: Optional[int] = 0
+
+    model_config = {"from_attributes": True}
+
+    @model_validator(mode="after")
+    def parse_schedule(self):
+        if isinstance(self.schedule, str):
+            try:
+                self.schedule = json.loads(self.schedule)
+            except Exception:
+                self.schedule = []
+        return self
+
+
+# ─── Sessions ───────────────────────────────────────────────────────────────
+
+class SessionCreate(BaseModel):
+    batch_id: int
+    date: date
+    topic: Optional[str] = None
+    duration_minutes: int = 60
+
+
+class SessionResponse(BaseModel):
+    id: int
+    batch_id: int
+    date: date
+    topic: Optional[str]
+    duration_minutes: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Attendance ──────────────────────────────────────────────────────────────
+
+class AttendanceRecord(BaseModel):
+    student_id: int
+    status: str
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, v):
+        if v not in ("present", "absent", "late"):
+            raise ValueError("status must be present, absent, or late")
+        return v
+
+
+class AttendanceBulkCreate(BaseModel):
+    session_id: int
+    records: List[AttendanceRecord]
+
+
+class AttendanceResponse(BaseModel):
+    id: int
+    session_id: int
+    student_id: int
+    status: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Fees ────────────────────────────────────────────────────────────────────
+
+class FeeGenerate(BaseModel):
+    month: str  # YYYY-MM
+    amount_due: float
+
+    @field_validator("amount_due")
+    @classmethod
+    def validate_amount(cls, v):
+        if v <= 0:
+            raise ValueError("amount_due must be positive")
+        return v
+
+
+class FeePayment(BaseModel):
+    amount_paid: float
+    payment_method: Optional[str] = None
+    payment_date: Optional[date] = None
+    notes: Optional[str] = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_method(cls, v):
+        if v is not None and v not in ("cash", "bkash", "nagad", "bank"):
+            raise ValueError("Invalid payment method")
+        return v
+
+
+class FeeResponse(BaseModel):
+    id: int
+    student_id: int
+    month: str
+    amount_due: float
+    amount_paid: float
+    payment_date: Optional[date]
+    payment_method: Optional[str]
+    status: str
+    notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    student_name: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Homework ────────────────────────────────────────────────────────────────
+
+class HomeworkCreate(BaseModel):
+    batch_id: int
+    title: str
+    description: Optional[str] = None
+    assigned_date: Optional[date] = None
+    due_date: date
+
+    @model_validator(mode="after")
+    def validate_dates(self):
+        assigned = self.assigned_date or date.today()
+        if self.due_date < assigned:
+            raise ValueError("due_date must be >= assigned_date")
+        return self
+
+
+class HomeworkUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    due_date: Optional[date] = None
+
+
+class HomeworkResponse(BaseModel):
+    id: int
+    batch_id: int
+    title: str
+    description: Optional[str]
+    assigned_date: date
+    due_date: date
+    created_at: datetime
+    submission_count: Optional[int] = 0
+
+    model_config = {"from_attributes": True}
+
+
+class SubmissionUpdate(BaseModel):
+    student_id: int
+    status: str
+    feedback: Optional[str] = None
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, v):
+        if v not in ("submitted", "not_submitted", "late"):
+            raise ValueError("Invalid submission status")
+        return v
+
+
+class SubmissionResponse(BaseModel):
+    id: int
+    homework_id: int
+    student_id: int
+    status: str
+    feedback: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    student_name: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Results ─────────────────────────────────────────────────────────────────
+
+class ResultCreate(BaseModel):
+    student_id: int
+    subject: str
+    exam_name: str
+    exam_date: date
+    score: float
+    total_marks: float
+
+    @model_validator(mode="after")
+    def validate_scores(self):
+        if self.score < 0:
+            raise ValueError("score must be >= 0")
+        if self.total_marks <= 0:
+            raise ValueError("total_marks must be > 0")
+        if self.score > self.total_marks:
+            raise ValueError("score cannot exceed total_marks")
+        return self
+
+
+class ResultUpdate(BaseModel):
+    subject: Optional[str] = None
+    exam_name: Optional[str] = None
+    exam_date: Optional[date] = None
+    score: Optional[float] = None
+    total_marks: Optional[float] = None
+
+
+class ResultResponse(BaseModel):
+    id: int
+    student_id: int
+    subject: str
+    exam_name: str
+    exam_date: date
+    score: float
+    total_marks: float
+    grade: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    student_name: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Dashboard ───────────────────────────────────────────────────────────────
+
+class DashboardStats(BaseModel):
+    total_active_students: int
+    todays_sessions: int
+    unpaid_fees_count: int
+    monthly_collection: float
+    attendance_rate: float
+
+
+class DashboardAlert(BaseModel):
+    type: str
+    message: str
+    student_id: Optional[int] = None
+    student_name: Optional[str] = None

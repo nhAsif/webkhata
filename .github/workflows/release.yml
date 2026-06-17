@@ -1,0 +1,55 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build Vite frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install and build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      # Assemble release package
+      - name: Assemble release
+        run: |
+          mkdir -p release/backend/static
+          cp -r backend/*.py backend/requirements.txt release/backend/
+          cp -r backend/routers release/backend/
+          cp -r backend/utils release/backend/
+          cp -r frontend/dist/* release/backend/static/
+          cp -r scripts release/
+          cp README.md release/
+          # Create install script
+          cp scripts/install.sh release/install.sh
+          chmod +x release/install.sh release/scripts/backup.sh
+
+      - name: Create release zip
+        run: |
+          cd release
+          zip -r ../webkhata-${{ github.ref_name }}.zip .
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: webkhata-${{ github.ref_name }}.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
