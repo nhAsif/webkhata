@@ -46,8 +46,9 @@ class StudentCreate(BaseModel):
     @field_validator("class_level")
     @classmethod
     def validate_class_level(cls, v):
-        if v not in ("JSC", "SSC"):
-            raise ValueError("class_level must be JSC or SSC")
+        valid_classes = ("Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "JSC", "SSC")
+        if v not in valid_classes:
+            raise ValueError(f"class_level must be one of {', '.join(valid_classes)}")
         return v
 
     @field_validator("subjects")
@@ -81,8 +82,9 @@ class StudentUpdate(BaseModel):
     @field_validator("class_level")
     @classmethod
     def validate_class_level(cls, v):
-        if v is not None and v not in ("JSC", "SSC"):
-            raise ValueError("class_level must be JSC or SSC")
+        valid_classes = ("Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "JSC", "SSC")
+        if v is not None and v not in valid_classes:
+            raise ValueError(f"class_level must be one of {', '.join(valid_classes)}")
         return v
 
     @field_validator("monthly_fee")

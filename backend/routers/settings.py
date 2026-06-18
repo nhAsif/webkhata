@@ -10,13 +10,13 @@ from sqlalchemy.orm import Session
 
 from config import settings
 from database import get_db
-from auth import get_current_tutor
-from models import Tutor
+from auth import require_tutor
+from models import User
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
 @router.get("/backup")
-async def create_backup(current_user: Tutor = Depends(get_current_tutor)):
+async def create_backup(current_user: User = Depends(require_tutor)):
     """Generates a complete backup of the application data in a zip file."""
     
     # Create a temporary directory to store the backup files
@@ -37,18 +37,20 @@ async def create_backup(current_user: Tutor = Depends(get_current_tutor)):
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             zipf.write(db_backup_path, arcname="tutor.db")
             
+        tasks = BackgroundTasks()
+        tasks.add_task(shutil.rmtree, temp_dir, ignore_errors=True)
         return FileResponse(
             path=zip_path,
             filename=os.path.basename(zip_path),
             media_type="application/zip",
-            background=BackgroundTasks(tasks=[lambda: shutil.rmtree(temp_dir, ignore_errors=True)])
+            background=tasks
         )
     except Exception as e:
         shutil.rmtree(temp_dir, ignore_errors=True)
         raise HTTPException(status_code=500, detail=f"Failed to create backup: {str(e)}")
 
 @router.post("/restore")
-async def restore_backup(file: UploadFile = File(...), current_user: Tutor = Depends(get_current_tutor)):
+async def restore_backup(file: UploadFile = File(...), current_user: User = Depends(require_tutor)):
     """Restores application data from a backup zip file."""
     if not file.filename.endswith('.wkb') and not file.filename.endswith('.zip'):
         raise HTTPException(status_code=400, detail="Invalid backup file format. Must be .wkb or .zip")

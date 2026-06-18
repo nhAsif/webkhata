@@ -30,6 +30,8 @@ env/
 pyvenv.cfg
 .venv
 backend/.env
+dailyword.md
+newfeature.md
 # SQLite/Database
 *.db
 *.db-journal

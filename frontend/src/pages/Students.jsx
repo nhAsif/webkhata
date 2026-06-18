@@ -7,12 +7,12 @@ import Modal from '../components/Modal';
 import { Input, Select, Textarea } from '../components/Input';
 import Button from '../components/Button';
 
-const CLASS_LEVELS = ['JSC', 'SSC'];
+const CLASS_LEVELS = ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'JSC', 'SSC'];
 const SUBJECTS_LIST = ['Math', 'English', 'Science', 'Bangla', 'BGS', 'Religion', 'Physics', 'Chemistry', 'Biology', 'ICT'];
 
 const EMPTY_FORM = {
   name: '',
-  class_level: 'SSC',
+  class_level: 'Class 6',
   subjects: [],
   guardian_name: '',
   guardian_phone: '',

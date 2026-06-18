@@ -2,24 +2,27 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import StatCard from '../../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
-import { CheckSquare, Calendar, BookOpen } from 'lucide-react';
+import { CheckSquare, Calendar, BookOpen, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ParentDashboard() {
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [vocabStats, setVocabStats] = useState(null);
+  const [routine, setRoutine] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/parent/profile'),
       api.get('/parent/attendance'),
-      api.get('/vocabulary/progress/stats').catch(() => ({ data: null }))
-    ]).then(([p, a, v]) => {
+      api.get('/vocabulary/progress/stats').catch(() => ({ data: null })),
+      api.get('/parent/routine').catch(() => ({ data: null }))
+    ]).then(([p, a, v, r]) => {
       setProfile(p.data);
       setAttendance(a.data);
       setVocabStats(v.data);
+      setRoutine(r.data);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -96,7 +99,7 @@ export default function ParentDashboard() {
       </div>
 
       {profile?.batches?.length > 0 && (
-        <Card className="bg-matter border-white/10">
+        <Card className="bg-matter border-white/10 mb-6">
           <CardHeader>
             <CardTitle className="font-heading text-pure">📚 Enrolled Batches</CardTitle>
           </CardHeader>
@@ -121,6 +124,48 @@ export default function ParentDashboard() {
         </Card>
       )}
 
+      {routine && (
+        <Card className="bg-matter border-white/10 mb-6">
+          <CardHeader>
+            <CardTitle className="font-heading text-pure flex items-center gap-2">
+              <Clock className="w-5 h-5 text-bitcoin" />
+              Today's Routine
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-0">
+            {(() => {
+              const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
+              const subjects = routine?.weekly_timetable?.[today] || [];
+              const isOff = subjects.length === 0;
+
+              return (
+                <div
+                  className={`flex items-center gap-4 p-4 rounded-xl border bg-bitcoin/5 border-bitcoin/20`}
+                >
+                  <div className="w-12 font-bold font-mono text-base text-bitcoin text-center shrink-0">
+                    {today}
+                  </div>
+
+                  {isOff ? (
+                    <span className="text-stardust/70 text-sm italic font-body">
+                      🏖️ No classes today
+                    </span>
+                  ) : (
+                    <div className="flex gap-2 flex-wrap">
+                      {subjects.map((sub, idx) => (
+                        <span key={idx} className="rounded-full px-3 py-1 text-sm font-mono border bg-indigo-500/20 text-indigo-400 border-indigo-500/30">
+                          {sub}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
+
       {vocabStats && (
         <Card className="bg-gradient-to-br from-void to-matter border-bitcoin/20 shadow-[0_0_20px_rgba(247,147,26,0.1)] relative overflow-hidden group mb-6">
           <div className="absolute top-0 right-0 w-32 h-32 bg-bitcoin/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
@@ -138,12 +183,21 @@ export default function ParentDashboard() {
               <div className="text-sm text-stardust font-body">
                 Learn {vocabStats.today_total} new English words today to improve your vocabulary.
               </div>
-              <Link 
-                to="/parent/vocabulary"
-                className="px-6 py-2.5 bg-gradient-to-r from-burnt to-bitcoin hover:from-burnt/90 hover:to-bitcoin/90 text-void font-bold rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_10px_rgba(247,147,26,0.2)] text-sm uppercase tracking-wide"
-              >
-                View Today's Vocabulary
-              </Link>
+              <div className="flex gap-3 mt-4 sm:mt-0">
+                <Link 
+                  to="/parent/vocabulary"
+                  className="px-6 py-2.5 bg-gradient-to-r from-burnt to-bitcoin hover:from-burnt/90 hover:to-bitcoin/90 text-void font-bold rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_10px_rgba(247,147,26,0.2)] text-sm uppercase tracking-wide"
+                >
+                  View Today's Vocabulary
+                </Link>
+                <Link 
+                  to="/parent/vocabulary"
+                  state={{ tab: 'practice' }}
+                  className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-pure border border-white/20 font-bold rounded-xl flex items-center gap-2 transition-all text-sm uppercase tracking-wide"
+                >
+                  Practice
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

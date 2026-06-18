@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   BookOpen, 
   Search, 
@@ -74,7 +75,8 @@ function WordCard({ item, onBookmarkToggle, isBookmarked }) {
 }
 
 export default function ParentVocabulary() {
-  const [activeTab, setActiveTab] = useState('daily'); // daily, practice, saved, search
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'daily'); // daily, practice, saved, search
   
   const [dailyWords, setDailyWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -97,6 +99,10 @@ export default function ParentVocabulary() {
     loadStats();
     loadDaily();
     loadSaved();
+    if (location.state?.tab === 'practice') {
+      startPractice();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadStats = async () => {
