@@ -519,14 +519,14 @@ export default function Batches() {
                 return (
                   <div
                     key={day}
-                    className={`rounded-xl border transition-all duration-300 overflow-hidden ${
+                    className={`relative rounded-xl border transition-all duration-300 ${ttDropdown[day] ? 'z-50' : 'z-0'} ${
                       isActive 
                         ? 'border-bitcoin/30 bg-bitcoin/[0.02]' 
                         : 'border-white/5 bg-void/50 opacity-60'
                     }`}
                   >
                     {/* Day header */}
-                    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-white/5 ${
+                    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-white/5 rounded-t-[11px] ${
                       isActive ? 'bg-bitcoin/[0.06]' : 'bg-void/40'
                     }`}>
                       <div className="flex items-center gap-2">
