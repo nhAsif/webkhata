@@ -4,7 +4,8 @@ from typing import Optional
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import bcrypt
+import hashlib
+import secrets
 from sqlalchemy.orm import Session
 
 from config import settings
@@ -15,12 +16,18 @@ bearer_scheme = HTTPBearer()
 
 
 def hash_password(password: str) -> str:
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    salt = secrets.token_hex(16)
+    hashed = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return f"{salt}${hashed.hex()}"
 
 
-def verify_password(plain: str, hashed: str) -> bool:
-    return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
+def verify_password(plain: str, hashed_str: str) -> bool:
+    try:
+        salt, stored_hash = hashed_str.split('$')
+        new_hash = hashlib.pbkdf2_hmac('sha256', plain.encode('utf-8'), salt.encode('utf-8'), 100000)
+        return secrets.compare_digest(new_hash.hex(), stored_hash)
+    except ValueError:
+        return False
 
 
 def create_access_token(data: dict, expires_delta: timedelta) -> str:
