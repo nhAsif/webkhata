@@ -41,22 +41,20 @@ def get_stats(
     ).with_entities(func.coalesce(func.sum(models.StudentFeeCycle.fee_amount), 0.0)).scalar() or 0.0
 
     # Overall attendance rate for current month
-    year, mon = current_month.split("-")
-    sessions_this_month = db.query(models.Session).filter(
-        func.strftime("%Y", models.Session.date) == year,
-        func.strftime("%m", models.Session.date) == mon,
-    ).all()
-    session_ids = [s.id for s in sessions_this_month]
-
-    if session_ids:
-        total_records = db.query(models.Attendance).filter(
-            models.Attendance.session_id.in_(session_ids)
-        ).count()
+    year_str, mon_str = current_month.split("-")
+    
+    total_records = db.query(models.Attendance).filter(
+        func.strftime("%Y", models.Attendance.date) == year_str,
+        func.strftime("%m", models.Attendance.date) == mon_str,
+    ).count()
+    
+    if total_records > 0:
         present_records = db.query(models.Attendance).filter(
-            models.Attendance.session_id.in_(session_ids),
+            func.strftime("%Y", models.Attendance.date) == year_str,
+            func.strftime("%m", models.Attendance.date) == mon_str,
             models.Attendance.status.in_(["present", "late"]),
         ).count()
-        attendance_rate = round((present_records / total_records * 100), 1) if total_records else 0.0
+        attendance_rate = round((present_records / total_records * 100), 1)
     else:
         attendance_rate = 0.0
 
@@ -105,32 +103,26 @@ def get_alerts(
     alerts = []
     today = date.today()
     current_month = today.strftime("%Y-%m")
-    year, mon = current_month.split("-")
+    year_str, mon_str = current_month.split("-")
 
     # Low attendance students (< 60% this month)
-    sessions_this_month = db.query(models.Session).filter(
-        func.strftime("%Y", models.Session.date) == year,
-        func.strftime("%m", models.Session.date) == mon,
-    ).all()
-    session_ids = [s.id for s in sessions_this_month]
-
-    if session_ids:
-        students = db.query(models.Student).filter(models.Student.status == "active").all()
-        for student in students:
-            records = db.query(models.Attendance).filter(
-                models.Attendance.student_id == student.id,
-                models.Attendance.session_id.in_(session_ids),
-            ).all()
-            if records:
-                present = sum(1 for r in records if r.status in ("present", "late"))
-                rate = present / len(session_ids) * 100
-                if rate < 60:
-                    alerts.append(schemas.DashboardAlert(
-                        type="low_attendance",
-                        message=f"{student.name} has {rate:.0f}% attendance this month",
-                        student_id=student.id,
-                        student_name=student.name,
-                    ))
+    students = db.query(models.Student).filter(models.Student.status == "active").all()
+    for student in students:
+        records = db.query(models.Attendance).filter(
+            models.Attendance.student_id == student.id,
+            func.strftime("%Y", models.Attendance.date) == year_str,
+            func.strftime("%m", models.Attendance.date) == mon_str,
+        ).all()
+        if records:
+            present = sum(1 for r in records if r.status in ("present", "late"))
+            rate = present / len(records) * 100
+            if rate < 60:
+                alerts.append(schemas.DashboardAlert(
+                    type="low_attendance",
+                    message=f"{student.name} has {rate:.0f}% attendance this month",
+                    student_id=student.id,
+                    student_name=student.name,
+                ))
 
     # Overdue fees (unpaid cycles from StudentFeeCycle)
     unpaid_cycles = db.query(models.StudentFeeCycle).filter(

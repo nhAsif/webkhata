@@ -228,13 +228,13 @@ class AttendanceRecord(BaseModel):
 
 
 class AttendanceBulkCreate(BaseModel):
-    session_id: int
+    date: date
     records: List[AttendanceRecord]
 
 
 class AttendanceResponse(BaseModel):
     id: int
-    session_id: int
+    date: date
     student_id: int
     status: str
     created_at: datetime

@@ -122,11 +122,13 @@ for i in range(10):
 
             for s in batch_students_list:
                 status = random.choices(["present", "absent", "late"], weights=[75, 15, 10])[0]
-                db.add(models.Attendance(
-                    session_id=session.id,
-                    student_id=s.id,
-                    status=status,
-                ))
+                existing = db.query(models.Attendance).filter_by(date=session_date, student_id=s.id).first()
+                if not existing:
+                    db.add(models.Attendance(
+                        date=session_date,
+                        student_id=s.id,
+                        status=status,
+                    ))
         except Exception as e:
             db.rollback()
             print(f"  Skipped duplicate session: {e}")

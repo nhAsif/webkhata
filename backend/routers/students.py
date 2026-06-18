@@ -12,6 +12,7 @@ from auth import require_tutor
 from database import get_db
 import models
 import schemas
+from datetime import timedelta
 
 router = APIRouter(prefix="/api/students", tags=["students"])
 
@@ -24,6 +25,50 @@ def generate_parent_code(db: Session) -> str:
         exists = db.query(models.Student).filter(models.Student.parent_code == code).first()
         if not exists:
             return code
+
+
+def backfill_student_attendance(db: Session, student: models.Student, old_start_date: Optional[date] = None):
+    """Automatically generates daily 'present' attendance from start_date to today."""
+    today = date.today()
+    if student.start_date and student.start_date > today:
+        return
+
+    # If start date moved later, delete auto-generated records before new start date
+    if old_start_date and student.start_date and old_start_date < student.start_date:
+        # We only delete "present" records (assumed auto-generated/default)
+        db.query(models.Attendance).filter(
+            models.Attendance.student_id == student.id,
+            models.Attendance.date >= old_start_date,
+            models.Attendance.date < student.start_date,
+            models.Attendance.status == 'present'
+        ).delete()
+        db.commit()
+
+    if not student.start_date:
+        return
+
+    # Generate missing attendance
+    start = student.start_date
+    end = today
+    
+    existing = db.query(models.Attendance.date).filter(
+        models.Attendance.student_id == student.id,
+        models.Attendance.date >= start,
+        models.Attendance.date <= end
+    ).all()
+    existing_dates = {e[0] for e in existing}
+
+    current = start
+    while current <= end:
+        if current not in existing_dates:
+            att = models.Attendance(
+                student_id=student.id,
+                date=current,
+                status="present"
+            )
+            db.add(att)
+        current += timedelta(days=1)
+    db.commit()
 
 
 @router.get("", response_model=list[schemas.StudentResponse])
@@ -87,6 +132,9 @@ def create_student(
     db.add(parent_user)
     db.commit()
     
+    # Backfill attendance
+    backfill_student_attendance(db, student)
+    
     setattr(student, "parent_username", parent_user.username)
     return student
 
@@ -123,11 +171,17 @@ def update_student(
     parent_username = update_data.pop("parent_username", None)
     parent_password = update_data.pop("parent_password", None)
 
+    old_start_date = student.start_date
+
     for key, value in update_data.items():
         setattr(student, key, value)
 
     db.commit()
     db.refresh(student)
+
+    # Backfill attendance if start date changed
+    if "start_date" in update_data:
+        backfill_student_attendance(db, student, old_start_date)
 
     # Update or create the parent user
     from auth import hash_password

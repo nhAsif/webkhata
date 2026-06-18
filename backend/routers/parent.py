@@ -56,37 +56,50 @@ def get_attendance(
     student = get_child(current_user, db)
     today = date.today()
     month = month or today.strftime("%Y-%m")
-    year, mon = month.split("-")
+    year_str, mon_str = month.split("-")
+    year, mon = int(year_str), int(mon_str)
 
-    sessions = db.query(models.Session).filter(
-        func.strftime("%Y", models.Session.date) == year,
-        func.strftime("%m", models.Session.date) == mon,
-    ).all()
-
-    session_ids = [s.id for s in sessions]
     attendance_records = db.query(models.Attendance).filter(
         models.Attendance.student_id == student.id,
-        models.Attendance.session_id.in_(session_ids),
+        func.strftime("%Y", models.Attendance.date) == year_str,
+        func.strftime("%m", models.Attendance.date) == mon_str,
     ).all()
 
-    # Map session_id → date
-    session_map = {s.id: s for s in sessions}
-    calendar = {}
+    calendar_dict = {}
     for att in attendance_records:
-        s = session_map.get(att.session_id)
-        if s:
-            calendar[str(s.date)] = att.status
+        calendar_dict[str(att.date)] = att.status
 
-    present = sum(1 for v in calendar.values() if v == "present")
-    late = sum(1 for v in calendar.values() if v == "late")
-    absent = sum(1 for v in calendar.values() if v == "absent")
-    total = len(sessions)
-    rate = round((present + late) / total * 100, 1) if total else 0
+    present = sum(1 for v in calendar_dict.values() if v == "present")
+    late = sum(1 for v in calendar_dict.values() if v == "late")
+    absent = sum(1 for v in calendar_dict.values() if v == "absent")
+    
+    import calendar
+    if today.year == year and today.month == mon:
+        days_in_month = today.day
+    elif today.year < year or (today.year == year and today.month < mon):
+        days_in_month = 0
+    else:
+        days_in_month = calendar.monthrange(year, mon)[1]
+
+    # Total days considered for the student is from their start_date
+    student_start = student.start_date or date(year, mon, 1)
+    start_of_month = date(year, mon, 1)
+    end_of_month = date(year, mon, calendar.monthrange(year, mon)[1])
+    
+    if student_start > end_of_month:
+        total = 0
+    else:
+        calc_start = max(start_of_month, student_start)
+        calc_end = min(end_of_month, today)
+        total = (calc_end - calc_start).days + 1
+
+    total = max(0, total)
+    rate = round((present + late) / total * 100, 1) if total > 0 else 0
 
     return {
         "month": month,
         "student_name": student.name,
-        "calendar": calendar,
+        "calendar": calendar_dict,
         "summary": {
             "present": present,
             "late": late,

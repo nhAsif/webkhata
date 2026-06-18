@@ -1,8 +1,10 @@
 from datetime import date
 from typing import Optional
+import calendar
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from auth import require_tutor
 from database import get_db
@@ -71,13 +73,9 @@ def bulk_mark_attendance(
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
-    session = db.query(models.Session).filter(models.Session.id == body.session_id).first()
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
     for record in body.records:
         existing = db.query(models.Attendance).filter(
-            models.Attendance.session_id == body.session_id,
+            models.Attendance.date == body.date,
             models.Attendance.student_id == record.student_id,
         ).first()
 
@@ -85,7 +83,7 @@ def bulk_mark_attendance(
             existing.status = record.status
         else:
             att = models.Attendance(
-                session_id=body.session_id,
+                date=body.date,
                 student_id=record.student_id,
                 status=record.status,
             )
@@ -101,11 +99,6 @@ def auto_init_session(
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
-    """
-    Create a session for the given batch+date if it doesn't exist,
-    then auto-mark every enrolled student as 'present' unless they
-    already have a record. Returns the session and all attendance records.
-    """
     batch = db.query(models.Batch).filter(models.Batch.id == body.batch_id).first()
     if not batch:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -133,24 +126,24 @@ def auto_init_session(
     ).all()
     student_ids = [bs.student_id for bs in batch_students]
 
-    # Auto-mark present for students who have no record yet
-    for sid in student_ids:
-        existing = db.query(models.Attendance).filter(
-            models.Attendance.session_id == session.id,
-            models.Attendance.student_id == sid,
-        ).first()
-        if not existing:
-            db.add(models.Attendance(
-                session_id=session.id,
-                student_id=sid,
-                status="present",
-            ))
+    today = date.today()
+    if body.date <= today:
+        for sid in student_ids:
+            existing = db.query(models.Attendance).filter(
+                models.Attendance.date == body.date,
+                models.Attendance.student_id == sid,
+            ).first()
+            if not existing:
+                db.add(models.Attendance(
+                    date=body.date,
+                    student_id=sid,
+                    status="present",
+                ))
+        db.commit()
 
-    db.commit()
-
-    # Return session + all attendance records
     attendance_records = db.query(models.Attendance).filter(
-        models.Attendance.session_id == session.id
+        models.Attendance.date == body.date,
+        models.Attendance.student_id.in_(student_ids)
     ).all()
 
     return {
@@ -168,23 +161,25 @@ def auto_init_session(
     }
 
 
-@attendance_router.patch("/{session_id}/{student_id}", response_model=schemas.AttendanceResponse)
+@attendance_router.patch("/{record_date}/{student_id}", response_model=schemas.AttendanceResponse)
 def update_single_attendance(
-    session_id: int,
+    record_date: date,
     student_id: int,
     body: schemas.AttendanceStatusUpdate,
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
-    """Instantly update a single student's attendance status."""
+    if record_date > date.today():
+        raise HTTPException(status_code=400, detail="Cannot mark attendance for future dates")
+        
     record = db.query(models.Attendance).filter(
-        models.Attendance.session_id == session_id,
+        models.Attendance.date == record_date,
         models.Attendance.student_id == student_id,
     ).first()
 
     if not record:
         record = models.Attendance(
-            session_id=session_id,
+            date=record_date,
             student_id=student_id,
             status=body.status,
         )
@@ -197,14 +192,14 @@ def update_single_attendance(
     return record
 
 
-@attendance_router.get("/{session_id}", response_model=list[schemas.AttendanceResponse])
-def get_session_attendance(
-    session_id: int,
+@attendance_router.get("/{record_date}", response_model=list[schemas.AttendanceResponse])
+def get_date_attendance(
+    record_date: date,
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
     return db.query(models.Attendance).filter(
-        models.Attendance.session_id == session_id
+        models.Attendance.date == record_date
     ).all()
 
 
@@ -218,14 +213,14 @@ def get_student_attendance(
 ):
     query = db.query(models.Attendance).filter(
         models.Attendance.student_id == student_id
-    ).join(models.Session)
+    )
 
     if from_date:
-        query = query.filter(models.Session.date >= from_date)
+        query = query.filter(models.Attendance.date >= from_date)
     if to_date:
-        query = query.filter(models.Session.date <= to_date)
+        query = query.filter(models.Attendance.date <= to_date)
 
-    return query.order_by(models.Session.date.desc()).all()
+    return query.order_by(models.Attendance.date.desc()).all()
 
 
 @attendance_router.get("/summary/monthly")
@@ -234,15 +229,19 @@ def attendance_summary(
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
-    from sqlalchemy import func
-    year, mon = month.split("-")
-    sessions = db.query(models.Session).filter(
-        func.strftime("%Y", models.Session.date) == year,
-        func.strftime("%m", models.Session.date) == mon,
-    ).all()
+    year_str, mon_str = month.split("-")
+    year, mon = int(year_str), int(mon_str)
+    
+    # Calculate days to consider for the month
+    today = date.today()
+    if today.year == year and today.month == mon:
+        days_in_month = today.day
+    elif today.year < year or (today.year == year and today.month < mon):
+        days_in_month = 0
+    else:
+        days_in_month = calendar.monthrange(year, mon)[1]
 
-    session_ids = [s.id for s in sessions]
-    if not session_ids:
+    if days_in_month == 0:
         return {"month": month, "total_sessions": 0, "summary": []}
 
     students = db.query(models.Student).filter(models.Student.status == "active").all()
@@ -250,14 +249,28 @@ def attendance_summary(
     for student in students:
         records = db.query(models.Attendance).filter(
             models.Attendance.student_id == student.id,
-            models.Attendance.session_id.in_(session_ids),
+            func.strftime("%Y", models.Attendance.date) == year_str,
+            func.strftime("%m", models.Attendance.date) == mon_str,
         ).all()
 
         present_count = sum(1 for r in records if r.status == "present")
         absent_count = sum(1 for r in records if r.status == "absent")
         late_count = sum(1 for r in records if r.status == "late")
-        total = len(session_ids)
-        rate = round((present_count + late_count) / total * 100, 1) if total else 0
+        
+        # Total days considered for the student is from their start_date
+        student_start = student.start_date or date(year, mon, 1)
+        start_of_month = date(year, mon, 1)
+        end_of_month = date(year, mon, calendar.monthrange(year, mon)[1])
+        
+        if student_start > end_of_month:
+            total = 0
+        else:
+            calc_start = max(start_of_month, student_start)
+            calc_end = min(end_of_month, today)
+            total = (calc_end - calc_start).days + 1
+
+        total = max(0, total)
+        rate = round((present_count + late_count) / total * 100, 1) if total > 0 else 0
 
         summary.append({
             "student_id": student.id,
@@ -269,4 +282,4 @@ def attendance_summary(
             "attendance_rate": rate,
         })
 
-    return {"month": month, "total_sessions": len(session_ids), "summary": summary}
+    return {"month": month, "total_sessions": days_in_month, "summary": summary}

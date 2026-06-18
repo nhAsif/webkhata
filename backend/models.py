@@ -113,25 +113,23 @@ class Session(Base):
 
     # Relationships
     batch = relationship("Batch", back_populates="sessions")
-    attendance_records = relationship("Attendance", back_populates="session", cascade="all, delete-orphan")
 
 
 class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(Integer, ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    date = Column(Date, nullable=False, index=True)
     student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
-    status = Column(String, nullable=False)
+    status = Column(String, nullable=False, default="present")
     created_at = Column(DateTime, default=func.now())
 
     __table_args__ = (
-        UniqueConstraint("session_id", "student_id", name="uq_attendance_session_student"),
+        UniqueConstraint("date", "student_id", name="uq_attendance_date_student"),
         CheckConstraint("status IN ('present', 'absent', 'late')", name="check_attendance_status"),
     )
 
     # Relationships
-    session = relationship("Session", back_populates="attendance_records")
     student = relationship("Student", back_populates="attendance_records")
 
 

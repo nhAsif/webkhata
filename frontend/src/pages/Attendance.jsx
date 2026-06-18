@@ -105,7 +105,7 @@ export default function Attendance() {
     setSavingStudents((prev) => ({ ...prev, [studentId]: true }));
 
     try {
-      await api.patch(`/attendance/${existingSession.id}/${studentId}`, { status: nextStatus });
+      await api.patch(`/attendance/${sessionDate}/${studentId}`, { status: nextStatus });
     } catch {
       // Revert on error
       setAttendance((prev) => ({ ...prev, [studentId]: currentStatus }));
