@@ -39,11 +39,10 @@ USE_PROCD=1
 
 start_service() {
     procd_open_instance
-    procd_set_param command /usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 6540 --workers 1 --app-dir $INSTALL_DIR/backend
-    procd_set_param respawn 3600 5 5
+    procd_set_param command /bin/sh -c "cd $INSTALL_DIR/backend && exec /usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 6540 --workers 1"
+    procd_set_param respawn
     procd_set_param stdout 1
     procd_set_param stderr 1
-    procd_set_param pidfile /var/run/$SERVICE_NAME.pid
     procd_close_instance
 }
 EOF
