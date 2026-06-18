@@ -152,6 +152,7 @@ from routers.dashboard import router as dashboard_router
 from routers.parent import router as parent_router
 from routers.payments import router as payments_router
 from routers.reports import router as reports_router
+from routers.vocabulary import router as vocabulary_router
 
 app.include_router(auth_router)
 app.include_router(students_router)
@@ -165,6 +166,7 @@ app.include_router(dashboard_router)
 app.include_router(parent_router)
 app.include_router(payments_router)
 app.include_router(reports_router)
+app.include_router(vocabulary_router)
 
 
 # ─── Static Files (React Build) ───────────────────────────────────────────────

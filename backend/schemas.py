@@ -550,3 +550,40 @@ class MonthlyCollectionRow(BaseModel):
     total_paid_this_month: float
     outstanding_balance: float
     status: str  # 'paid' | 'partial' | 'overdue'
+
+
+# ─── Vocabulary ──────────────────────────────────────────────────────────────
+
+class VocabularyWordResponse(BaseModel):
+    id: int
+    word: str
+    bangla_meaning: str
+    part_of_speech: str
+    synonyms: Optional[str]
+    antonyms: Optional[str]
+    example_sentence: Optional[str]
+    bangla_sentence_meaning: Optional[str]
+
+    model_config = {"from_attributes": True}
+
+
+class DailyVocabularyResponse(BaseModel):
+    id: int
+    date: date
+    word_id: int
+    display_order: int
+    word: VocabularyWordResponse
+
+    model_config = {"from_attributes": True}
+
+
+class StudentVocabularyProgressResponse(BaseModel):
+    id: int
+    student_id: int
+    word_id: int
+    viewed: bool
+    bookmarked: bool
+    viewed_at: Optional[datetime]
+    word: VocabularyWordResponse
+
+    model_config = {"from_attributes": True}

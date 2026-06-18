@@ -29,7 +29,7 @@ ENV/
 env/
 pyvenv.cfg
 .venv
-
+backend/.env
 # SQLite/Database
 *.db
 *.db-journal

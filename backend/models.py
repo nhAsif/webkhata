@@ -269,3 +269,50 @@ class Result(Base):
 
     # Relationships
     student = relationship("Student", back_populates="results")
+
+
+class VocabularyWord(Base):
+    __tablename__ = "vocabulary_words"
+
+    id = Column(Integer, primary_key=True, index=True)
+    word = Column(String, unique=True, nullable=False, index=True)
+    bangla_meaning = Column(String, nullable=False)
+    part_of_speech = Column(String, nullable=False)
+    synonyms = Column(String, nullable=True)
+    antonyms = Column(String, nullable=True)
+    example_sentence = Column(Text, nullable=True)
+    bangla_sentence_meaning = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+
+
+class DailyVocabularySet(Base):
+    __tablename__ = "daily_vocabulary_sets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False, index=True)
+    word_id = Column(Integer, ForeignKey("vocabulary_words.id", ondelete="CASCADE"), nullable=False)
+    display_order = Column(Integer, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("date", "word_id", name="uq_daily_vocab_date_word"),
+    )
+
+    word = relationship("VocabularyWord")
+
+
+class StudentVocabularyProgress(Base):
+    __tablename__ = "student_vocabulary_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    word_id = Column(Integer, ForeignKey("vocabulary_words.id", ondelete="CASCADE"), nullable=False)
+    viewed = Column(Boolean, default=False)
+    bookmarked = Column(Boolean, default=False)
+    viewed_at = Column(DateTime, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("student_id", "word_id", name="uq_student_vocab_student_word"),
+    )
+
+    student = relationship("Student")
+    word = relationship("VocabularyWord")

@@ -3,19 +3,23 @@ import api from '../../api/client';
 import StatCard from '../../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 import { CheckSquare, Calendar, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function ParentDashboard() {
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState(null);
+  const [vocabStats, setVocabStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/parent/profile'),
       api.get('/parent/attendance'),
-    ]).then(([p, a]) => {
+      api.get('/vocabulary/progress/stats').catch(() => ({ data: null }))
+    ]).then(([p, a, v]) => {
       setProfile(p.data);
       setAttendance(a.data);
+      setVocabStats(v.data);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -112,6 +116,34 @@ export default function ParentDashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {vocabStats && (
+        <Card className="bg-gradient-to-br from-void to-matter border-bitcoin/20 shadow-[0_0_20px_rgba(247,147,26,0.1)] relative overflow-hidden group mb-6">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-bitcoin/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+          <CardHeader className="flex flex-row items-center justify-between z-10 relative">
+            <CardTitle className="font-heading text-pure flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-bitcoin" />
+              Today's Vocabulary
+            </CardTitle>
+            <div className="text-xs font-mono text-stardust bg-white/5 px-2 py-1 rounded-md">
+              Progress: {vocabStats.today_viewed}/{vocabStats.today_total}
+            </div>
+          </CardHeader>
+          <CardContent className="p-6 pt-0 z-10 relative">
+            <div className="flex items-center justify-between flex-wrap gap-4 mt-2">
+              <div className="text-sm text-stardust font-body">
+                Learn {vocabStats.today_total} new English words today to improve your vocabulary.
+              </div>
+              <Link 
+                to="/parent/vocabulary"
+                className="px-6 py-2.5 bg-gradient-to-r from-burnt to-bitcoin hover:from-burnt/90 hover:to-bitcoin/90 text-void font-bold rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_10px_rgba(247,147,26,0.2)] text-sm uppercase tracking-wide"
+              >
+                View Today's Vocabulary
+              </Link>
             </div>
           </CardContent>
         </Card>

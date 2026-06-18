@@ -26,6 +26,7 @@ import ParentFees from './pages/parent/ParentFees';
 import ParentRoutine from './pages/parent/ParentRoutine';
 import ParentHomework from './pages/parent/ParentHomework';
 import ParentResults from './pages/parent/ParentResults';
+import ParentVocabulary from './pages/parent/ParentVocabulary';
 
 export default function App() {
   return (
@@ -73,6 +74,7 @@ export default function App() {
             <Route path="routine" element={<ParentRoutine />} />
             <Route path="homework" element={<ParentHomework />} />
             <Route path="results" element={<ParentResults />} />
+            <Route path="vocabulary" element={<ParentVocabulary />} />
           </Route>
 
           {/* Fallback */}

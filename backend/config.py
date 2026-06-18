@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Default tutor credentials (only used on first run)
     DEFAULT_TUTOR_USERNAME: str = "admin"
     DEFAULT_TUTOR_PASSWORD: str = "changeme"
+    
+    # External APIs
+    GEMINI_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

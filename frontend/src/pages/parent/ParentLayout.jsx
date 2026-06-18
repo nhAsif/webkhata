@@ -13,7 +13,8 @@ import {
   LogOut, 
   Key,
   Menu,
-  X
+  X,
+  BookOpen
 } from 'lucide-react';
 
 const PARENT_NAV = [
@@ -23,6 +24,7 @@ const PARENT_NAV = [
   { to: '/parent/routine', icon: Calendar, label: 'Routine' },
   { to: '/parent/homework', icon: FileText, label: 'Homework' },
   { to: '/parent/results', icon: TrendingUp, label: 'Results' },
+  { to: '/parent/vocabulary', icon: BookOpen, label: 'Vocabulary' },
 ];
 
 export default function ParentLayout() {
