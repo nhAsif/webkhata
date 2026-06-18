@@ -22,7 +22,12 @@ router = APIRouter(
 )
 
 # Configure Gemini API
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+client = None
+if settings.GEMINI_API_KEY:
+    try:
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    except Exception as e:
+        print(f"Error initializing Gemini client: {e}")
 
 PROMPT = """
 Generate 20 English vocabulary words suitable for students in Bangladesh learning English. 
@@ -39,6 +44,9 @@ Each object must have the following keys exactly:
 """
 
 def fetch_words_from_gemini():
+    if not client:
+        print("Gemini API key is not configured. Returning empty vocabulary.")
+        return []
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
