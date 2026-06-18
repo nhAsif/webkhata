@@ -33,7 +33,7 @@ jobs:
           cp -r backend/*.py backend/requirements.txt release/backend/
           cp -r backend/routers release/backend/
           cp -r backend/utils release/backend/
-          cp -r frontend/dist/* release/backend/static/
+          cp -r backend/static/* release/backend/static/
           cp -r scripts release/
           cp README.md release/
           # Create install script
