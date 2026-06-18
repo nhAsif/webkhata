@@ -5,7 +5,10 @@ import api from '../api/client';
 import StatCard from '../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import Button from '../components/Button';
-import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle } from 'lucide-react';
+import Modal from '../components/Modal';
+import { Input, Textarea } from '../components/Input';
+import toast from 'react-hot-toast';
+import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, PlusCircle } from 'lucide-react';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -18,19 +21,42 @@ export default function StudentProfile() {
   const [student, setStudent] = useState(null);
   const [fees, setFees] = useState([]);
   const [results, setResults] = useState([]);
+  const [financial, setFinancial] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [payModal, setPayModal] = useState(false);
+  const [payForm, setPayForm] = useState({ amount: '', payment_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     Promise.all([
       api.get(`/students/${id}`),
       api.get(`/fees/student/${id}`),
       api.get(`/results/student/${id}`),
-    ]).then(([s, f, r]) => {
+      api.get(`/students/${id}/financial`),
+    ]).then(([s, f, r, fin]) => {
       setStudent(s.data);
-      setFees(f.data);
+      setFees(f.data);  // now these are FeeCycleResponse objects
       setResults(r.data);
-    }).finally(() => setLoading(false));
+      setFinancial(fin.data);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
+
+  const handlePaySubmit = async (e) => {
+    e.preventDefault();
+    setPaying(true);
+    try {
+      await api.post('/payments', { student_id: parseInt(id), ...payForm, amount: parseFloat(payForm.amount) });
+      toast.success('Payment recorded successfully');
+      setPayModal(false);
+      setPayForm({ amount: '', payment_date: new Date().toISOString().split('T')[0], notes: '' });
+      // Refresh financial data
+      api.get(`/students/${id}/financial`).then((r) => setFinancial(r.data)).catch(() => {});
+    } catch {
+      // handled by interceptor
+    } finally {
+      setPaying(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -62,9 +88,10 @@ export default function StudentProfile() {
       grade: r.grade,
     }));
 
-  const totalFeesDue = fees.reduce((s, f) => s + f.amount_due, 0);
-  const totalFeesPaid = fees.reduce((s, f) => s + f.amount_paid, 0);
-  const unpaidFees = fees.filter((f) => f.status !== 'paid').length;
+  // Cycle-based fee stats
+  const totalCycles = fees.length;
+  const paidCycles = fees.filter(c => c.is_paid).length;
+  const unpaidCycles = totalCycles - paidCycles;
 
   return (
     <div className="space-y-6 font-body">
@@ -138,20 +165,8 @@ export default function StudentProfile() {
         </CardContent>
       </Card>
 
-      {/* Fee and performance stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <StatCard
-          label="Unpaid Months"
-          value={unpaidFees}
-          icon={<DollarSign className="w-5 h-5" />}
-          color={unpaidFees > 0 ? '#ef4444' : '#10b981'}
-        />
-        <StatCard
-          label="Total Paid"
-          value={`৳${totalFeesPaid.toLocaleString()}`}
-          icon={<CheckCircle className="w-5 h-5 text-green-400" />}
-          color="#10b981"
-        />
+      {/* Stat Card */}
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
         <StatCard
           label="Total Exams"
           value={results.length}
@@ -159,6 +174,73 @@ export default function StudentProfile() {
           color="#F7931A"
         />
       </div>
+
+      {/* Financial Dashboard */}
+      {financial && (() => {
+        const statusColor =
+          financial.status === 'paid' ? 'border-green-500/40'
+          : financial.status === 'partial' ? 'border-yellow-500/40'
+          : 'border-red-500/40';
+        const badgeClass =
+          financial.status === 'paid'
+            ? 'bg-green-500/15 border-green-500/30 text-green-400'
+            : financial.status === 'partial'
+            ? 'bg-yellow-500/15 border-yellow-500/30 text-yellow-400'
+            : 'bg-red-500/15 border-red-500/30 text-red-400';
+        return (
+          <Card hover={false} className={`border-2 ${statusColor}`}>
+            <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
+                <Wallet className="w-5 h-5 text-bitcoin" /> Financial Overview
+              </CardTitle>
+              <div className="flex items-center gap-3">
+                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border uppercase ${badgeClass}`}>
+                  {financial.status}
+                </span>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setPayModal(true)}
+                >
+                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" /> Add Payment
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Monthly Fee</span>
+                  <span className="text-lg font-bold text-bitcoin font-mono">৳{(financial.monthly_fee ?? 0).toLocaleString()}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Start Date</span>
+                  <span className="text-sm font-medium text-pure font-mono">{financial.start_date || '—'}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Completed Cycles</span>
+                  <span className="text-lg font-bold text-gold font-mono">{totalCycles}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Paid Cycles</span>
+                  <span className="text-lg font-bold text-green-400 font-mono">{paidCycles}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Pending Cycles</span>
+                  <span className={`text-lg font-bold font-mono ${unpaidCycles === 0 ? 'text-green-400' : unpaidCycles === 1 ? 'text-yellow-400' : 'text-red-400'}`}>
+                    {unpaidCycles}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Pending Amount</span>
+                  <span className={`text-lg font-bold font-mono ${(financial.outstanding_balance ?? 0) === 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    ৳{(financial.outstanding_balance ?? 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Results chart */}
       {chartData.length > 0 && (
@@ -200,12 +282,12 @@ export default function StudentProfile() {
         </Card>
       )}
 
-      {/* Fee history */}
+      {/* Cycle history */}
       {fees.length > 0 && (
         <Card hover={false}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
-              <Landmark className="w-5 h-5 text-bitcoin" /> Fee History Ledger
+              <Landmark className="w-5 h-5 text-bitcoin" /> Fee Cycle History
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -213,33 +295,28 @@ export default function StudentProfile() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-void/40 border-y border-white/10">
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Month</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Due</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Paid</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Cycle</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Period</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Amount</th>
                     <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Method</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Paid On</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {fees.map((f) => (
-                    <tr key={f.id} className="hover:bg-white/5 transition-all">
-                      <td className="px-6 py-3 text-sm text-pure/90 font-medium">{f.month}</td>
-                      <td className="px-6 py-3 text-sm text-pure font-mono">৳{f.amount_due.toLocaleString()}</td>
-                      <td className={`px-6 py-3 text-sm font-mono ${f.amount_paid > 0 ? 'text-green-400' : 'text-pure/60'}`}>
-                        ৳{f.amount_paid.toLocaleString()}
+                  {fees.map((c) => (
+                    <tr key={c.id} className="hover:bg-white/5 transition-all">
+                      <td className="px-6 py-3 text-sm font-bold text-pure font-mono">#{c.cycle_number}</td>
+                      <td className="px-6 py-3 text-sm text-stardust font-mono">
+                        {c.cycle_start_date} → {c.cycle_end_date}
                       </td>
+                      <td className="px-6 py-3 text-sm text-pure font-mono">৳{c.fee_amount.toLocaleString()}</td>
                       <td className="px-6 py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
-                          f.status === 'paid' 
-                            ? 'bg-green-500/15 border-green-500/30 text-green-400' 
-                            : f.status === 'partial' 
-                            ? 'bg-bitcoin/15 border-bitcoin/30 text-bitcoin' 
-                            : 'bg-red-500/15 border-red-500/30 text-red-400'
-                        }`}>
-                          {f.status}
-                        </span>
+                        {c.is_paid
+                          ? <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border bg-green-500/15 border-green-500/30 text-green-400">Paid</span>
+                          : <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border bg-red-500/15 border-red-500/30 text-red-400">Unpaid</span>
+                        }
                       </td>
-                      <td className="px-6 py-3 text-sm text-stardust font-mono uppercase">{f.payment_method || '—'}</td>
+                      <td className="px-6 py-3 text-sm text-stardust font-mono">{c.payment_date || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -248,6 +325,55 @@ export default function StudentProfile() {
           </CardContent>
         </Card>
       )}
+
+      {/* Add Payment Modal */}
+      <Modal
+        isOpen={payModal}
+        onClose={() => setPayModal(false)}
+        title="Record Payment"
+        footer={
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setPayModal(false)}>Cancel</Button>
+            <Button variant="primary" form="pay-form" type="submit" disabled={paying}>
+              {paying ? <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" /> : null}
+              Save Payment
+            </Button>
+          </div>
+        }
+      >
+        <form id="pay-form" onSubmit={handlePaySubmit} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Amount (৳) *</label>
+            <Input
+              type="number"
+              min="1"
+              step="0.01"
+              value={payForm.amount}
+              onChange={(e) => setPayForm((f) => ({ ...f, amount: e.target.value }))}
+              required
+              placeholder="e.g. 500"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Payment Date *</label>
+            <Input
+              type="date"
+              value={payForm.payment_date}
+              onChange={(e) => setPayForm((f) => ({ ...f, payment_date: e.target.value }))}
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-stardust">Notes (optional)</label>
+            <Textarea
+              value={payForm.notes}
+              onChange={(e) => setPayForm((f) => ({ ...f, notes: e.target.value }))}
+              placeholder="e.g. Cash payment for June"
+              rows={2}
+            />
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

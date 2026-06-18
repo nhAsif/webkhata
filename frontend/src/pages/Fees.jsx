@@ -1,299 +1,390 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/client';
-import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { Card, CardContent } from '../components/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import Button from '../components/Button';
-import { Input, Select, Textarea } from '../components/Input';
+import { Input, Textarea } from '../components/Input';
+import {
+  Users, AlertCircle, CheckCircle2, Clock, DollarSign,
+  TrendingUp, TrendingDown, ChevronRight, Calendar, X, Check,
+} from 'lucide-react';
 
-const PAYMENT_METHODS = ['cash', 'bkash', 'nagad', 'bank'];
+// ─── Stat Card ────────────────────────────────────────────────────────────────
+function StatBadge({ label, value, sub, color, icon }) {
+  return (
+    <Card className={`border-${color}-500/30 shadow-[0_0_18px_-6px_rgba(var(--tw-shadow-color),0.3)] shadow-${color}-500/20`}>
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-xs text-stardust font-mono uppercase tracking-wider mb-1.5">{label}</div>
+            <div className={`text-2xl font-bold font-mono text-${color}-400`}>{value}</div>
+            {sub && <div className="text-xs text-stardust mt-1">{sub}</div>}
+          </div>
+          <div className={`p-2.5 rounded-xl bg-${color}-500/10 text-${color}-400`}>{icon}</div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
+// ─── Cycle Status Badge ───────────────────────────────────────────────────────
+function CycleBadge({ isPaid }) {
+  return isPaid
+    ? <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-green-500/15 text-green-400 border-green-500/30 uppercase tracking-wide">
+        <Check className="w-3 h-3" /> Paid
+      </span>
+    : <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-red-500/15 text-red-400 border-red-500/30 uppercase tracking-wide">
+        <X className="w-3 h-3" /> Unpaid
+      </span>;
+}
+
+// ─── Fee Status Badge (for student row) ───────────────────────────────────────
+function FeeStatusBadge({ unpaid }) {
+  if (unpaid === 0) return (
+    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-green-500/15 text-green-400 border-green-500/30">
+      <CheckCircle2 className="w-3 h-3" /> Clear
+    </span>
+  );
+  if (unpaid === 1) return (
+    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-yellow-500/15 text-yellow-400 border-yellow-500/30">
+      <Clock className="w-3 h-3" /> {unpaid} Pending
+    </span>
+  );
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-red-500/15 text-red-400 border-red-500/30">
+      <AlertCircle className="w-3 h-3" /> {unpaid} Pending
+    </span>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function Fees() {
-  const [fees, setFees] = useState([]);
+  const navigate = useNavigate();
+
+  const [stats, setStats] = useState(null);
+  const [dashboard, setDashboard] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [summary, setSummary] = useState(null);
 
-  // Generate modal
-  const [genModal, setGenModal] = useState(false);
-  const [genAmount, setGenAmount] = useState('');
-  const [genMonth, setGenMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [genSaving, setGenSaving] = useState(false);
+  // Student detail modal
+  const [detailStudent, setDetailStudent] = useState(null); // { id, name }
+  const [cycles, setCycles] = useState([]);
+  const [cyclesLoading, setCyclesLoading] = useState(false);
+  const [detailModal, setDetailModal] = useState(false);
 
-  // Payment modal
-  const [payModal, setPayModal] = useState(false);
-  const [payFee, setPayFee] = useState(null);
-  const [payForm, setPayForm] = useState({ amount_paid: '', payment_method: 'cash', payment_date: '', notes: '' });
-  const [paySaving, setPaySaving] = useState(false);
+  // Mark paid modal
+  const [markModal, setMarkModal] = useState(false);
+  const [markCycle, setMarkCycle] = useState(null);
+  const [markForm, setMarkForm] = useState({ payment_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [marking, setMarking] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     Promise.all([
-      api.get(`/fees?month=${month}`),
-      api.get(`/fees/summary/monthly?month=${month}`),
-    ]).then(([feesRes, sumRes]) => {
-      setFees(feesRes.data);
-      setSummary(sumRes.data);
-    }).finally(() => setLoading(false));
-  };
+      api.get('/fees/dashboard/stats'),
+      api.get('/fees/dashboard'),
+    ]).then(([s, d]) => {
+      setStats(s.data);
+      setDashboard(d.data);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
 
-  useEffect(load, [month]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    setGenSaving(true);
+  const openStudentDetail = async (student) => {
+    setDetailStudent(student);
+    setDetailModal(true);
+    setCyclesLoading(true);
     try {
-      const res = await api.post('/fees/generate', {
-        month: genMonth,
-        amount_due: parseFloat(genAmount),
-      });
-      toast.success(res.data.message);
-      setGenModal(false);
-      load();
-    } catch {} finally {
-      setGenSaving(false);
+      const res = await api.get(`/fees/student/${student.student_id}`);
+      setCycles(res.data);
+    } catch {
+      setCycles([]);
+    } finally {
+      setCyclesLoading(false);
     }
   };
 
-  const openPayment = (fee) => {
-    setPayFee(fee);
-    setPayForm({
-      amount_paid: fee.amount_paid || '',
-      payment_method: fee.payment_method || 'cash',
-      payment_date: fee.payment_date || new Date().toISOString().split('T')[0],
-      notes: fee.notes || '',
-    });
-    setPayModal(true);
+  const openMarkPaid = (cycle) => {
+    setMarkCycle(cycle);
+    setMarkForm({ payment_date: new Date().toISOString().split('T')[0], notes: '' });
+    setMarkModal(true);
   };
 
-  const handlePayment = async (e) => {
+  const handleMarkPaid = async (e) => {
     e.preventDefault();
-    setPaySaving(true);
+    setMarking(true);
     try {
-      await api.put(`/fees/${payFee.id}`, {
-        amount_paid: parseFloat(payForm.amount_paid),
-        payment_method: payForm.payment_method,
-        payment_date: payForm.payment_date || null,
-        notes: payForm.notes || null,
+      await api.post(`/fees/cycle/${markCycle.id}/mark-paid`, {
+        payment_date: markForm.payment_date || null,
+        notes: markForm.notes || null,
       });
-      toast.success('Payment recorded');
-      setPayModal(false);
+      toast.success(`Cycle #${markCycle.cycle_number} marked as paid ✓`);
+      setMarkModal(false);
+      // Refresh cycles
+      const res = await api.get(`/fees/student/${detailStudent.student_id}`);
+      setCycles(res.data);
       load();
     } catch {} finally {
-      setPaySaving(false);
+      setMarking(false);
     }
   };
 
-  const statusBadge = (status) => {
-    const map = {
-      paid: 'bg-green-500/20 text-green-400 border-green-500/30',
-      unpaid: 'bg-red-500/20 text-red-400 border-red-500/30',
-      partial: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    };
-    return <span className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${map[status] || 'bg-white/10 text-pure border-white/20'}`}>{status}</span>;
+  const handleMarkUnpaid = async (cycle) => {
+    try {
+      await api.post(`/fees/cycle/${cycle.id}/mark-unpaid`);
+      toast.success(`Cycle #${cycle.cycle_number} marked as unpaid`);
+      const res = await api.get(`/fees/student/${detailStudent.student_id}`);
+      setCycles(res.data);
+      load();
+    } catch {}
   };
 
-  const columns = [
-    { key: 'student_name', label: 'Student' },
-    { key: 'month', label: 'Month' },
-    { key: 'amount_due', label: 'Amount Due', render: (f) => <span className="font-mono">৳{f.amount_due.toLocaleString()}</span> },
-    { key: 'amount_paid', label: 'Paid', render: (f) => (
-      <span className={f.amount_paid > 0 ? 'text-green-400 font-mono' : 'text-stardust font-mono'}>
-        ৳{f.amount_paid.toLocaleString()}
-      </span>
-    )},
-    { key: 'status', label: 'Status', render: (f) => statusBadge(f.status) },
-    { key: 'payment_method', label: 'Method', render: (f) => <span className="font-mono">{f.payment_method || '—'}</span> },
-    { key: 'actions', label: '', render: (f) => (
-      <Button
-        variant="primary"
-        size="sm"
-        onClick={() => openPayment(f)}
-      >
-        Record Payment
-      </Button>
-    )},
-  ];
+  const formatDate = (d) => {
+    if (!d) return '—';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Fees</h1>
-          <p className="text-stardust text-sm mt-1">Track monthly fee collection</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <Input
-            type="month"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            className="w-full sm:w-auto"
-          />
-          <Button variant="primary" onClick={() => setGenModal(true)}>
-            ⚡ Generate Fees
-          </Button>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Fee Cycles</h1>
+          <p className="text-stardust text-sm mt-1">Cycle-based fee collection — 30-day billing periods</p>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      {summary && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="border-green-500/30 shadow-[0_0_15px_-5px_rgba(34,197,94,0.15)] hover:border-green-500/50 hover:shadow-[0_0_20px_-5px_rgba(34,197,94,0.2)]">
-            <CardContent className="p-6">
-              <div className="text-sm text-stardust mb-1 font-body">Collected</div>
-              <div className="text-2xl font-mono font-semibold text-green-400">
-                ৳{summary.total_collected.toLocaleString()}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-red-500/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.15)] hover:border-red-500/50 hover:shadow-[0_0_20px_-5px_rgba(239,68,68,0.2)]">
-            <CardContent className="p-6">
-              <div className="text-sm text-stardust mb-1 font-body">Outstanding</div>
-              <div className="text-2xl font-mono font-semibold text-red-400">
-                ৳{summary.outstanding.toLocaleString()}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-indigo-500/30 shadow-[0_0_15px_-5px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.2)]">
-            <CardContent className="p-6">
-              <div className="text-sm text-stardust mb-1 font-body">Total Due</div>
-              <div className="text-2xl font-mono font-semibold text-indigo-400">
-                ৳{summary.total_due.toLocaleString()}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-sm text-stardust mb-2 font-body">Status Breakdown</div>
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">✅ {summary.paid_count} paid</span>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">⚡ {summary.partial_count} partial</span>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">❌ {summary.unpaid_count} unpaid</span>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Stats */}
+      {stats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatBadge
+            label="Students w/ Due"
+            value={stats.students_with_due}
+            sub={`of ${stats.total_students} active`}
+            color="red"
+            icon={<AlertCircle className="w-5 h-5" />}
+          />
+          <StatBadge
+            label="Unpaid Cycles"
+            value={stats.total_unpaid_cycles}
+            sub={`৳${(stats.total_pending ?? 0).toLocaleString()} pending`}
+            color="yellow"
+            icon={<Clock className="w-5 h-5" />}
+          />
+          <StatBadge
+            label="Paid Cycles"
+            value={stats.total_paid_cycles}
+            sub={`of ${stats.total_completed_cycles} completed`}
+            color="green"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+          />
+          <StatBadge
+            label="Collected"
+            value={`৳${(stats.total_collected ?? 0).toLocaleString()}`}
+            sub={`৳${(stats.total_pending ?? 0).toLocaleString()} pending`}
+            color="indigo"
+            icon={<DollarSign className="w-5 h-5" />}
+          />
         </div>
       )}
 
-      <DataTable
-        columns={columns}
-        data={fees}
-        loading={loading}
-        searchPlaceholder="Search student..."
-        searchKeys={['student_name']}
-        emptyTitle="No fee records for this month"
-        emptyDesc="Generate fees for all active students using the button above."
-        emptyAction={<Button variant="primary" onClick={() => setGenModal(true)}>Generate Fees</Button>}
-      />
+      {/* Dashboard Table */}
+      <Card>
+        <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg font-heading text-pure">
+            <Users className="w-5 h-5 text-bitcoin" /> Students with Pending Fees
+          </CardTitle>
+          <span className="text-xs font-mono text-stardust bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+            {dashboard.length} student{dashboard.length !== 1 ? 's' : ''}
+          </span>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-8 space-y-3 animate-pulse">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-14 bg-white/5 rounded-xl" />
+              ))}
+            </div>
+          ) : dashboard.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="text-4xl mb-3">🎉</div>
+              <div className="text-lg font-heading font-semibold text-pure mb-1">All fees are clear!</div>
+              <p className="text-stardust text-sm">No students have pending fee cycles.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[640px]">
+                <thead>
+                  <tr className="bg-void/40 border-y border-white/10">
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Student</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Monthly Fee</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Completed</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Unpaid</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Amount Due</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
+                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {dashboard.map((row) => (
+                    <tr
+                      key={row.student_id}
+                      className="hover:bg-white/5 transition-all cursor-pointer group"
+                      onClick={() => openStudentDetail(row)}
+                    >
+                      <td className="px-6 py-4">
+                        <span className="font-medium text-pure text-sm group-hover:text-bitcoin transition-colors">{row.student_name}</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-mono text-stardust">৳{row.monthly_fee.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-pure">{row.completed_cycles}</td>
+                      <td className="px-6 py-4 text-sm font-bold font-mono text-red-400">{row.unpaid_cycles}</td>
+                      <td className="px-6 py-4 text-sm font-bold font-mono text-red-400">৳{row.amount_due.toLocaleString()}</td>
+                      <td className="px-6 py-4"><FeeStatusBadge unpaid={row.unpaid_cycles} /></td>
+                      <td className="px-6 py-4 text-right">
+                        <ChevronRight className="w-4 h-4 text-stardust group-hover:text-bitcoin transition-colors" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* Generate Modal */}
+      {/* Student Fee Detail Modal */}
       <Modal
-        isOpen={genModal}
-        onClose={() => setGenModal(false)}
-        title="Generate Monthly Fees"
-        footer={
-          <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setGenModal(false)}>Cancel</Button>
-            <Button variant="primary" form="gen-form" type="submit" disabled={genSaving}>
-              {genSaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null}
-              Generate
-            </Button>
-          </div>
-        }
+        isOpen={detailModal}
+        onClose={() => setDetailModal(false)}
+        title={`Fee Cycles — ${detailStudent?.student_name ?? ''}`}
       >
-        <form id="gen-form" onSubmit={handleGenerate} className="space-y-4">
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-blue-400 text-sm flex gap-3">
-            <span>ℹ️</span>
-            <div>This will create fee records for all active students. Existing records will be skipped.</div>
+        {cyclesLoading ? (
+          <div className="space-y-3 animate-pulse py-4">
+            {[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-white/5 rounded-xl" />)}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Month</label>
-              <Input
-                type="month"
-                value={genMonth}
-                onChange={(e) => setGenMonth(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Amount Due (৳) *</label>
-              <Input
-                type="number"
-                value={genAmount}
-                onChange={(e) => setGenAmount(e.target.value)}
-                required
-                min="1"
-                placeholder="e.g. 1500"
-              />
+        ) : cycles.length === 0 ? (
+          <div className="py-10 text-center text-stardust">No cycles found.</div>
+        ) : (
+          <div className="space-y-3">
+            {/* Summary row */}
+            {(() => {
+              const total = cycles.length;
+              const paid = cycles.filter(c => c.is_paid).length;
+              const unpaid = total - paid;
+              const student = dashboard.find(d => d.student_id === detailStudent?.student_id);
+              return (
+                <div className="grid grid-cols-3 gap-3 mb-2">
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+                    <div className="text-xs text-stardust font-mono uppercase mb-1">Completed</div>
+                    <div className="text-xl font-bold text-pure font-mono">{total}</div>
+                  </div>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-center">
+                    <div className="text-xs text-stardust font-mono uppercase mb-1">Paid</div>
+                    <div className="text-xl font-bold text-green-400 font-mono">{paid}</div>
+                  </div>
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+                    <div className="text-xs text-stardust font-mono uppercase mb-1">Unpaid</div>
+                    <div className="text-xl font-bold text-red-400 font-mono">{unpaid}</div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Cycles list */}
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+              {cycles.map((cycle) => (
+                <div
+                  key={cycle.id}
+                  className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
+                    cycle.is_paid
+                      ? 'bg-green-500/5 border-green-500/20'
+                      : 'bg-red-500/5 border-red-500/20'
+                  }`}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-pure font-mono">Cycle #{cycle.cycle_number}</span>
+                      <CycleBadge isPaid={cycle.is_paid} />
+                    </div>
+                    <div className="text-xs text-stardust font-mono flex items-center gap-1.5">
+                      <Calendar className="w-3 h-3" />
+                      {formatDate(cycle.cycle_start_date)} → {formatDate(cycle.cycle_end_date)}
+                    </div>
+                    <div className="text-xs font-mono text-pure/70">
+                      ৳{cycle.fee_amount.toLocaleString()}
+                      {cycle.is_paid && cycle.payment_date && (
+                        <span className="text-green-400 ml-2">Paid {formatDate(cycle.payment_date)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5 items-end">
+                    {!cycle.is_paid ? (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => openMarkPaid(cycle)}
+                      >
+                        <Check className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                      </Button>
+                    ) : (
+                      <button
+                        className="text-xs text-stardust hover:text-red-400 transition-colors font-mono underline underline-offset-2"
+                        onClick={() => handleMarkUnpaid(cycle)}
+                      >
+                        Mark Unpaid
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </form>
+        )}
       </Modal>
 
-      {/* Payment Modal */}
+      {/* Mark Paid Modal */}
       <Modal
-        isOpen={payModal}
-        onClose={() => setPayModal(false)}
-        title={`Record Payment — ${payFee?.student_name}`}
+        isOpen={markModal}
+        onClose={() => setMarkModal(false)}
+        title={`Mark Paid — Cycle #${markCycle?.cycle_number}`}
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setPayModal(false)}>Cancel</Button>
-            <Button variant="primary" form="pay-form" type="submit" disabled={paySaving}>
-              {paySaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null}
-              Save Payment
+            <Button variant="secondary" onClick={() => setMarkModal(false)}>Cancel</Button>
+            <Button variant="primary" form="mark-paid-form" type="submit" disabled={marking}>
+              {marking ? <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1.5" />}
+              Confirm Payment
             </Button>
           </div>
         }
       >
-        {payFee && (
-          <form id="pay-form" onSubmit={handlePayment} className="space-y-4">
-            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-green-400 text-sm flex items-center gap-3">
-              <span className="text-xl">💰</span>
+        {markCycle && (
+          <form id="mark-paid-form" onSubmit={handleMarkPaid} className="space-y-4">
+            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-sm text-green-400 flex items-center gap-3">
+              <DollarSign className="w-5 h-5 shrink-0" />
               <div>
-                Amount due: <strong className="font-mono">৳{payFee.amount_due.toLocaleString()}</strong>
+                <div className="font-bold font-mono">৳{markCycle.fee_amount?.toLocaleString()}</div>
+                <div className="text-xs text-green-400/70 mt-0.5">
+                  {formatDate(markCycle.cycle_start_date)} → {formatDate(markCycle.cycle_end_date)}
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-stardust">Amount Paid (৳) *</label>
-                <Input
-                  type="number"
-                  value={payForm.amount_paid}
-                  onChange={(e) => setPayForm((f) => ({ ...f, amount_paid: e.target.value }))}
-                  required
-                  min="0"
-                  max={payFee.amount_due}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-stardust">Payment Method</label>
-                <Select
-                  value={payForm.payment_method}
-                  onChange={(e) => setPayForm((f) => ({ ...f, payment_method: e.target.value }))}
-                >
-                  {PAYMENT_METHODS.map((m) => (
-                    <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
-                  ))}
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-stardust">Payment Date</label>
-                <Input
-                  type="date"
-                  value={payForm.payment_date}
-                  onChange={(e) => setPayForm((f) => ({ ...f, payment_date: e.target.value }))}
-                />
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Payment Date</label>
+              <Input
+                type="date"
+                value={markForm.payment_date}
+                onChange={(e) => setMarkForm(f => ({ ...f, payment_date: e.target.value }))}
+              />
             </div>
-            <div className="space-y-1.5 pt-2">
-              <label className="text-sm font-medium text-stardust">Notes</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Notes (optional)</label>
               <Textarea
-                value={payForm.notes}
-                onChange={(e) => setPayForm((f) => ({ ...f, notes: e.target.value }))}
-                placeholder="Optional note..."
+                value={markForm.notes}
+                onChange={(e) => setMarkForm(f => ({ ...f, notes: e.target.value }))}
+                placeholder="e.g. Cash payment received"
                 rows={2}
               />
             </div>

@@ -102,33 +102,64 @@ def get_fees(
     current_user: models.User = Depends(require_parent),
     db: Session = Depends(get_db),
 ):
-    student = get_child(current_user, db)
-    fees = db.query(models.Fee).filter(
-        models.Fee.student_id == student.id
-    ).order_by(models.Fee.month.desc()).all()
+    import math
+    from datetime import timedelta
 
+    student = get_child(current_user, db)
     today = date.today()
-    current_month = today.strftime("%Y-%m")
-    current_fee = next((f for f in fees if f.month == current_month), None)
+
+    # Auto-generate missing completed cycles
+    if student.start_date and student.start_date <= today:
+        completed_count = math.floor((today - student.start_date).days / 30)
+        for i in range(completed_count):
+            cycle_number = i + 1
+            c_start = student.start_date + timedelta(days=i * 30)
+            c_end = student.start_date + timedelta(days=(i + 1) * 30 - 1)
+            existing = db.query(models.StudentFeeCycle).filter(
+                models.StudentFeeCycle.student_id == student.id,
+                models.StudentFeeCycle.cycle_number == cycle_number,
+            ).first()
+            if not existing:
+                db.add(models.StudentFeeCycle(
+                    student_id=student.id,
+                    cycle_number=cycle_number,
+                    cycle_start_date=c_start,
+                    cycle_end_date=c_end,
+                    fee_amount=student.monthly_fee,
+                    is_paid=False,
+                ))
+        db.commit()
+
+    cycles = db.query(models.StudentFeeCycle).filter(
+        models.StudentFeeCycle.student_id == student.id
+    ).order_by(models.StudentFeeCycle.cycle_number).all()
+
+    completed = len(cycles)
+    paid = sum(1 for c in cycles if c.is_paid)
+    unpaid = completed - paid
+    pending_amount = unpaid * student.monthly_fee
 
     return {
         "student_name": student.name,
-        "current_month": {
-            "month": current_fee.month if current_fee else current_month,
-            "amount_due": current_fee.amount_due if current_fee else 0,
-            "amount_paid": current_fee.amount_paid if current_fee else 0,
-            "status": current_fee.status if current_fee else "not_generated",
-        } if current_fee else None,
-        "history": [
+        "monthly_fee": student.monthly_fee,
+        "start_date": str(student.start_date) if student.start_date else None,
+        "summary": {
+            "completed_cycles": completed,
+            "paid_cycles": paid,
+            "unpaid_cycles": unpaid,
+            "pending_amount": pending_amount,
+        },
+        "cycles": [
             {
-                "month": f.month,
-                "amount_due": f.amount_due,
-                "amount_paid": f.amount_paid,
-                "status": f.status,
-                "payment_date": str(f.payment_date) if f.payment_date else None,
-                "payment_method": f.payment_method,
+                "cycle_number": c.cycle_number,
+                "cycle_start_date": str(c.cycle_start_date),
+                "cycle_end_date": str(c.cycle_end_date),
+                "fee_amount": c.fee_amount,
+                "is_paid": c.is_paid,
+                "payment_date": str(c.payment_date) if c.payment_date else None,
+                "notes": c.notes,
             }
-            for f in fees
+            for c in cycles
         ],
     }
 

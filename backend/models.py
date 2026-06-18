@@ -41,6 +41,9 @@ class Student(Base):
     status = Column(String, nullable=False, default="active")
     parent_code = Column(String, unique=True, nullable=False, index=True)
     photo_path = Column(String, nullable=True)
+    # Fee-related fields for the new payment ledger system
+    monthly_fee = Column(Float, nullable=False, default=0.0)
+    start_date = Column(Date, nullable=True, default=date.today)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -53,6 +56,8 @@ class Student(Base):
     batch_students = relationship("BatchStudent", back_populates="student", cascade="all, delete-orphan")
     attendance_records = relationship("Attendance", back_populates="student", cascade="all, delete-orphan")
     fees = relationship("Fee", back_populates="student")
+    fee_cycles = relationship("StudentFeeCycle", back_populates="student", cascade="all, delete-orphan")
+    payments = relationship("Payment", back_populates="student", cascade="all, delete-orphan")
     homework_submissions = relationship("HomeworkSubmission", back_populates="student", cascade="all, delete-orphan")
     results = relationship("Result", back_populates="student")
 
@@ -130,6 +135,25 @@ class Attendance(Base):
     student = relationship("Student", back_populates="attendance_records")
 
 
+class Payment(Base):
+    """New payment ledger — records individual tuition payments per student."""
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="RESTRICT"), nullable=False, index=True)
+    amount = Column(Float, nullable=False)
+    payment_date = Column(Date, nullable=False, default=date.today)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+
+    __table_args__ = (
+        CheckConstraint("amount > 0", name="check_payment_amount_positive"),
+    )
+
+    # Relationships
+    student = relationship("Student", back_populates="payments")
+
+
 class Fee(Base):
     __tablename__ = "fees"
 
@@ -158,6 +182,31 @@ class Fee(Base):
 
     # Relationships
     student = relationship("Student", back_populates="fees")
+
+
+class StudentFeeCycle(Base):
+    """Tracks each 30-day billing cycle per student."""
+    __tablename__ = "student_fee_cycles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    cycle_number = Column(Integer, nullable=False)  # 1-based
+    cycle_start_date = Column(Date, nullable=False)
+    cycle_end_date = Column(Date, nullable=False)
+    fee_amount = Column(Float, nullable=False)
+    is_paid = Column(Boolean, default=False, nullable=False)
+    payment_date = Column(Date, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint("student_id", "cycle_number", name="uq_fee_cycle_student_cycle"),
+        CheckConstraint("fee_amount >= 0", name="check_fee_cycle_amount"),
+        CheckConstraint("cycle_number >= 1", name="check_fee_cycle_number"),
+    )
+
+    # Relationships
+    student = relationship("Student", back_populates="fee_cycles")
 
 
 class Homework(Base):

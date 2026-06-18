@@ -95,6 +95,108 @@ def bulk_mark_attendance(
     return {"message": f"Attendance marked for {len(body.records)} students"}
 
 
+@sessions_router.post("/auto-init")
+def auto_init_session(
+    body: schemas.SessionAutoInit,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    """
+    Create a session for the given batch+date if it doesn't exist,
+    then auto-mark every enrolled student as 'present' unless they
+    already have a record. Returns the session and all attendance records.
+    """
+    batch = db.query(models.Batch).filter(models.Batch.id == body.batch_id).first()
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+
+    # Get or create session
+    session = db.query(models.Session).filter(
+        models.Session.batch_id == body.batch_id,
+        models.Session.date == body.date,
+    ).first()
+
+    if not session:
+        session = models.Session(
+            batch_id=body.batch_id,
+            date=body.date,
+            topic=body.topic,
+            duration_minutes=body.duration_minutes,
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+
+    # Get all enrolled students in this batch
+    batch_students = db.query(models.BatchStudent).filter(
+        models.BatchStudent.batch_id == body.batch_id
+    ).all()
+    student_ids = [bs.student_id for bs in batch_students]
+
+    # Auto-mark present for students who have no record yet
+    for sid in student_ids:
+        existing = db.query(models.Attendance).filter(
+            models.Attendance.session_id == session.id,
+            models.Attendance.student_id == sid,
+        ).first()
+        if not existing:
+            db.add(models.Attendance(
+                session_id=session.id,
+                student_id=sid,
+                status="present",
+            ))
+
+    db.commit()
+
+    # Return session + all attendance records
+    attendance_records = db.query(models.Attendance).filter(
+        models.Attendance.session_id == session.id
+    ).all()
+
+    return {
+        "session": {
+            "id": session.id,
+            "batch_id": session.batch_id,
+            "date": str(session.date),
+            "topic": session.topic,
+            "duration_minutes": session.duration_minutes,
+        },
+        "attendance": [
+            {"student_id": a.student_id, "status": a.status, "id": a.id}
+            for a in attendance_records
+        ],
+    }
+
+
+@attendance_router.patch("/{session_id}/{student_id}", response_model=schemas.AttendanceResponse)
+def update_single_attendance(
+    session_id: int,
+    student_id: int,
+    body: schemas.AttendanceStatusUpdate,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    """Instantly update a single student's attendance status."""
+    record = db.query(models.Attendance).filter(
+        models.Attendance.session_id == session_id,
+        models.Attendance.student_id == student_id,
+    ).first()
+
+    if not record:
+        record = models.Attendance(
+            session_id=session_id,
+            student_id=student_id,
+            status=body.status,
+        )
+        db.add(record)
+    else:
+        record.status = body.status
+
+    db.commit()
+    db.refresh(record)
+    return record
+
+
 @attendance_router.get("/{session_id}", response_model=list[schemas.AttendanceResponse])
 def get_session_attendance(
     session_id: int,

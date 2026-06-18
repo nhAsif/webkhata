@@ -18,8 +18,11 @@ def get_stats(
     db: Session = Depends(get_db),
     _: models.User = Depends(require_tutor),
 ):
+    import math
     today = date.today()
     current_month = today.strftime("%Y-%m")
+
+    total_students = db.query(models.Student).count()
 
     total_active_students = db.query(models.Student).filter(
         models.Student.status == "active"
@@ -29,15 +32,13 @@ def get_stats(
         models.Session.date == today
     ).count()
 
-    unpaid_fees_count = db.query(models.Fee).filter(
-        models.Fee.status.in_(["unpaid", "partial"]),
-        models.Fee.month == current_month,
+    unpaid_fees_count = db.query(models.StudentFeeCycle).filter(
+        models.StudentFeeCycle.is_paid == False
     ).count()
 
-    monthly_fees = db.query(models.Fee).filter(
-        models.Fee.month == current_month
-    ).all()
-    monthly_collection = sum(f.amount_paid for f in monthly_fees)
+    monthly_collection = db.query(models.StudentFeeCycle).filter(
+        models.StudentFeeCycle.is_paid == True
+    ).with_entities(func.coalesce(func.sum(models.StudentFeeCycle.fee_amount), 0.0)).scalar() or 0.0
 
     # Overall attendance rate for current month
     year, mon = current_month.split("-")
@@ -59,12 +60,40 @@ def get_stats(
     else:
         attendance_rate = 0.0
 
+    # ── Payment-ledger financial aggregates ───────────────────────────────────
+    # total_monthly_expected = sum of monthly_fee for all active students
+    active_students = db.query(models.Student).filter(
+        models.Student.status == "active"
+    ).all()
+    total_monthly_expected = sum(s.monthly_fee for s in active_students)
+
+    # total_due = sum of (completed_cycles * monthly_fee) across ALL students
+    all_students = db.query(models.Student).all()
+    total_due = 0.0
+    for student in all_students:
+        if student.start_date and student.start_date <= today:
+            cycles = math.floor((today - student.start_date).days / 30)
+        else:
+            cycles = 0
+        total_due += cycles * student.monthly_fee
+
+    # total_paid = sum of all Payment records
+    all_payments = db.query(models.Payment).all()
+    total_paid = sum(p.amount for p in all_payments)
+
+    outstanding_balance = max(0.0, total_due - total_paid)
+
     return schemas.DashboardStats(
+        total_students=total_students,
         total_active_students=total_active_students,
         todays_sessions=todays_sessions,
         unpaid_fees_count=unpaid_fees_count,
         monthly_collection=monthly_collection,
         attendance_rate=attendance_rate,
+        total_monthly_expected=total_monthly_expected,
+        total_due=total_due,
+        total_paid=total_paid,
+        outstanding_balance=outstanding_balance,
     )
 
 
@@ -103,17 +132,20 @@ def get_alerts(
                         student_name=student.name,
                     ))
 
-    # Overdue fees
-    overdue_fees = db.query(models.Fee).filter(
-        models.Fee.status.in_(["unpaid", "partial"]),
-        models.Fee.month < current_month,
+    # Overdue fees (unpaid cycles from StudentFeeCycle)
+    unpaid_cycles = db.query(models.StudentFeeCycle).filter(
+        models.StudentFeeCycle.is_paid == False
     ).all()
-    for fee in overdue_fees:
-        student = db.query(models.Student).filter(models.Student.id == fee.student_id).first()
+    seen_students = set()
+    for cycle in unpaid_cycles:
+        if cycle.student_id in seen_students:
+            continue
+        student = db.query(models.Student).filter(models.Student.id == cycle.student_id).first()
         if student:
+            seen_students.add(student.id)
             alerts.append(schemas.DashboardAlert(
                 type="overdue_fee",
-                message=f"{student.name} has unpaid fee for {fee.month}",
+                message=f"{student.name} has unpaid fee cycles",
                 student_id=student.id,
                 student_name=student.name,
             ))

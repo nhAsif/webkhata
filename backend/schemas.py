@@ -40,6 +40,8 @@ class StudentCreate(BaseModel):
     parent_password: str
     address: Optional[str] = None
     enrollment_date: Optional[date] = None
+    monthly_fee: float = 0.0
+    start_date: Optional[date] = None
 
     @field_validator("class_level")
     @classmethod
@@ -55,6 +57,13 @@ class StudentCreate(BaseModel):
             raise ValueError("subjects must not be empty")
         return v
 
+    @field_validator("monthly_fee")
+    @classmethod
+    def validate_monthly_fee(cls, v):
+        if v < 0:
+            raise ValueError("monthly_fee must be >= 0")
+        return v
+
 
 class StudentUpdate(BaseModel):
     name: Optional[str] = None
@@ -66,12 +75,21 @@ class StudentUpdate(BaseModel):
     parent_password: Optional[str] = None
     address: Optional[str] = None
     status: Optional[str] = None
+    monthly_fee: Optional[float] = None
+    start_date: Optional[date] = None
 
     @field_validator("class_level")
     @classmethod
     def validate_class_level(cls, v):
         if v is not None and v not in ("JSC", "SSC"):
             raise ValueError("class_level must be JSC or SSC")
+        return v
+
+    @field_validator("monthly_fee")
+    @classmethod
+    def validate_monthly_fee(cls, v):
+        if v is not None and v < 0:
+            raise ValueError("monthly_fee must be >= 0")
         return v
 
 
@@ -99,6 +117,8 @@ class StudentResponse(BaseModel):
     parent_code: str
     parent_username: Optional[str] = None
     photo_path: Optional[str]
+    monthly_fee: float
+    start_date: Optional[date]
     created_at: datetime
     updated_at: datetime
 
@@ -222,6 +242,25 @@ class AttendanceResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class SessionAutoInit(BaseModel):
+    """Body for auto-initialising a session and marking all students present."""
+    batch_id: int
+    date: date
+    topic: Optional[str] = None
+    duration_minutes: int = 60
+
+
+class AttendanceStatusUpdate(BaseModel):
+    status: str
+
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, v):
+        if v not in ("present", "absent", "late"):
+            raise ValueError("status must be present, absent, or late")
+        return v
+
+
 # ─── Fees ────────────────────────────────────────────────────────────────────
 
 class FeeGenerate(BaseModel):
@@ -265,6 +304,52 @@ class FeeResponse(BaseModel):
     student_name: Optional[str] = None
 
     model_config = {"from_attributes": True}
+
+
+# ─── Fee Cycles ──────────────────────────────────────────────────────────────
+
+class FeeCycleResponse(BaseModel):
+    id: int
+    student_id: int
+    cycle_number: int
+    cycle_start_date: date
+    cycle_end_date: date
+    fee_amount: float
+    is_paid: bool
+    payment_date: Optional[date]
+    notes: Optional[str]
+    created_at: datetime
+    student_name: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class FeeCycleMarkPaid(BaseModel):
+    payment_date: Optional[date] = None
+    notes: Optional[str] = None
+
+
+class FeeDashboardRow(BaseModel):
+    student_id: int
+    student_name: str
+    monthly_fee: float
+    start_date: Optional[date]
+    completed_cycles: int
+    paid_cycles: int
+    unpaid_cycles: int
+    amount_due: float  # unpaid_cycles * monthly_fee
+
+    model_config = {"from_attributes": True}
+
+
+class FeeDashboardStats(BaseModel):
+    total_students: int
+    students_with_due: int
+    total_completed_cycles: int
+    total_paid_cycles: int
+    total_unpaid_cycles: int
+    total_collected: float
+    total_pending: float
 
 
 # ─── Homework ────────────────────────────────────────────────────────────────
@@ -377,11 +462,17 @@ class ResultResponse(BaseModel):
 # ─── Dashboard ───────────────────────────────────────────────────────────────
 
 class DashboardStats(BaseModel):
+    total_students: int
     total_active_students: int
     todays_sessions: int
     unpaid_fees_count: int
     monthly_collection: float
     attendance_rate: float
+    # New financial aggregates (payment ledger)
+    total_monthly_expected: float
+    total_due: float
+    total_paid: float
+    outstanding_balance: float
 
 
 class DashboardAlert(BaseModel):
@@ -389,3 +480,73 @@ class DashboardAlert(BaseModel):
     message: str
     student_id: Optional[int] = None
     student_name: Optional[str] = None
+
+
+# ─── Payments ────────────────────────────────────────────────────────────────
+
+class PaymentCreate(BaseModel):
+    student_id: int
+    amount: float
+    payment_date: Optional[date] = None
+    notes: Optional[str] = None
+
+    @field_validator("amount")
+    @classmethod
+    def validate_amount(cls, v):
+        if v <= 0:
+            raise ValueError("amount must be > 0")
+        return v
+
+
+class PaymentUpdate(BaseModel):
+    amount: Optional[float] = None
+    payment_date: Optional[date] = None
+    notes: Optional[str] = None
+
+    @field_validator("amount")
+    @classmethod
+    def validate_amount(cls, v):
+        if v is not None and v <= 0:
+            raise ValueError("amount must be > 0")
+        return v
+
+
+class PaymentResponse(BaseModel):
+    id: int
+    student_id: int
+    amount: float
+    payment_date: date
+    notes: Optional[str]
+    created_at: datetime
+    student_name: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Student Financial Summary ────────────────────────────────────────────────
+
+class StudentFinancial(BaseModel):
+    """Per-student financial summary computed from the payment ledger."""
+    student_id: int
+    student_name: str
+    monthly_fee: float
+    start_date: Optional[date]
+    completed_cycles: int
+    total_due: float
+    total_paid: float
+    outstanding_balance: float
+    # 'paid' | 'partial' | 'overdue'
+    status: str
+
+
+# ─── Reports ─────────────────────────────────────────────────────────────────
+
+class MonthlyCollectionRow(BaseModel):
+    """One row in the monthly collection report."""
+    student_id: int
+    student_name: str
+    class_level: str
+    monthly_fee: float
+    total_paid_this_month: float
+    outstanding_balance: float
+    status: str  # 'paid' | 'partial' | 'overdue'

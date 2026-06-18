@@ -19,6 +19,8 @@ const EMPTY_FORM = {
   parent_username: '',
   parent_password: '',
   address: '',
+  monthly_fee: '',
+  start_date: new Date().toISOString().split('T')[0],
 };
 
 function statusBadge(status) {
@@ -68,6 +70,8 @@ export default function Students() {
       parent_username: s.parent_username || '',
       parent_password: '', // Leave blank when editing to avoid overwriting unless intended
       address: s.address || '',
+      monthly_fee: s.monthly_fee || '',
+      start_date: s.start_date || new Date().toISOString().split('T')[0],
     });
     setEditId(s.id);
     setModal('edit');
@@ -123,6 +127,12 @@ export default function Students() {
     { key: 'guardian_name', label: 'Guardian' },
     { key: 'guardian_phone', label: 'Phone', render: (s) => (
       <span className="font-mono text-sm">{s.guardian_phone}</span>
+    ) },
+    { key: 'monthly_fee', label: 'Monthly Fee', render: (s) => (
+      <span className="font-mono text-sm font-bold text-bitcoin">৳{(s.monthly_fee ?? 0).toLocaleString()}</span>
+    ) },
+    { key: 'start_date', label: 'Start Date', render: (s) => (
+      <span className="font-mono text-xs text-stardust">{s.start_date || '—'}</span>
     ) },
     { key: 'parent_code', label: 'Parent Login / Code', render: (s) => (
       <div className="flex flex-col gap-1">
@@ -255,6 +265,29 @@ export default function Students() {
                 required={modal === 'add'}
                 minLength={6}
                 placeholder={modal === 'add' ? "Min 6 characters" : "New password (optional)"}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Monthly Fee (৳) *</label>
+              <Input
+                type="number"
+                min="1"
+                value={form.monthly_fee}
+                onChange={(e) => setForm((f) => ({ ...f, monthly_fee: e.target.value }))}
+                required
+                placeholder="e.g. 500"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-stardust">Start Date *</label>
+              <Input
+                type="date"
+                value={form.start_date}
+                onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
+                required
               />
             </div>
           </div>

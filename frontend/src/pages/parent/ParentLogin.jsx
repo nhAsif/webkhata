@@ -8,7 +8,7 @@ import { Users, ShieldAlert } from 'lucide-react';
 
 export default function ParentLogin() {
   const [username, setUsername] = useState('');
-  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { parentLogin } = useAuth();
@@ -19,7 +19,7 @@ export default function ParentLogin() {
     setError('');
     setLoading(true);
     try {
-      await parentLogin(username, code);
+      await parentLogin(username, password);
       toast.success('Welcome!');
       navigate('/parent');
     } catch (err) {
@@ -81,13 +81,13 @@ export default function ParentLogin() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust" htmlFor="parent-code">Password / Parent Code</label>
+            <label className="text-sm font-medium text-stardust" htmlFor="parent-password">Password</label>
             <Input
-              id="parent-code"
+              id="parent-password"
               type="password"
-              placeholder="Enter your password or code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>

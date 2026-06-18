@@ -15,7 +15,9 @@ import {
   Key,
   Menu,
   X,
-  Calendar
+  Calendar,
+  Wallet,
+  BarChart2
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -26,6 +28,8 @@ const NAV_ITEMS = [
   { to: '/fees', icon: CreditCard, label: 'Fees' },
   { to: '/homework', icon: FileText, label: 'Homework' },
   { to: '/results', icon: TrendingUp, label: 'Results' },
+  { to: '/payments', icon: Wallet, label: 'Payments' },
+  { to: '/reports', icon: BarChart2, label: 'Reports' },
 ];
 
 export default function Layout() {

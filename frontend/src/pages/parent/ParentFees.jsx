@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 
+function CycleBadge({ isPaid }) {
+  return isPaid
+    ? <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">Paid</span>
+    : <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">Unpaid</span>;
+}
+
 export default function ParentFees() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,17 +15,6 @@ export default function ParentFees() {
   useEffect(() => {
     api.get('/parent/fees').then((r) => setData(r.data)).finally(() => setLoading(false));
   }, []);
-
-  const statusBadge = (status) => {
-    const map = { 
-      paid: 'bg-green-500/20 text-green-400 border-green-500/30', 
-      unpaid: 'bg-red-500/20 text-red-400 border-red-500/30', 
-      partial: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' 
-    };
-    const defaultCls = 'bg-white/10 text-pure border-white/20';
-    const cls = map[status.toLowerCase()] || defaultCls;
-    return <span className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${cls}`}>{status}</span>;
-  };
 
   if (loading) {
     return (
@@ -30,90 +25,126 @@ export default function ParentFees() {
     );
   }
 
+  const summary = data?.summary;
+
+  const statusColor =
+    !summary ? 'border-white/10'
+    : summary.unpaid_cycles === 0 ? 'border-green-500/30'
+    : summary.unpaid_cycles === 1 ? 'border-yellow-500/30'
+    : 'border-red-500/30';
+
+  const statusBadgeClass =
+    !summary ? 'bg-white/10 text-stardust border-white/20'
+    : summary.unpaid_cycles === 0 ? 'bg-green-500/15 text-green-400 border-green-500/30'
+    : summary.unpaid_cycles === 1 ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+    : 'bg-red-500/15 text-red-400 border-red-500/30';
+
+  const statusText =
+    !summary ? 'No Data'
+    : summary.unpaid_cycles === 0 ? 'No Due'
+    : summary.unpaid_cycles === 1 ? '1 Pending Cycle'
+    : `${summary.unpaid_cycles} Pending Cycles`;
+
   return (
     <div className="space-y-6">
       <div className="mb-8">
         <h1 className="text-2xl font-heading text-pure font-bold">Fees</h1>
-        <p className="text-stardust font-body mt-1">Monthly fee status and payment history</p>
+        <p className="text-stardust font-body mt-1">Cycle-based fee status and payment history</p>
       </div>
 
-      {/* Current Month */}
-      {data?.current_month && (
-        <Card className="bg-matter border-white/10 mb-6">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 flex-wrap gap-4">
-            <CardTitle className="font-heading text-pure">Current Month — {data.current_month.month}</CardTitle>
-            {statusBadge(data.current_month.status)}
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col justify-center border-b-4 border-b-blue-500/50">
-                <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Amount Due</div>
-                <div className="text-xl font-heading text-pure font-bold">৳{data.current_month.amount_due?.toLocaleString()}</div>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col justify-center border-b-4 border-b-green-500/50">
-                <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Amount Paid</div>
-                <div className="text-xl font-heading text-green-400 font-bold">৳{data.current_month.amount_paid?.toLocaleString()}</div>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col justify-center border-b-4 border-b-red-500/50">
-                <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Remaining</div>
-                <div className="text-xl font-heading text-red-400 font-bold">৳{(data.current_month.amount_due - data.current_month.amount_paid)?.toLocaleString()}</div>
+      {/* Summary Card */}
+      <Card className={`bg-matter border-2 ${statusColor} mb-6`}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2 flex-wrap gap-4">
+          <CardTitle className="font-heading text-pure">Fee Summary</CardTitle>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold font-mono border ${statusBadgeClass}`}>
+            {statusText}
+          </span>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col justify-center">
+              <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Monthly Fee</div>
+              <div className="text-xl font-heading text-bitcoin font-bold">৳{(data?.monthly_fee ?? 0).toLocaleString()}</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col justify-center">
+              <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Completed</div>
+              <div className="text-xl font-heading text-pure font-bold">{summary?.completed_cycles ?? 0}</div>
+            </div>
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 flex flex-col justify-center">
+              <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Paid</div>
+              <div className="text-xl font-heading text-green-400 font-bold">{summary?.paid_cycles ?? 0}</div>
+            </div>
+            <div className={`rounded-lg p-4 flex flex-col justify-center border ${
+              (summary?.unpaid_cycles ?? 0) === 0
+                ? 'bg-green-500/10 border-green-500/20'
+                : (summary?.unpaid_cycles ?? 0) === 1
+                ? 'bg-yellow-500/10 border-yellow-500/20'
+                : 'bg-red-500/10 border-red-500/20'
+            }`}>
+              <div className="text-xs text-stardust font-body uppercase tracking-wider mb-1">Pending</div>
+              <div className={`text-xl font-heading font-bold ${
+                (summary?.unpaid_cycles ?? 0) === 0 ? 'text-green-400'
+                : (summary?.unpaid_cycles ?? 0) === 1 ? 'text-yellow-400'
+                : 'text-red-400'
+              }`}>
+                {summary?.unpaid_cycles ?? 0}
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+          {(summary?.pending_amount ?? 0) > 0 && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <div className="text-sm font-bold text-red-400 font-heading">Pending Amount</div>
+                <div className="text-xl font-mono font-bold text-red-300">
+                  ৳{(summary.pending_amount).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {!data?.current_month && (
-        <Card className="bg-matter border-white/10 mb-6">
-          <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-            <div className="text-4xl mb-4">💰</div>
-            <div className="text-pure font-heading text-lg mb-2">No fee record for current month</div>
-            <div className="text-stardust font-body text-sm">Contact your tutor for fee information.</div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Payment History */}
+      {/* Cycle History */}
       <Card className="bg-matter border-white/10">
         <CardHeader>
-          <CardTitle className="font-heading text-pure">Payment History</CardTitle>
+          <CardTitle className="font-heading text-pure">Cycle History</CardTitle>
         </CardHeader>
         <CardContent>
-        {data?.history?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="text-4xl mb-4">📜</div>
-            <div className="text-pure font-heading text-lg">No payment history</div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm font-body min-w-[600px]">
-              <thead className="bg-white/5 text-stardust font-heading border-y border-white/10">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Month</th>
-                  <th className="px-4 py-3 font-semibold">Amount Due</th>
-                  <th className="px-4 py-3 font-semibold">Amount Paid</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold">Payment Date</th>
-                  <th className="px-4 py-3 font-semibold">Method</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {data?.history?.map((fee, i) => (
-                  <tr key={i} className="hover:bg-white/5 transition-colors">
-                    <td className="px-4 py-3 font-medium text-pure">{fee.month}</td>
-                    <td className="px-4 py-3 text-stardust">৳{fee.amount_due?.toLocaleString()}</td>
-                    <td className={`px-4 py-3 ${fee.amount_paid > 0 ? 'text-green-400' : 'text-stardust'}`}>
-                      ৳{fee.amount_paid?.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3">{statusBadge(fee.status)}</td>
-                    <td className="px-4 py-3 text-stardust font-mono text-xs">{fee.payment_date || '—'}</td>
-                    <td className="px-4 py-3 text-stardust">{fee.payment_method || '—'}</td>
+          {!data?.cycles?.length ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-4xl mb-4">📜</div>
+              <div className="text-pure font-heading text-lg">No fee cycles yet</div>
+              <div className="text-stardust font-body text-sm mt-1">Cycles are generated every 30 days from your start date.</div>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm font-body min-w-[500px]">
+                <thead className="bg-white/5 text-stardust font-heading border-y border-white/10">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Cycle</th>
+                    <th className="px-4 py-3 font-semibold">Period</th>
+                    <th className="px-4 py-3 font-semibold">Amount</th>
+                    <th className="px-4 py-3 font-semibold">Status</th>
+                    <th className="px-4 py-3 font-semibold">Paid On</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {data.cycles.map((c) => (
+                    <tr key={c.cycle_number} className="hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3 font-bold text-pure font-mono">#{c.cycle_number}</td>
+                      <td className="px-4 py-3 text-stardust font-mono text-xs">
+                        {c.cycle_start_date} → {c.cycle_end_date}
+                      </td>
+                      <td className="px-4 py-3 text-pure font-mono">৳{c.fee_amount?.toLocaleString()}</td>
+                      <td className="px-4 py-3"><CycleBadge isPaid={c.is_paid} /></td>
+                      <td className="px-4 py-3 text-stardust font-mono text-xs">{c.payment_date || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

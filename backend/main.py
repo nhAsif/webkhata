@@ -39,6 +39,46 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass  # Column already exists
 
+        # Add monthly_fee column to students if it doesn't exist
+        try:
+            conn.execute(text("ALTER TABLE students ADD COLUMN monthly_fee REAL NOT NULL DEFAULT 0.0"))
+            conn.commit()
+            logger.info("Migrated: added monthly_fee column to students")
+        except Exception:
+            pass  # Column already exists
+
+        # Add start_date column to students if it doesn't exist
+        try:
+            conn.execute(text("ALTER TABLE students ADD COLUMN start_date DATE"))
+            # Back-fill existing rows with today's date so the column is usable
+            conn.execute(text("UPDATE students SET start_date = DATE('now') WHERE start_date IS NULL"))
+            conn.commit()
+            logger.info("Migrated: added start_date column to students")
+        except Exception:
+            pass  # Column already exists
+
+        # Create student_fee_cycles table if it doesn't exist
+        try:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS student_fee_cycles (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+                    cycle_number INTEGER NOT NULL CHECK(cycle_number >= 1),
+                    cycle_start_date DATE NOT NULL,
+                    cycle_end_date DATE NOT NULL,
+                    fee_amount REAL NOT NULL CHECK(fee_amount >= 0),
+                    is_paid BOOLEAN NOT NULL DEFAULT 0,
+                    payment_date DATE,
+                    notes TEXT,
+                    created_at DATETIME DEFAULT (datetime('now')),
+                    UNIQUE(student_id, cycle_number)
+                )
+            """))
+            conn.commit()
+            logger.info("Migrated: created student_fee_cycles table")
+        except Exception:
+            pass  # Table already exists
+
     # Seed default tutor account on first run
     from auth import init_default_tutor
     db = SessionLocal()
@@ -110,6 +150,8 @@ from routers.homework import router as homework_router
 from routers.results import router as results_router
 from routers.dashboard import router as dashboard_router
 from routers.parent import router as parent_router
+from routers.payments import router as payments_router
+from routers.reports import router as reports_router
 
 app.include_router(auth_router)
 app.include_router(students_router)
@@ -121,6 +163,8 @@ app.include_router(homework_router)
 app.include_router(results_router)
 app.include_router(dashboard_router)
 app.include_router(parent_router)
+app.include_router(payments_router)
+app.include_router(reports_router)
 
 
 # ─── Static Files (React Build) ───────────────────────────────────────────────

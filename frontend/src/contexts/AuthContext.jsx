@@ -23,8 +23,8 @@ export function AuthProvider({ children }) {
     return userData;
   }, []);
 
-  const parentLogin = useCallback(async (username, parent_code) => {
-    const res = await api.post('/auth/parent-login', { username, parent_code });
+  const parentLogin = useCallback(async (username, password) => {
+    const res = await api.post('/auth/parent-login', { username, password });
     const { access_token, role, student_id } = res.data;
     const userData = { role, student_id, username };
     localStorage.setItem('token', access_token);

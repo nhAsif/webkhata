@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../api/client';
 import StatCard from '../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
-import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkles } from 'lucide-react';
+import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkles, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -46,9 +46,9 @@ export default function Dashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {loading ? (
-          [...Array(5)].map((_, i) => (
+          [...Array(8)].map((_, i) => (
             <div key={i} className="h-28 bg-matter border border-white/10 rounded-2xl animate-pulse p-5 space-y-3">
               <div className="h-3.5 bg-white/5 rounded w-2/3" />
               <div className="h-8 bg-white/5 rounded w-1/2" />
@@ -63,28 +63,46 @@ export default function Dashboard() {
               color="#F7931A"
             />
             <StatCard
+              label="Total Students"
+              value={stats.total_students ?? stats.total_active_students}
+              icon={<Users className="w-5 h-5 text-gold" />}
+              color="#FFD600"
+            />
+            <StatCard
               label="Today's Sessions"
               value={stats.todays_sessions}
               icon={<Calendar className="w-5 h-5 text-gold" />}
               color="#FFD600"
             />
             <StatCard
-              label="Unpaid Fees"
-              value={stats.unpaid_fees_count}
-              icon={<DollarSign className="w-5 h-5" />}
-              color={stats.unpaid_fees_count > 0 ? '#ef4444' : '#10b981'}
-            />
-            <StatCard
-              label="Monthly Collection"
-              value={`৳${stats.monthly_collection.toLocaleString()}`}
-              icon={<Award className="w-5 h-5 text-bitcoin" />}
-              color="#F7931A"
-            />
-            <StatCard
               label="Attendance Rate"
               value={`${stats.attendance_rate}%`}
               icon={<ShieldAlert className="w-5 h-5 text-gold" />}
               color={stats.attendance_rate >= 75 ? '#10b981' : '#F7931A'}
+            />
+            <StatCard
+              label="Monthly Expected"
+              value={`৳${(stats.total_monthly_expected ?? stats.monthly_collection ?? 0).toLocaleString()}`}
+              icon={<Wallet className="w-5 h-5 text-bitcoin" />}
+              color="#F7931A"
+            />
+            <StatCard
+              label="Total Due"
+              value={`৳${(stats.total_due ?? 0).toLocaleString()}`}
+              icon={<TrendingUp className="w-5 h-5" />}
+              color="#ef4444"
+            />
+            <StatCard
+              label="Total Paid"
+              value={`৳${(stats.total_paid ?? stats.monthly_collection ?? 0).toLocaleString()}`}
+              icon={<TrendingDown className="w-5 h-5 text-green-400" />}
+              color="#10b981"
+            />
+            <StatCard
+              label="Outstanding"
+              value={`৳${(stats.outstanding_balance ?? 0).toLocaleString()}`}
+              icon={<DollarSign className="w-5 h-5" />}
+              color={(stats.outstanding_balance ?? 0) > 0 ? '#ef4444' : '#10b981'}
             />
           </>
         ) : null}
