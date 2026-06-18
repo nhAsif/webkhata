@@ -48,7 +48,6 @@ class Student(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-        CheckConstraint("class_level IN ('Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'JSC', 'SSC')", name="check_student_class"),
         CheckConstraint("status IN ('active', 'inactive')", name="check_student_status"),
     )
 
