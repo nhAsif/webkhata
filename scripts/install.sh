@@ -10,6 +10,9 @@ SERVICE_NAME="webkhata"
 
 echo "=== WebKhata Installer ==="
 
+printf "Enter your Gemini API key (or press Enter to skip): "
+read GEMINI_API_KEY
+
 # Ensure Python3 and dependencies are installed
 echo "Installing Python3 and dependencies..."
 opkg update || true
@@ -21,6 +24,14 @@ mkdir -p "$INSTALL_DIR"
 # Copy application files
 cp -r backend "$INSTALL_DIR/"
 cp -r scripts "$INSTALL_DIR/"
+
+# Set Gemini API key in .env
+if [ -n "$GEMINI_API_KEY" ]; then
+    # Remove existing key if any
+    [ -f "$INSTALL_DIR/backend/.env" ] && sed -i '/^GEMINI_API_KEY=/d' "$INSTALL_DIR/backend/.env"
+    echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> "$INSTALL_DIR/backend/.env"
+    echo "Gemini API key configured."
+fi
 
 # Install Python dependencies
 cd "$INSTALL_DIR/backend"
