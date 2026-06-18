@@ -167,6 +167,8 @@ app.include_router(parent_router)
 app.include_router(payments_router)
 app.include_router(reports_router)
 app.include_router(vocabulary_router)
+from routers.settings import router as settings_router
+app.include_router(settings_router)
 
 
 # ─── Static Files (React Build) ───────────────────────────────────────────────

@@ -17,7 +17,8 @@ import {
   X,
   Calendar,
   Wallet,
-  BarChart2
+  BarChart2,
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { to: '/results', icon: TrendingUp, label: 'Results' },
   { to: '/payments', icon: Wallet, label: 'Payments' },
   { to: '/reports', icon: BarChart2, label: 'Reports' },
+  { to: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
 export default function Layout() {

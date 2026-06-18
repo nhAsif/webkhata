@@ -16,6 +16,7 @@ import Results from './pages/Results';
 import StudentProfile from './pages/StudentProfile';
 import Payments from './pages/Payments';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 // Parent portal pages
 import ParentLogin from './pages/parent/ParentLogin';
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="results" element={<Results />} />
             <Route path="payments" element={<Payments />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Parent portal routes */}
