@@ -216,7 +216,7 @@ export default function Fees() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[640px]">
+              <table className="w-full text-left border-collapse min-w-[640px] whitespace-nowrap">
                 <thead>
                   <tr className="bg-void/40 border-y border-white/10">
                     <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Student</th>

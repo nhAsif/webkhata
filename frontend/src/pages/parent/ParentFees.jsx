@@ -119,7 +119,7 @@ export default function ParentFees() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm font-body min-w-[500px]">
+              <table className="w-full text-left text-sm font-body min-w-[500px] whitespace-nowrap">
                 <thead className="bg-white/5 text-stardust font-heading border-y border-white/10">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Cycle</th>

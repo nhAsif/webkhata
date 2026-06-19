@@ -104,6 +104,13 @@ export default function Students() {
     load();
   };
 
+  const deleteStudent = async (id) => {
+    if (!confirm('Are you sure you want to permanently delete this student? All their records will be lost.')) return;
+    await api.delete(`/students/${id}`);
+    toast.success('Student deleted permanently');
+    load();
+  };
+
   const columns = [
     { key: 'name', label: 'Name', render: (s) => (
       <Button
@@ -119,12 +126,12 @@ export default function Students() {
         {s.class_level}
       </span>
     )},
-    { key: 'subjects', label: 'Subjects', render: (s) => (
+    { key: 'subjects', label: 'Subjects', className: 'hidden', render: (s) => (
       <span className="text-xs text-stardust font-body">
         {(Array.isArray(s.subjects) ? s.subjects : []).join(', ') || '—'}
       </span>
     )},
-    { key: 'guardian_name', label: 'Guardian' },
+    { key: 'guardian_name', label: 'Guardian', className: 'hidden' },
     { key: 'guardian_phone', label: 'Phone', render: (s) => (
       <span className="font-mono text-sm">{s.guardian_phone}</span>
     ) },
@@ -134,7 +141,7 @@ export default function Students() {
     { key: 'start_date', label: 'Start Date', render: (s) => (
       <span className="font-mono text-xs text-stardust">{s.start_date || '—'}</span>
     ) },
-    { key: 'parent_code', label: 'Parent Login / Code', render: (s) => (
+    { key: 'parent_code', label: 'Parent Login / Code', className: 'hidden', render: (s) => (
       <div className="flex flex-col gap-1">
         <code className="text-xs bg-white/5 border border-white/10 px-2 py-0.5 rounded text-bitcoin font-mono w-max">
           {s.parent_username || '-'}
@@ -150,11 +157,12 @@ export default function Students() {
         <Button variant="secondary" size="sm" onClick={() => openEdit(s)}>Edit</Button>
         <Button
           size="sm"
-          variant={s.status === 'active' ? 'danger' : 'success'}
+          variant={s.status === 'active' ? 'secondary' : 'success'}
           onClick={() => toggleStatus(s)}
         >
           {s.status === 'active' ? 'Archive' : 'Activate'}
         </Button>
+        <Button variant="danger" size="sm" onClick={() => deleteStudent(s.id)}>Delete</Button>
       </div>
     )},
   ];

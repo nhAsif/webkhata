@@ -197,6 +197,13 @@ export default function Batches() {
     load();
   };
 
+  const deleteBatch = async (id) => {
+    if (!confirm('Are you sure you want to permanently delete this batch? This action cannot be undone.')) return;
+    await api.delete(`/batches/${id}/permanent`);
+    toast.success('Batch deleted permanently');
+    load();
+  };
+
   const addStudent = async () => {
     if (!addStudentId) return;
     try {
@@ -319,7 +326,8 @@ export default function Batches() {
         <Button variant="secondary" size="sm" onClick={() => openStudents(b)}>Roster</Button>
         <Button variant="secondary" size="sm" onClick={() => openTimetable(b)}>Timetable</Button>
         <Button variant="secondary" size="sm" onClick={() => openEdit(b)}>Edit</Button>
-        <Button variant="danger" size="sm" onClick={() => archiveBatch(b.id)}>Archive</Button>
+        <Button variant="secondary" size="sm" onClick={() => archiveBatch(b.id)}>Archive</Button>
+        <Button variant="danger" size="sm" onClick={() => deleteBatch(b.id)}>Delete</Button>
       </div>
     )},
   ];

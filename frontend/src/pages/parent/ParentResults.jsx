@@ -106,7 +106,7 @@ export default function ParentResults() {
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="border-b border-white/10 text-stardust text-sm uppercase tracking-wider font-heading">
                     <th className="p-4 font-medium">Exam</th>

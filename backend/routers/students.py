@@ -283,3 +283,26 @@ def get_student_financial(
         outstanding_balance=outstanding_balance,
         status=pay_status,
     )
+
+
+@router.delete("/{student_id}")
+def delete_student(
+    student_id: int,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    student = db.query(models.Student).filter(models.Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+        
+    # Delete related records that have RESTRICT
+    db.query(models.Payment).filter(models.Payment.student_id == student_id).delete()
+    db.query(models.Fee).filter(models.Fee.student_id == student_id).delete()
+    db.query(models.Result).filter(models.Result.student_id == student_id).delete()
+    
+    # Also delete the parent user since the student is gone
+    db.query(models.User).filter(models.User.student_id == student_id).delete()
+    
+    db.delete(student)
+    db.commit()
+    return {"message": "Student deleted permanently"}

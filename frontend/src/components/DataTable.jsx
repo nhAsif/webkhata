@@ -49,7 +49,7 @@ export default function DataTable({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-matter overflow-hidden font-body">
+    <div className="w-full max-w-full rounded-2xl border border-white/10 bg-matter overflow-hidden font-body">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 border-b border-white/10">
         {searchKeys.length > 0 && (
           <div className="relative w-full sm:max-w-xs">
@@ -78,14 +78,14 @@ export default function DataTable({
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse whitespace-nowrap">
               <thead>
                 <tr className="bg-void/50 border-b border-white/10">
                   {columns.map((col) => (
                     <th 
                       key={col.key}
-                      className="px-6 py-4 text-xs font-semibold tracking-wider text-stardust uppercase font-mono"
+                      className={`px-6 py-4 text-xs font-semibold tracking-wider text-stardust uppercase font-mono ${col.className || ''}`}
                     >
                       {col.label}
                     </th>
@@ -99,7 +99,7 @@ export default function DataTable({
                     className="hover:bg-white/5 transition-all duration-150 group"
                   >
                     {columns.map((col) => (
-                      <td key={col.key} className="px-6 py-4 text-sm text-pure/90">
+                      <td key={col.key} className={`px-6 py-4 text-sm text-pure/90 ${col.className || ''}`}>
                         {col.render ? col.render(row) : row[col.key]}
                       </td>
                     ))}
@@ -110,7 +110,7 @@ export default function DataTable({
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-void/30">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-white/10 bg-void/30">
               <span className="text-xs text-stardust font-mono">
                 Showing {((page - 1) * perPage) + 1} to {Math.min(page * perPage, filtered.length)} of {filtered.length} entries
               </span>

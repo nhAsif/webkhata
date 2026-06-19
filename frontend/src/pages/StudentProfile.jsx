@@ -126,11 +126,11 @@ export default function StudentProfile() {
             <User className="w-5 h-5 text-bitcoin" /> Personal Information
           </CardTitle>
           <code className="text-xs bg-white/5 border border-white/10 px-2.5 py-0.5 rounded text-bitcoin font-mono">
-            Parent Code: {student.parent_code}
+            Parent Username: {student.parent_username || '—'}
           </code>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Guardian Name</span>
               <span className="text-sm font-medium text-pure">{student.guardian_name}</span>
@@ -207,7 +207,7 @@ export default function StudentProfile() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Monthly Fee</span>
                   <span className="text-lg font-bold text-bitcoin font-mono">৳{(financial.monthly_fee ?? 0).toLocaleString()}</span>
@@ -292,7 +292,7 @@ export default function StudentProfile() {
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-void/40 border-y border-white/10">
                     <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Cycle</th>

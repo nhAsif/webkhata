@@ -91,6 +91,21 @@ def archive_batch(
     return {"message": "Batch archived"}
 
 
+@router.delete("/{batch_id}/permanent")
+def delete_batch(
+    batch_id: int,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    
+    db.delete(batch)
+    db.commit()
+    return {"message": "Batch deleted permanently"}
+
+
 @router.get("/{batch_id}/students", response_model=list[schemas.StudentResponse])
 def get_batch_students(
     batch_id: int,

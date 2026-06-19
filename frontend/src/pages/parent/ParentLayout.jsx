@@ -114,7 +114,7 @@ export default function ParentLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 md:pl-60 min-h-screen flex flex-col relative">
+      <div className="flex-1 md:pl-60 min-h-screen flex flex-col relative min-w-0">
         <header className="sticky top-0 h-16 bg-void/50 backdrop-blur-md border-b border-white/10 z-30 flex items-center justify-between px-6">
           <button
             className="text-pure bg-white/5 hover:bg-white/10 border border-white/10 hover:border-bitcoin/30 p-2 rounded-xl transition-all duration-200 md:hidden flex items-center justify-center"
@@ -131,7 +131,7 @@ export default function ParentLayout() {
           </div>
         </header>
 
-        <main className="flex-1 p-6 w-full">
+        <main className="flex-1 p-4 sm:p-6 w-full max-w-full overflow-x-hidden">
           <Outlet />
         </main>
       </div>
