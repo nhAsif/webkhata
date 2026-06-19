@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
 import ChangePasswordModal from '../../components/ChangePasswordModal';
 import { cn } from '../../utils/cn';
 import { 
@@ -15,9 +14,7 @@ import {
   Key,
   Menu,
   X,
-  BookOpen,
-  Sun,
-  Moon
+  BookOpen
 } from 'lucide-react';
 
 const PARENT_NAV = [
@@ -32,7 +29,6 @@ const PARENT_NAV = [
 
 export default function ParentLayout() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -156,13 +152,7 @@ export default function ParentLayout() {
                 <span className="font-black">Read-Only Access</span>
               </div>
 
-              <button
-                onClick={toggleTheme}
-                className="flex items-center justify-center w-10 h-10 text-black bg-[#FFD93D] border-4 border-black hover:bg-white transition-all duration-100 cursor-pointer shadow-[3px_3px_0px_0px_var(--neo-shadow)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-                title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {theme === 'dark' ? <Sun className="w-5 h-5 stroke-[2.5px]" /> : <Moon className="w-5 h-5 stroke-[2.5px]" />}
-              </button>
+
             </div>
           </div>
           {/* Scalloped edge decorative divider */}

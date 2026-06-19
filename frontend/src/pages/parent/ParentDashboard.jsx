@@ -191,7 +191,7 @@ export default function ParentDashboard() {
               <div className="flex gap-3 mt-4 sm:mt-0 flex-wrap">
                 <Link 
                   to="/parent/vocabulary"
-                  className="inline-flex items-center justify-center h-10 px-5 bg-dark text-white rounded-full font-heading font-bold text-sm shadow-sm hover:scale-[1.04] active:scale-[0.98] transition-transform duration-200 select-none cursor-pointer"
+                  className="inline-flex items-center justify-center h-10 px-5 bg-[#FF6B6B] text-black rounded-full font-heading font-bold text-sm shadow-sm hover:scale-[1.04] active:scale-[0.98] transition-transform duration-200 select-none cursor-pointer"
                 >
                   View Today's Vocabulary
                 </Link>
