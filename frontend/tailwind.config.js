@@ -10,7 +10,7 @@ export default {
         // Map legacy colors to new dynamic tokens
         void: 'var(--neutral-secondary-soft)', // page background
         matter: 'var(--neutral-primary-soft)', // card background (cream)
-        pure: 'var(--white)',
+        pure: 'var(--neo-ink)',
         stardust: 'var(--body-subtle)',
         boundary: 'var(--border-default)',
         bitcoin: 'var(--brand)',
@@ -88,9 +88,9 @@ export default {
         'border-success': 'var(--border-success)',
       },
       fontFamily: {
-        heading: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
-        body: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
-        display: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
+        heading: ["'Zilla Slab'", "'Noto Sans Bengali'", "serif"],
+        body: ["'Libre Franklin'", "'Noto Sans Bengali'", "sans-serif"],
+        display: ["'Baloo 2'", "'Noto Sans Bengali'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
       animation: {

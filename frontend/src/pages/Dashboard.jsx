@@ -110,12 +110,12 @@ export default function Dashboard() {
 
       {/* Alerts */}
       {!loading && alerts.length > 0 && (
-        <Card hover={false}>
+        <Card hover={false} className="notebook-spirals bg-white">
           <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FFD93D]/10">
             <CardTitle className="flex items-center gap-2 text-xl font-heading font-black text-black">
               <span>🔔</span> Active Alerts
             </CardTitle>
-            <span className="px-3 py-1 text-xs font-black uppercase rounded-none bg-[#FF6B6B] text-black border-4 border-black flex items-center gap-1.5 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+            <span className="px-3 py-1 text-xs font-black uppercase rounded-none bg-[#FF6B6B] text-black border-4 border-black flex items-center gap-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
@@ -154,15 +154,15 @@ export default function Dashboard() {
       )}
 
       {!loading && alerts.length === 0 && (
-        <Card hover={false}>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center bg-white">
+        <div className="max-w-md mx-auto">
+          <div className="sticker-note p-8 text-center flex flex-col items-center justify-center">
             <div className="w-12 h-12 rounded-none bg-[#C4B5FD] border-4 border-black flex items-center justify-center text-black mb-4 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
               <Sparkles className="w-5 h-5 stroke-[3px]" />
             </div>
             <div className="text-xl font-heading font-black text-black uppercase tracking-tight">All clear!</div>
             <div className="text-sm text-black/75 font-bold mt-1.5">No alerts at the moment. Keep up the great work!</div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );

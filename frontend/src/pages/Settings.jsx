@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Download, Upload, AlertTriangle, ShieldCheck, Database } from 'lucide-react';
 import api from '../api/client';
 import toast from 'react-hot-toast';
+import Button from '../components/Button';
 
 export default function Settings() {
   const [isBackingUp, setIsBackingUp] = useState(false);
@@ -85,65 +86,69 @@ export default function Settings() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-gradient-to-r from-burnt to-bitcoin rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(247,147,26,0.2)]">
-          <ShieldCheck className="w-6 h-6 text-pure" />
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 bg-[#FF6B6B] border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex-shrink-0">
+          <ShieldCheck className="w-6 h-6 text-black stroke-[3px]" />
         </div>
         <div>
-          <h1 className="text-2xl font-heading font-bold text-pure tracking-tight">System Settings</h1>
-          <p className="text-stardust font-mono text-xs mt-1">Manage application data and preferences</p>
+          <h1 className="text-3xl font-heading font-black text-black tracking-tight uppercase">System Settings</h1>
+          <p className="text-black/60 font-mono text-xs mt-1 uppercase font-bold">Manage application data and preferences</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Backup & Restore Section */}
-        <div className="bg-matter border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
-          <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Database className="w-32 h-32 text-bitcoin" />
+        <div className="bg-white border-4 border-black p-6 relative overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-100">
+          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+            <Database className="w-32 h-32 text-black" />
           </div>
           
-          <h2 className="text-xl font-heading font-semibold text-pure mb-2 flex items-center gap-2 relative z-10">
-            <Database className="w-5 h-5 text-bitcoin" />
+          <h2 className="text-xl font-heading font-black text-black mb-3 flex items-center gap-2 uppercase tracking-tight">
+            <Database className="w-5 h-5 text-black stroke-[3px]" />
             Backup & Restore
           </h2>
-          <p className="text-sm text-stardust mb-6 relative z-10">
+          <p className="text-sm text-black/70 font-body font-semibold mb-6">
             Create a complete backup of your entire application data, or restore from an existing backup package.
           </p>
 
-          <div className="space-y-4 relative z-10">
+          <div className="space-y-4">
             {/* Backup Button */}
-            <div className="bg-white/5 border border-white/5 rounded-xl p-5 hover:bg-white/10 transition-colors">
+            <div className="bg-[#FAF6EE] border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-pure text-sm">Create Backup</h3>
-                  <p className="text-xs text-stardust mt-1">Generate a downloadable package of all current data.</p>
+                  <h3 className="font-heading font-black text-black text-base uppercase">Create Backup</h3>
+                  <p className="text-xs text-black/60 font-bold mt-1">Generate a downloadable package of all current data.</p>
                 </div>
-                <button
+                <Button
                   onClick={handleBackup}
                   disabled={isBackingUp || isRestoring}
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-burnt to-bitcoin hover:from-burnt/90 hover:to-bitcoin/90 text-void font-bold py-2.5 px-5 rounded-lg text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(247,147,26,0.3)] hover:shadow-[0_0_20px_rgba(247,147,26,0.4)] whitespace-nowrap"
+                  variant="primary"
+                  size="sm"
+                  className="whitespace-nowrap"
                 >
-                  <Download className={`w-4 h-4 ${isBackingUp ? 'animate-bounce' : ''}`} />
+                  <Download className={`w-4 h-4 stroke-[3px] ${isBackingUp ? 'animate-bounce' : ''}`} />
                   {isBackingUp ? 'Generating...' : 'Create Backup'}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Restore Button */}
-            <div className="bg-white/5 border border-white/5 rounded-xl p-5 hover:bg-white/10 transition-colors">
+            <div className="bg-[#FAF6EE] border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-pure text-sm">Restore Data</h3>
-                  <p className="text-xs text-stardust mt-1">Restore your application data from a previous backup file.</p>
+                  <h3 className="font-heading font-black text-black text-base uppercase">Restore Data</h3>
+                  <p className="text-xs text-black/60 font-bold mt-1">Restore your application data from a previous backup file.</p>
                 </div>
-                <button
+                <Button
                   onClick={handleRestoreClick}
                   disabled={isBackingUp || isRestoring}
-                  className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-pure font-bold py-2.5 px-5 rounded-lg text-sm transition-all border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  variant="secondary"
+                  size="sm"
+                  className="whitespace-nowrap"
                 >
-                  <Upload className={`w-4 h-4 ${isRestoring ? 'animate-bounce' : ''}`} />
+                  <Upload className={`w-4 h-4 stroke-[3px] ${isRestoring ? 'animate-bounce' : ''}`} />
                   {isRestoring ? 'Restoring...' : 'Restore'}
-                </button>
+                </Button>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -152,8 +157,8 @@ export default function Settings() {
                   className="hidden"
                 />
               </div>
-              <div className="mt-4 flex items-start gap-2 text-[10px] text-amber-500/80 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">
-                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div className="mt-4 flex items-start gap-2.5 text-[11px] text-[#FF6B6B] bg-[#FF6B6B]/10 p-3.5 border-2 border-black font-semibold">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 stroke-[3px] text-black" />
                 <p>Restoring will overwrite all current data. Make sure you have a recent backup before proceeding.</p>
               </div>
             </div>

@@ -298,7 +298,7 @@ export default function Batches() {
     { key: 'schedule', label: 'Schedule Days', render: (b) => (
       <div className="flex gap-1.5 flex-wrap">
         {(Array.isArray(b.schedule) ? b.schedule : []).map((d) => (
-          <span key={d} className="inline-flex px-2 py-0.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 text-pure font-mono uppercase">
+          <span key={d} className="inline-flex px-2 py-0.5 border-2 border-black text-black bg-[#C4B5FD]/30 font-mono text-[10px] uppercase font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
             {d}
           </span>
         ))}
@@ -310,13 +310,13 @@ export default function Batches() {
       </span>
     ) },
     { key: 'student_count', label: 'Students', render: (b) => (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 border-2 border-black text-black bg-[#C4B5FD] font-mono text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
         <Users className="w-3.5 h-3.5" /> {b.student_count ?? 0}
       </span>
     )},
     { key: 'status', label: 'Status', render: (b) => (
-      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
-        b.status === 'active' ? 'bg-green-500/15 border-green-500/30 text-green-400' : 'bg-white/5 border border-white/10 text-stardust'
+      <span className={`inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
+        b.status === 'active' ? 'bg-[#4ADE80]' : 'bg-[#E2E8F0] text-black/60'
       }`}>
         {b.status}
       </span>
@@ -454,21 +454,21 @@ export default function Batches() {
           </div>
 
           {batchStudents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 border border-white/5 bg-void/30 rounded-2xl text-center">
+            <div className="flex flex-col items-center justify-center py-10 border-4 border-black bg-[#FAF6EE] text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <div className="text-3xl mb-2">👥</div>
-              <div className="text-sm font-semibold text-pure">No students yet</div>
-              <div className="text-xs text-stardust mt-1">Select a student from the dropdown above to add them.</div>
+              <div className="text-sm font-semibold text-black">No students yet</div>
+              <div className="text-xs text-black/65 mt-1">Select a student from the dropdown above to add them.</div>
             </div>
           ) : (
             <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
               {batchStudents.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between p-3.5 bg-void/50 border border-white/5 rounded-xl gap-3 transition-colors hover:border-white/10"
+                  className="flex items-center justify-between p-3.5 bg-white border-2 border-black gap-3 transition-colors hover:bg-neutral-50"
                 >
                   <div>
-                    <div className="font-semibold text-pure text-sm">{s.name}</div>
-                    <div className="text-xs text-stardust font-mono mt-0.5">{s.class_level} · {s.guardian_phone}</div>
+                    <div className="font-semibold text-black text-sm">{s.name}</div>
+                    <div className="text-xs text-black/60 font-mono mt-0.5">{s.class_level} · {s.guardian_phone}</div>
                   </div>
                   <Button
                     variant="danger"
@@ -510,10 +510,10 @@ export default function Batches() {
           <div className="space-y-4">
             {/* Active days notice */}
             {schedule.length > 0 && (
-              <div className="p-3 bg-white/5 border border-white/5 rounded-xl text-xs text-stardust flex items-center gap-2 flex-wrap">
-                <span className="font-mono uppercase font-bold text-bitcoin">📅 Active days:</span>
+              <div className="p-3 bg-[#FAF6EE] border-2 border-black text-xs text-black/75 flex items-center gap-2 flex-wrap">
+                <span className="font-mono uppercase font-bold text-black">📅 Active days:</span>
                 {schedule.map((d) => (
-                  <span key={d} className="inline-flex px-2 py-0.5 rounded bg-bitcoin/10 border border-bitcoin/20 text-bitcoin font-mono text-[10px] uppercase font-bold">
+                  <span key={d} className="inline-flex px-2 py-0.5 border-2 border-black bg-[#FFD93D] text-black font-mono text-[10px] uppercase font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                     {DAY_LABELS[d] || d}
                   </span>
                 ))}
@@ -527,27 +527,27 @@ export default function Batches() {
                 return (
                   <div
                     key={day}
-                    className={`relative rounded-xl border transition-all duration-300 ${ttDropdown[day] ? 'z-50' : 'z-0'} ${
+                    className={`relative border-2 border-black transition-all duration-300 ${ttDropdown[day] ? 'z-50' : 'z-0'} ${
                       isActive 
-                        ? 'border-bitcoin/30 bg-bitcoin/[0.02]' 
-                        : 'border-white/5 bg-void/50 opacity-60'
+                        ? 'bg-[#FFD93D]/5' 
+                        : 'bg-neutral-100 opacity-60'
                     }`}
                   >
                     {/* Day header */}
-                    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-white/5 rounded-t-[11px] ${
-                      isActive ? 'bg-bitcoin/[0.06]' : 'bg-void/40'
+                    <div className={`flex items-center justify-between px-4 py-2.5 border-b-2 border-black ${
+                      isActive ? 'bg-[#FFD93D]/10' : 'bg-neutral-200'
                     }`}>
                       <div className="flex items-center gap-2">
-                        <span className="font-heading font-semibold text-sm text-pure">
+                        <span className="font-heading font-semibold text-sm text-black">
                           {DAY_LABELS[day]}
                         </span>
                         <span className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
-                          isActive ? 'text-bitcoin' : 'text-stardust'
+                          isActive ? 'text-black' : 'text-black/55'
                         }`}>
                           {isActive ? '● Active' : '○ Off'}
                         </span>
                       </div>
-                      <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-bold font-mono rounded bg-white/5 text-stardust border border-white/10">
+                      <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-bold font-mono border border-black bg-white text-black">
                         {timetable[day].length}
                       </span>
                     </div>
@@ -560,10 +560,10 @@ export default function Batches() {
                           {timetable[day].map((subj, idx) => (
                             <span
                               key={idx}
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold font-body ${
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 border border-black text-xs font-bold font-body ${
                                 isActive
-                                  ? 'bg-bitcoin/10 border-bitcoin/20 text-bitcoin'
-                                  : 'bg-white/5 border-white/10 text-pure/80'
+                                  ? 'bg-[#FFD93D]/20 text-black'
+                                  : 'bg-[#E2E8F0] text-black/70'
                               }`}
                             >
                               {subj}
@@ -584,7 +584,7 @@ export default function Batches() {
                       <div className="flex gap-2 relative" ref={el => dropdownRefs.current[day] = el}>
                         <input
                           ref={(el) => { inputRefs.current[day] = el; }}
-                          className="flex h-9 flex-1 bg-black/40 border border-white/10 rounded-lg px-3 text-xs text-pure transition-all duration-200 placeholder:text-white/20 focus-visible:border-bitcoin focus-visible:shadow-[0_0_10px_rgba(247,147,26,0.15)] focus-visible:outline-none"
+                          className="flex h-9 flex-1 bg-white border-2 border-black px-3 text-xs text-black transition-all duration-200 placeholder:text-black/30 focus-visible:border-black focus-visible:outline-none"
                           placeholder={`Add subject for ${day}…`}
                           value={ttInputs[day]}
                           onChange={(e) => setTtInputs((inp) => ({ ...inp, [day]: e.target.value }))}
@@ -604,13 +604,13 @@ export default function Batches() {
 
                         {/* Dropdown */}
                         {ttDropdown[day] && getSuggestions(day).length > 0 && (
-                          <div className="absolute top-full left-0 right-14 mt-1 bg-matter border border-white/10 rounded-lg shadow-xl z-50 max-h-40 overflow-y-auto p-1 backdrop-blur-md">
+                          <div className="absolute top-full left-0 right-14 mt-1 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 max-h-40 overflow-y-auto p-1">
                             {getSuggestions(day).map(s => (
                               <button
                                 key={s}
                                 type="button"
                                 onClick={() => addSubject(day, s)}
-                                className="w-full text-left px-3 py-1.5 text-xs text-pure hover:bg-white/5 rounded transition-colors font-body"
+                                className="w-full text-left px-3 py-1.5 text-xs text-black hover:bg-neutral-100 transition-colors font-body"
                               >
                                 {s}
                               </button>

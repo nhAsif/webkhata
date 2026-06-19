@@ -9,20 +9,20 @@ import { BarChart2, Download, Search, Users, DollarSign, TrendingUp, AlertTriang
 function statusBadge(outstanding, totalDue) {
   if (outstanding === 0) {
     return (
-      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono border bg-green-500/15 border-green-500/30 text-green-400">
+      <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#4ADE80] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
         Paid
       </span>
     );
   }
   if (outstanding === totalDue && totalDue > 0) {
     return (
-      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono border bg-red-500/15 border-red-500/30 text-red-400">
+      <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#FF6B6B] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
         Unpaid
       </span>
     );
   }
   return (
-    <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono border bg-yellow-500/15 border-yellow-500/30 text-yellow-400">
+    <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#FFD93D] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
       Partial
     </span>
   );
@@ -120,9 +120,9 @@ export default function Reports() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {loading ? (
           [...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 bg-matter border border-white/10 rounded-2xl animate-pulse p-5 space-y-3">
-              <div className="h-3.5 bg-white/5 rounded w-2/3" />
-              <div className="h-8 bg-white/5 rounded w-1/2" />
+            <div key={i} className="h-28 bg-white border-4 border-black p-5 space-y-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-pulse">
+              <div className="h-3.5 bg-neutral-200 border border-black rounded-none w-2/3" />
+              <div className="h-8 bg-neutral-200 border border-black rounded-none w-1/2" />
             </div>
           ))
         ) : (
@@ -130,26 +130,26 @@ export default function Reports() {
             <StatCard
               label="Students in Report"
               value={filtered.length}
-              icon={<Users className="w-5 h-5 text-bitcoin" />}
-              color="#F7931A"
+              icon={<Users className="w-5 h-5 text-black" />}
+              color="#FFD93D"
             />
             <StatCard
               label="Total Due"
               value={`৳${totalDue.toLocaleString()}`}
-              icon={<TrendingUp className="w-5 h-5" />}
-              color="#ef4444"
+              icon={<TrendingUp className="w-5 h-5 text-black" />}
+              color="#FF6B6B"
             />
             <StatCard
               label="Total Collected"
               value={`৳${totalPaid.toLocaleString()}`}
-              icon={<DollarSign className="w-5 h-5 text-green-400" />}
-              color="#10b981"
+              icon={<DollarSign className="w-5 h-5 text-black" />}
+              color="#4ADE80"
             />
             <StatCard
               label="Outstanding"
               value={`৳${totalOutstanding.toLocaleString()}`}
-              icon={<AlertTriangle className="w-5 h-5" />}
-              color={totalOutstanding > 0 ? '#ef4444' : '#10b981'}
+              icon={<AlertTriangle className="w-5 h-5 text-black" />}
+              color={totalOutstanding > 0 ? '#FF6B6B' : '#4ADE80'}
             />
           </>
         )}
@@ -157,55 +157,55 @@ export default function Reports() {
 
       {/* Report Table */}
       <Card hover={false}>
-        <CardHeader className="border-b border-white/10 pb-4">
-          <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
-            <BarChart2 className="w-5 h-5 text-bitcoin" /> Collection Report — {month}
+        <CardHeader className="border-b-4 border-black bg-[#C4B5FD]/10 pb-4">
+          <CardTitle className="text-lg font-heading font-black text-black flex items-center gap-2">
+            <BarChart2 className="w-5 h-5 text-black stroke-[2.5px]" /> Collection Report — {month}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-6 space-y-3">
+            <div className="p-6 space-y-3 bg-white">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-white/5 animate-pulse rounded-xl border border-white/10" />
+                <div key={i} className="h-12 bg-white animate-pulse border-2 border-black" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 text-center">
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-white">
               <div className="text-4xl mb-3">📊</div>
-              <div className="text-lg font-heading font-semibold text-pure mb-1">No data for this period</div>
-              <div className="text-sm text-stardust">Try selecting a different month or adding students with fees.</div>
+              <div className="text-lg font-heading font-black text-black mb-1">No data for this period</div>
+              <div className="text-sm text-black/60 font-bold">Try selecting a different month or adding students with fees.</div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-white">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
-                  <tr className="bg-void/40 border-y border-white/10">
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Student Name</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Monthly Fee</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Total Due</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Total Paid</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Outstanding</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
+                  <tr className="bg-[#FAF6EE] border-b-4 border-black">
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Student Name</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Monthly Fee</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Total Due</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Total Paid</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Outstanding</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y-2 divide-black bg-white">
                   {filtered.map((r) => {
                     const outstanding = r.outstanding_balance ?? 0;
                     const due = r.total_due ?? 0;
                     return (
-                      <tr key={r.student_id} className="hover:bg-white/5 transition-all">
-                        <td className="px-6 py-3.5 text-sm font-medium text-pure font-body">{r.student_name}</td>
-                        <td className="px-6 py-3.5 text-sm font-mono text-bitcoin font-bold">
+                      <tr key={r.student_id} className="hover:bg-neutral-50 transition-all">
+                        <td className="px-6 py-3.5 text-sm font-medium text-black font-body">{r.student_name}</td>
+                        <td className="px-6 py-3.5 text-sm font-mono text-black font-bold">
                           ৳{(r.monthly_fee ?? 0).toLocaleString()}
                         </td>
-                        <td className="px-6 py-3.5 text-sm font-mono text-red-400">
+                        <td className="px-6 py-3.5 text-sm font-mono text-red-600 font-bold">
                           ৳{due.toLocaleString()}
                         </td>
-                        <td className="px-6 py-3.5 text-sm font-mono text-green-400">
+                        <td className="px-6 py-3.5 text-sm font-mono text-emerald-700 font-bold">
                           ৳{(r.total_paid ?? 0).toLocaleString()}
                         </td>
                         <td className={`px-6 py-3.5 text-sm font-mono font-bold ${
-                          outstanding === 0 ? 'text-green-400' : outstanding === due && due > 0 ? 'text-red-400' : 'text-yellow-400'
+                          outstanding === 0 ? 'text-emerald-700' : outstanding === due && due > 0 ? 'text-red-600' : 'text-amber-700'
                         }`}>
                           ৳{outstanding.toLocaleString()}
                         </td>
@@ -216,18 +216,18 @@ export default function Reports() {
                     );
                   })}
                   {/* Totals row */}
-                  <tr className="bg-white/5 border-t-2 border-white/10">
-                    <td className="px-6 py-3.5 text-sm font-bold text-pure font-mono uppercase tracking-wider">
+                  <tr className="bg-[#FAF6EE] border-t-4 border-black font-bold">
+                    <td className="px-6 py-3.5 text-sm font-black text-black font-heading uppercase tracking-wider">
                       TOTALS ({filtered.length} students)
                     </td>
-                    <td className="px-6 py-3.5 text-sm font-mono text-stardust">—</td>
-                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-red-400">
+                    <td className="px-6 py-3.5 text-sm font-mono text-black/60">—</td>
+                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-red-600">
                       ৳{totalDue.toLocaleString()}
                     </td>
-                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-green-400">
+                    <td className="px-6 py-3.5 text-sm font-mono font-bold text-emerald-700">
                       ৳{totalPaid.toLocaleString()}
                     </td>
-                    <td className={`px-6 py-3.5 text-sm font-mono font-bold ${totalOutstanding > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                    <td className={`px-6 py-3.5 text-sm font-mono font-bold ${totalOutstanding > 0 ? 'text-red-600' : 'text-emerald-700'}`}>
                       ৳{totalOutstanding.toLocaleString()}
                     </td>
                     <td className="px-6 py-3.5"></td>

@@ -4,9 +4,9 @@ import { Card, CardContent } from '../../components/Card';
 import { Input } from '../../components/Input';
 
 const STATUS_COLORS = {
-  present: { bg: 'bg-green-500/20', color: 'text-green-400', border: 'border-green-500/30', label: 'P' },
-  absent: { bg: 'bg-red-500/20', color: 'text-red-400', border: 'border-red-500/30', label: 'A' },
-  late: { bg: 'bg-yellow-500/20', color: 'text-yellow-400', border: 'border-yellow-500/30', label: 'L' },
+  present: { bg: 'bg-[#4ADE80]', color: 'text-black', border: 'border-2 border-black', label: 'P' },
+  absent: { bg: 'bg-[#FF6B6B]', color: 'text-black', border: 'border-2 border-black', label: 'A' },
+  late: { bg: 'bg-[#FFD93D]', color: 'text-black', border: 'border-2 border-black', label: 'L' },
 };
 
 function getDaysInMonth(year, month) {
@@ -38,8 +38,8 @@ export default function ParentAttendance() {
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 className="text-2xl font-heading text-pure font-bold">Attendance</h1>
-          <p className="text-stardust font-body mt-1">Monthly attendance calendar</p>
+          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">Attendance</h1>
+          <p className="text-black/60 font-body mt-1">Monthly attendance calendar</p>
         </div>
         <div className="w-auto min-w-[150px]">
           <Input
@@ -50,34 +50,34 @@ export default function ParentAttendance() {
         </div>
       </div>
 
-      {data && (
-        <div className="flex gap-3 mb-6 flex-wrap">
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">✅ Present: {data.summary.present}</span>
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">❌ Absent: {data.summary.absent}</span>
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">⏰ Late: {data.summary.late}</span>
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/20 text-blue-400 border-blue-500/30">📅 Sessions: {data.summary.total_sessions}</span>
+      {data?.summary && (
+        <div className="flex flex-wrap gap-2.5 mb-6">
+          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">✅ Present: {data.summary.present}</span>
+          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">❌ Absent: {data.summary.absent}</span>
+          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FFD93D] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">⏰ Late: {data.summary.late}</span>
+          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#C4B5FD] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">📅 Sessions: {data.summary.total_sessions}</span>
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${
+            className={`inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
               data.summary.attendance_rate >= 75
-                ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                : 'bg-red-500/20 text-red-400 border-red-500/30'
+                ? 'bg-[#4ADE80] text-black'
+                : 'bg-[#FF6B6B] text-black'
             }`}
           >
-            📊 {data.summary.attendance_rate}%
+            📊 {data.summary.attendance_rate}% Rate
           </span>
         </div>
       )}
 
-      <Card className="bg-matter border-white/10">
-        <CardContent className="p-4 sm:p-6">
+      <Card>
+        <CardContent className="p-4 sm:p-6 bg-white">
           {loading ? (
-            <div className="animate-pulse bg-white/5 border border-white/10 rounded-lg h-[300px]" />
+            <div className="animate-pulse bg-neutral-100 border-4 border-black h-[300px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
           ) : (
             <div>
               {/* Day labels */}
-              <div className="grid grid-cols-7 gap-1 mb-1">
+              <div className="grid grid-cols-7 gap-1 mb-2">
                 {DAY_LABELS.map((d) => (
-                  <div key={d} className="text-center text-xs text-stardust font-heading font-semibold p-1">
+                  <div key={d} className="text-center text-xs text-black font-heading font-black uppercase p-1">
                     {d}
                   </div>
                 ))}
@@ -100,15 +100,15 @@ export default function ParentAttendance() {
                   return (
                     <div
                       key={day}
-                      className={`aspect-square flex flex-col items-center justify-center rounded-md text-xs transition-all duration-150 cursor-default border ${
+                      className={`aspect-square flex flex-col items-center justify-center text-xs transition-all duration-150 cursor-default border-2 ${
                         style
-                          ? `${style.bg} ${style.color} ${style.border} font-bold`
-                          : 'bg-white/5 text-stardust border-transparent font-normal'
+                          ? `${style.bg} ${style.color} ${style.border} font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
+                          : 'bg-[#FAF6EE] text-black/55 border-neutral-300 font-normal hover:bg-neutral-100'
                       }`}
                       title={status ? `${dateStr}: ${status}` : dateStr}
                     >
-                      <div className="font-mono">{day}</div>
-                      {status && <div className="text-[9px] opacity-80 mt-0.5 font-mono">{style.label}</div>}
+                      <div className="font-mono text-sm">{day}</div>
+                      {status && <div className="text-[9px] opacity-75 mt-0.5 font-mono uppercase font-black">{style.label}</div>}
                     </div>
                   );
                 })}
@@ -117,9 +117,9 @@ export default function ParentAttendance() {
               {/* Legend */}
               <div className="flex gap-4 mt-6 justify-center flex-wrap">
                 {Object.entries(STATUS_COLORS).map(([s, style]) => (
-                  <div key={s} className="flex items-center gap-1.5 text-xs font-mono">
-                    <div className={`w-3 h-3 rounded ${style.bg} border ${style.border}`} />
-                    <span className="text-stardust capitalize">{s}</span>
+                  <div key={s} className="flex items-center gap-1.5 text-xs font-mono font-bold">
+                    <div className={`w-4 h-4 ${style.bg} ${style.border} shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]`} />
+                    <span className="text-black capitalize">{s}</span>
                   </div>
                 ))}
               </div>

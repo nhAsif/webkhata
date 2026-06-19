@@ -3,93 +3,93 @@
 
 :root {
   /* Dynamic Neo-brutalist Core variables */
-  --neo-ink: #D1D1D6; /* Soft silver-gray text */
-  --neo-canvas: #2A2A2D; /* Dim slate canvas */
-  --neo-card: #333336; /* Dim card surface */
-  --neo-shadow: #151516; /* Dim offset shadows */
-  --neo-border: #151516; /* Dim borders */
+  --neo-ink: #181B20; /* Rich carbon ink */
+  --neo-canvas: #FAF6EE; /* Premium warm ivory-cream paper background */
+  --neo-card: #FFFFFF; /* Clean white notebook sheet */
+  --neo-shadow: #181B20; /* Bold offset ink shadow */
+  --neo-border: #181B20; /* Crisp ink borders */
   
-  --neo-grid-line: rgba(255, 255, 255, 0.04);
-  --neo-ruled-line: rgba(255, 255, 255, 0.06);
+  --neo-grid-line: rgba(24, 27, 32, 0.05); /* Very soft blue-grey grid lines */
+  --neo-ruled-line: rgba(24, 27, 32, 0.08); /* Faint paper rules */
 
   /* Background Neutral - Cream Paper Canvas */
   --neutral-primary-soft: var(--neo-card);
   --neutral-primary: var(--neo-canvas);
-  --neutral-primary-medium: #222225; /* Dimmed medium neutral */
+  --neutral-primary-medium: #F3EDE0; /* Slightly darker paper page shadow */
   --neutral-primary-strong: var(--neo-canvas);
   
   --neutral-secondary-soft: var(--neo-canvas);
-  --neutral-secondary: #4A4A4F; /* Soft muted violet gray */
-  --neutral-secondary-medium: #4A4A4F;
-  --neutral-secondary-strong: #4A4A4F;
+  --neutral-secondary: #E5DAC2; /* Cardboard cover color */
+  --neutral-secondary-medium: #E5DAC2;
+  --neutral-secondary-strong: #E5DAC2;
   
-  --neutral-tertiary-soft: #4A4A4F;
-  --neutral-tertiary: #4A4A4F;
-  --neutral-tertiary-medium: #4A4A4F;
-  --neutral-quaternary: #FFD93D; /* Vivid Yellow highlighter accent */
+  --neutral-tertiary-soft: #D3C3A4;
+  --neutral-tertiary: #D3C3A4;
+  --neutral-tertiary-medium: #D3C3A4;
+  --neutral-quaternary: #FFD93D; /* Highlighter yellow */
   --quaternary-medium: #FFD93D;
-  --gray: var(--neo-ink);
+  --gray: #64748B;
 
   /* Background Brand - Hot Red margin ink */
-  --brand-softer: #FF6B6B;
+  --brand-softer: #FF8A8A;
   --brand-soft: #FF6B6B;
   --brand: #FF6B6B;
-  --brand-medium: #FF6B6B;
+  --brand-medium: #E05353;
   --brand-strong: var(--neo-ink);
 
   /* Background Status */
-  --success-soft: #C4B5FD;
+  --success-soft: #DDD6FE;
   --success: #C4B5FD;
-  --success-medium: #C4B5FD;
+  --success-medium: #B09EFC;
   --success-strong: var(--neo-ink);
 
-  --danger-soft: #FF6B6B;
+  --danger-soft: #FF8A8A;
   --danger: #FF6B6B;
-  --danger-medium: #FF6B6B;
+  --danger-medium: #E05353;
   --danger-strong: var(--neo-ink);
 
-  --warning-soft: #FFD93D;
+  --warning-soft: #FFE169;
   --warning: #FFD93D;
-  --warning-medium: #FFD93D;
+  --warning-medium: #E2B919;
   --warning-strong: var(--neo-ink);
 
   /* Background Utility & Accents */
   --dark: var(--neo-ink);
   --dark-strong: var(--neo-ink);
-  --disabled: #2C2C2F;
+  --disabled: #E2E8F0;
   
   --purple: #C4B5FD;
-  --sky: #C4B5FD;
-  --teal: #C4B5FD;
-  --pink: #FF6B6B;
-  --cyan: #FFD93D;
-  --fuchsia: #C4B5FD;
-  --indigo: #C4B5FD;
-  --orange: #FFD93D;
+  --sky: #BAE6FD;
+  --teal: #99F6E4;
+  --pink: #FBCFE8;
+  --cyan: #A5F3FC;
+  --fuchsia: #F5D0FE;
+  --indigo: #C7D2FE;
+  --orange: #FED7AA;
 
   /* Text Colors - Dynamic ink */
   --white: #FFFFFF;
   --black: var(--neo-ink);
   --heading: var(--neo-ink);
   --body: var(--neo-ink);
-  --body-subtle: var(--neo-ink);
+  --body-subtle: #475569; /* Faded slate-ink */
 
   --fg-brand-subtle: #FF6B6B;
   --fg-brand: var(--neo-ink);
   --fg-brand-strong: var(--neo-ink);
 
-  --fg-success: var(--neo-ink);
-  --fg-success-strong: var(--neo-ink);
-  --fg-danger: var(--neo-ink);
-  --fg-danger-strong: var(--neo-ink);
-  --fg-warning-subtle: var(--neo-ink);
-  --fg-warning: var(--neo-ink);
-  --fg-disabled: #888888;
+  --fg-success: #1E1B4B;
+  --fg-success-strong: #1E1B4B;
+  --fg-danger: #7F1D1D;
+  --fg-danger-strong: #7F1D1D;
+  --fg-warning-subtle: #78350F;
+  --fg-warning: #78350F;
+  --fg-disabled: #94A3B8;
 
-  --fg-yellow: var(--neo-ink);
+  --fg-yellow: #78350F;
   --fg-info: var(--neo-ink);
-  --fg-purple: var(--neo-ink);
-  --fg-purple-strong: var(--neo-ink);
+  --fg-purple: #1E1B4B;
+  --fg-purple-strong: #1E1B4B;
   --fg-cyan: var(--neo-ink);
   --fg-indigo: var(--neo-ink);
   --fg-pink: var(--neo-ink);
@@ -134,24 +134,6 @@
   --leaf-pattern-opacity: 0.08;
 }
 
-:root.dark {
-  /* Cyber-Brutalism Slate Blackboard Style */
-  --neo-ink: #FFFFFF;
-  --neo-canvas: #121212;
-  --neo-card: #1C1C1E;
-  --neo-shadow: #FFFFFF;
-  --neo-border: #000000;
-  
-  --neo-grid-line: rgba(255, 255, 255, 0.08);
-  --neo-ruled-line: rgba(255, 255, 255, 0.12);
-
-  --neutral-primary-medium: #1C1C1E;
-  --disabled: #2C2C2E;
-  --fg-disabled: #666666;
-
-  --leaf-pattern-opacity: 0.04;
-}
-
 /* Override stark white card backgrounds to Moleskine paper cards in light mode & slate cards in dark mode */
 .bg-white {
   background-color: var(--neo-card) !important;
@@ -169,6 +151,15 @@
 }
 
 @layer utilities {
+  /* Notebook Grid Pattern - light blue graph paper */
+  .bg-notebook-grid {
+    background-size: 30px 30px;
+    background-image: 
+      linear-gradient(to right, rgba(165, 192, 243, 0.22) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(165, 192, 243, 0.22) 1px, transparent 1px);
+    background-color: var(--neo-canvas);
+  }
+
   /* Dynamic Grid Background - Slate blackboard in dark, Purple graph in light */
   .bg-leaf-pattern {
     background-size: 30px 30px;
@@ -198,6 +189,40 @@
     width: 2px;
     background-color: #FF6B6B; /* Khata red margin rule */
     pointer-events: none;
+  }
+
+  /* Notebook Spiral Rings on the side of elements */
+  .notebook-spirals {
+    position: relative;
+    padding-left: 36px !important;
+  }
+  .notebook-spirals::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    left: 8px;
+    width: 14px;
+    /* Draw punched holes and spiral wire loops */
+    background: 
+      radial-gradient(circle at 4px 50%, var(--neo-border) 2.5px, transparent 3px),
+      linear-gradient(90deg, transparent 6px, #8A9AAB 6px, #BDCFDD 8px, #8A9AAB 10px, transparent 10px);
+    background-size: 14px 24px;
+    background-repeat: repeat-y;
+    pointer-events: none;
+  }
+
+  /* Post-it / Sticky Note */
+  .sticker-note {
+    background-color: #FEF08A; /* Light yellow post-it */
+    border: 3px solid var(--neo-border);
+    box-shadow: 4px 4px 0px 0px var(--neo-shadow);
+    transform: rotate(-1deg);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .sticker-note:hover {
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 6px 6px 0px 0px var(--neo-shadow);
   }
 
   /* Halftone Dots */

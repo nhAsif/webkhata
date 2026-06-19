@@ -29,7 +29,7 @@ export default function StatCard({ label, value, icon, color = '#FF6B6B', change
             {label}
           </div>
           <div 
-            className="text-4xl font-heading font-black text-black mt-2 leading-none tracking-tighter"
+            className="text-4xl font-display font-black text-black mt-2 leading-none tracking-tighter"
           >
             {value ?? '—'}
           </div>
