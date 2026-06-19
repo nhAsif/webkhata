@@ -8,7 +8,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Shuffle, 
-  RefreshCw 
+  RefreshCw,
+  Calendar
 } from 'lucide-react';
 import { 
   getDailyVocabulary, 
@@ -16,7 +17,9 @@ import {
   getBookmarkedWords, 
   getProgressStats, 
   updateProgress,
-  savePracticeResult
+  savePracticeResult,
+  getVocabularyDates,
+  getVocabularyHistory
 } from '../../api/vocabulary';
 import toast from 'react-hot-toast';
 
@@ -99,15 +102,50 @@ export default function ParentVocabulary() {
   // We maintain a local set of bookmarked word IDs for immediate UI updates
   const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
 
+  const [dates, setDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [historyWords, setHistoryWords] = useState([]);
+
   useEffect(() => {
     loadStats();
     loadDaily();
     loadSaved();
+    loadDates();
     if (location.state?.tab === 'practice') {
       setActiveTab('practice');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'history' && selectedDate) {
+      loadHistory(selectedDate);
+    }
+  }, [activeTab, selectedDate]);
+
+  const loadDates = async () => {
+    try {
+      const availableDates = await getVocabularyDates();
+      setDates(availableDates);
+      if (availableDates.length > 0) {
+        setSelectedDate(availableDates[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadHistory = async (date) => {
+    try {
+      setLoading(true);
+      const words = await getVocabularyHistory(date);
+      setHistoryWords(words);
+    } catch (err) {
+      toast.error('Failed to load history');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadStats = async () => {
     try {
@@ -349,6 +387,14 @@ export default function ParentVocabulary() {
           Today's Words
         </button>
         <button
+          onClick={() => setActiveTab('history')}
+          className={`px-4 py-2 rounded-lg font-mono text-sm tracking-wide transition-colors ${
+            activeTab === 'history' ? 'bg-bitcoin/20 text-bitcoin' : 'text-stardust hover:text-pure hover:bg-white/5'
+          }`}
+        >
+          <span className="flex items-center gap-2"><Calendar className="w-4 h-4"/> History</span>
+        </button>
+        <button
           onClick={() => { setActiveTab('practice'); setPracticeMode(null); }}
           className={`px-4 py-2 rounded-lg font-mono text-sm tracking-wide transition-colors ${
             activeTab === 'practice' ? 'bg-bitcoin/20 text-bitcoin' : 'text-stardust hover:text-pure hover:bg-white/5'
@@ -416,6 +462,47 @@ export default function ParentVocabulary() {
             {activeTab === 'daily' && dailyWords.length === 0 && !loading && (
               <div className="text-center py-20 text-stardust">
                 <p>No words available today. Please check back later.</p>
+              </div>
+            )}
+
+            {/* History Tab */}
+            {activeTab === 'history' && (
+              <div className="max-w-4xl mx-auto">
+                <div className="flex justify-end mb-6">
+                  <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2">
+                    <Calendar className="w-4 h-4 text-stardust" />
+                    <select
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="bg-transparent border-none text-pure font-mono text-sm focus:ring-0 outline-none cursor-pointer"
+                    >
+                      {dates.length === 0 && <option value="">No dates available</option>}
+                      {dates.map((d) => (
+                        <option key={d} value={d} className="bg-void text-pure">
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {historyWords.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {historyWords.map((item) => (
+                      <WordCard 
+                        key={item.id} 
+                        item={item} 
+                        isBookmarked={bookmarkedIds.has(item.word_id)}
+                        onBookmarkToggle={toggleBookmark}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20 text-stardust bg-white/5 border border-white/10 rounded-2xl">
+                    <BookOpen className="w-12 h-12 text-stardust/30 mx-auto mb-4" />
+                    <p>No vocabulary words found for this date.</p>
+                  </div>
+                )}
               </div>
             )}
 
