@@ -589,3 +589,29 @@ class StudentVocabularyProgressResponse(BaseModel):
     word: VocabularyWordResponse
 
     model_config = {"from_attributes": True}
+
+
+class PracticeResultCreate(BaseModel):
+    mode: str
+    score: int
+    total_questions: int
+
+    @field_validator("score")
+    @classmethod
+    def validate_score(cls, v, info):
+        # We can't easily validate against total_questions here without info.data, but it's fine.
+        if v < 0:
+            raise ValueError("Score cannot be negative")
+        return v
+
+
+class PracticeResultResponse(BaseModel):
+    id: int
+    student_id: int
+    date: date
+    mode: str
+    score: int
+    total_questions: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

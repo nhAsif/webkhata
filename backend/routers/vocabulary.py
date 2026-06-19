@@ -65,6 +65,10 @@ def fetch_words_from_gemini():
         return []
 
 
+import threading
+
+fetch_lock = threading.Lock()
+
 @router.get("/daily", response_model=List[schemas.DailyVocabularyResponse])
 def get_daily_vocabulary(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     today = date.today()
@@ -78,7 +82,13 @@ def get_daily_vocabulary(db: Session = Depends(get_db), current_user: models.Use
         db.commit()
         daily_sets = daily_sets[:20]
     elif len(daily_sets) < 20:
-        words_needed = 20 - len(daily_sets)
+        with fetch_lock:
+            # Check again inside the lock to avoid race conditions
+            daily_sets = db.query(models.DailyVocabularySet).filter(models.DailyVocabularySet.date == today).order_by(models.DailyVocabularySet.display_order).all()
+            if len(daily_sets) >= 20:
+                return daily_sets[:20]
+                
+            words_needed = 20 - len(daily_sets)
         # Fetch new words
         new_words_data = fetch_words_from_gemini()
         if not new_words_data:
@@ -128,6 +138,109 @@ def get_daily_vocabulary(db: Session = Depends(get_db), current_user: models.Use
         daily_sets = db.query(models.DailyVocabularySet).filter(models.DailyVocabularySet.date == today).order_by(models.DailyVocabularySet.display_order).all()
 
     return daily_sets
+
+
+@router.get("/dates", response_model=List[str])
+def get_available_dates(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # Used for admin panel history
+    dates = db.query(models.DailyVocabularySet.date).distinct().order_by(models.DailyVocabularySet.date.desc()).all()
+    return [d[0].isoformat() for d in dates]
+
+
+@router.get("/history", response_model=List[schemas.DailyVocabularyResponse])
+def get_vocabulary_history(date: str = None, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    from datetime import date as dt_date
+    if date:
+        try:
+            target_date = dt_date.fromisoformat(date)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format")
+    else:
+        target_date = dt_date.today()
+    
+    daily_sets = db.query(models.DailyVocabularySet).filter(models.DailyVocabularySet.date == target_date).order_by(models.DailyVocabularySet.display_order).all()
+    return daily_sets
+
+
+@router.get("/stats/students")
+def get_students_vocabulary_stats(date: str = None, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "tutor":
+        raise HTTPException(status_code=403, detail="Only tutors can view student stats")
+        
+    from datetime import date as dt_date
+    if date:
+        try:
+            target_date = dt_date.fromisoformat(date)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format")
+    else:
+        target_date = dt_date.today()
+        
+    # Get all active students
+    students = db.query(models.Student).filter(models.Student.status == "active").all()
+    
+    # Get the word IDs for the target date
+    daily_sets = db.query(models.DailyVocabularySet).filter(models.DailyVocabularySet.date == target_date).all()
+    word_ids = [ds.word_id for ds in daily_sets]
+    
+    if not word_ids:
+        return [{"student_id": s.id, "student_name": s.name, "viewed": 0, "total": 0, "completed": False} for s in students]
+        
+    stats = []
+    for student in students:
+        viewed_count = db.query(models.StudentVocabularyProgress).filter(
+            models.StudentVocabularyProgress.student_id == student.id,
+            models.StudentVocabularyProgress.word_id.in_(word_ids),
+            models.StudentVocabularyProgress.viewed == True
+        ).count()
+        
+        stats.append({
+            "student_id": student.id,
+            "student_name": student.name,
+            "viewed": viewed_count,
+            "total": len(word_ids),
+            "completed": viewed_count == len(word_ids) and len(word_ids) > 0
+        })
+        
+    return stats
+
+
+@router.post("/practice/results", response_model=schemas.PracticeResultResponse)
+def save_practice_result(data: schemas.PracticeResultCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if not current_user.student_id:
+        raise HTTPException(status_code=403, detail="Only students can save practice results")
+        
+    result = models.StudentVocabularyPracticeResult(
+        student_id=current_user.student_id,
+        mode=data.mode,
+        score=data.score,
+        total_questions=data.total_questions,
+        date=date.today()
+    )
+    db.add(result)
+    db.commit()
+    db.refresh(result)
+    return result
+
+
+@router.get("/stats/students/{student_id}/practice", response_model=List[schemas.PracticeResultResponse])
+def get_student_practice_results(student_id: int, date_str: str = None, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "tutor":
+        raise HTTPException(status_code=403, detail="Only tutors can view detailed student stats")
+        
+    query = db.query(models.StudentVocabularyPracticeResult).filter(
+        models.StudentVocabularyPracticeResult.student_id == student_id
+    )
+    
+    if date_str:
+        from datetime import date as dt_date
+        try:
+            target_date = dt_date.fromisoformat(date_str)
+            query = query.filter(models.StudentVocabularyPracticeResult.date == target_date)
+        except ValueError:
+            pass
+            
+    return query.order_by(models.StudentVocabularyPracticeResult.created_at.desc()).all()
 
 
 class ProgressUpdate(BaseModel):

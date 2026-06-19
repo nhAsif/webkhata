@@ -18,7 +18,8 @@ import {
   Calendar,
   Wallet,
   BarChart2,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Book
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { to: '/homework', icon: FileText, label: 'Homework' },
   { to: '/results', icon: TrendingUp, label: 'Results' },
   { to: '/payments', icon: Wallet, label: 'Payments' },
+  { to: '/vocabulary', icon: Book, label: 'Vocabulary' },
   { to: '/reports', icon: BarChart2, label: 'Reports' },
   { to: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];

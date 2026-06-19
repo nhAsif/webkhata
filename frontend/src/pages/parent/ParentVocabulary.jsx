@@ -14,9 +14,9 @@ import {
   getDailyVocabulary, 
   searchVocabulary, 
   getBookmarkedWords, 
-  getPracticeWords, 
   getProgressStats, 
-  updateProgress 
+  updateProgress,
+  savePracticeResult
 } from '../../api/vocabulary';
 import toast from 'react-hot-toast';
 
@@ -81,8 +81,12 @@ export default function ParentVocabulary() {
   const [dailyWords, setDailyWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const [practiceWords, setPracticeWords] = useState([]);
+  const [practiceQuestions, setPracticeQuestions] = useState([]);
   const [practiceIndex, setPracticeIndex] = useState(0);
+  const [practiceMode, setPracticeMode] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [score, setScore] = useState(0);
+  const [practiceFinished, setPracticeFinished] = useState(false);
   
   const [savedWords, setSavedWords] = useState([]);
   
@@ -100,7 +104,7 @@ export default function ParentVocabulary() {
     loadDaily();
     loadSaved();
     if (location.state?.tab === 'practice') {
-      startPractice();
+      setActiveTab('practice');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -179,28 +183,114 @@ export default function ParentVocabulary() {
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
-  const startPractice = async () => {
-    try {
-      setLoading(true);
-      setActiveTab('practice');
-      const words = await getPracticeWords();
-      setPracticeWords(words);
-      setPracticeIndex(0);
-      if (words.length === 0) {
-        toast('No previous words to practice yet!', { icon: 'ℹ️' });
+  const startPractice = (mode = null) => {
+    setActiveTab('practice');
+    setPracticeMode(mode);
+    if (!mode) {
+      setPracticeQuestions([]);
+      return;
+    }
+    
+    let eligibleWords = [...dailyWords];
+    if (mode === 'synonym') {
+      eligibleWords = eligibleWords.filter(w => {
+        const word = w.word || w;
+        return word.synonyms && word.synonyms.trim().length > 0;
+      });
+    } else if (mode === 'antonym') {
+      eligibleWords = eligibleWords.filter(w => {
+        const word = w.word || w;
+        return word.antonyms && word.antonyms.trim().length > 0;
+      });
+    }
+    
+    if (eligibleWords.length < 4) {
+      toast('Not enough daily words with this property to generate practice!', { icon: 'ℹ️' });
+      setPracticeMode(null);
+      setPracticeQuestions([]);
+      return;
+    }
+    
+    const shuffledDaily = eligibleWords.sort(() => 0.5 - Math.random());
+    const selectedWords = shuffledDaily.slice(0, 20);
+    
+    const questions = selectedWords.map(wordItem => {
+      const wordObj = wordItem.word || wordItem;
+      let correctAnswer = '';
+      let questionPrefix = '';
+      let distractorsPool = [];
+      
+      const otherWords = eligibleWords.filter(w => (w.word?.id || w.id) !== wordObj.id);
+      
+      if (mode === 'meaning') {
+        questionPrefix = 'What is the meaning of';
+        correctAnswer = wordObj.bangla_meaning;
+        distractorsPool = otherWords.map(w => w.word?.bangla_meaning || w.bangla_meaning);
+      } else if (mode === 'synonym') {
+        questionPrefix = 'Which is a synonym for';
+        correctAnswer = wordObj.synonyms;
+        distractorsPool = otherWords.map(w => w.word?.synonyms || w.synonyms);
+      } else if (mode === 'antonym') {
+        questionPrefix = 'Which is an antonym for';
+        correctAnswer = wordObj.antonyms;
+        distractorsPool = otherWords.map(w => w.word?.antonyms || w.antonyms);
+      } else if (mode === 'pos') {
+        questionPrefix = 'What is the part of speech of';
+        correctAnswer = wordObj.part_of_speech;
+        distractorsPool = ['Noun', 'Pronoun', 'Verb', 'Adjective', 'Adverb', 'Preposition', 'Conjunction', 'Interjection'].filter(pos => pos.toLowerCase() !== correctAnswer.toLowerCase());
       }
-    } catch (err) {
-      toast.error('Failed to load practice words');
-    } finally {
-      setLoading(false);
+      
+      let distractors = [];
+      if (mode === 'pos') {
+        distractors = [...distractorsPool].sort(() => 0.5 - Math.random()).slice(0, 3);
+      } else {
+        const uniqueDistractors = [...new Set(distractorsPool)].filter(d => d !== correctAnswer);
+        distractors = uniqueDistractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+        while (distractors.length < 3) {
+            distractors.push(`Distractor ${Math.random().toString(36).substring(7)}`);
+        }
+      }
+      
+      const options = [correctAnswer, ...distractors].sort(() => 0.5 - Math.random());
+      
+      return {
+        word: wordObj,
+        questionPrefix,
+        options,
+        correctAnswer
+      };
+    });
+    
+    setPracticeQuestions(questions);
+    setPracticeIndex(0);
+    setSelectedOption(null);
+    setScore(0);
+    setPracticeFinished(false);
+  };
+
+  const handleOptionSelect = (option) => {
+    if (selectedOption !== null) return; // already selected
+    setSelectedOption(option);
+    if (option === practiceQuestions[practiceIndex].correctAnswer) {
+      setScore(s => s + 1);
     }
   };
 
-  const nextPractice = () => {
-    if (practiceIndex < practiceWords.length - 1) {
+  const nextPractice = async () => {
+    if (practiceIndex < practiceQuestions.length - 1) {
       setPracticeIndex(practiceIndex + 1);
+      setSelectedOption(null);
     } else {
-      toast.success('Practice complete!');
+      setPracticeFinished(true);
+      try {
+        await savePracticeResult({
+          mode: practiceMode,
+          score: score,
+          total_questions: practiceQuestions.length
+        });
+      } catch (err) {
+        console.error('Failed to save practice result', err);
+      }
     }
   };
 
@@ -259,7 +349,7 @@ export default function ParentVocabulary() {
           Today's Words
         </button>
         <button
-          onClick={startPractice}
+          onClick={() => { setActiveTab('practice'); setPracticeMode(null); }}
           className={`px-4 py-2 rounded-lg font-mono text-sm tracking-wide transition-colors ${
             activeTab === 'practice' ? 'bg-bitcoin/20 text-bitcoin' : 'text-stardust hover:text-pure hover:bg-white/5'
           }`}
@@ -332,29 +422,94 @@ export default function ParentVocabulary() {
             {/* Practice Tab */}
             {activeTab === 'practice' && (
               <div className="max-w-2xl mx-auto">
-                {practiceWords.length > 0 ? (
-                  <>
-                    <div className="text-center text-stardust font-mono text-sm mb-4">
-                      Practice Word {practiceIndex + 1} of {practiceWords.length}
+                {!practiceMode ? (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
+                    <h2 className="text-3xl font-bold text-pure mb-6">Choose Practice Mode</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <button onClick={() => startPractice('meaning')} className="p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-bitcoin/20 hover:border-bitcoin transition-colors text-lg font-bold text-pure">Meaning</button>
+                      <button onClick={() => startPractice('synonym')} className="p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-bitcoin/20 hover:border-bitcoin transition-colors text-lg font-bold text-pure">Synonyms</button>
+                      <button onClick={() => startPractice('antonym')} className="p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-bitcoin/20 hover:border-bitcoin transition-colors text-lg font-bold text-pure">Antonyms</button>
+                      <button onClick={() => startPractice('pos')} className="p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-bitcoin/20 hover:border-bitcoin transition-colors text-lg font-bold text-pure">Parts of Speech</button>
                     </div>
-                    <WordCard 
-                      item={practiceWords[practiceIndex]} 
-                      isBookmarked={bookmarkedIds.has(practiceWords[practiceIndex].id)}
-                      onBookmarkToggle={toggleBookmark}
-                    />
-                    
-                    <div className="flex justify-center mt-6">
-                      <button
-                        onClick={nextPractice}
-                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-pure font-bold rounded-xl flex items-center gap-2 transition-all"
-                      >
-                        {practiceIndex < practiceWords.length - 1 ? 'Next Word' : 'Finish'} <ChevronRight className="w-5 h-5" />
-                      </button>
+                  </div>
+                ) : practiceQuestions.length > 0 ? (
+                  practiceFinished ? (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
+                      <h2 className="text-3xl font-bold text-pure mb-2">Practice Complete!</h2>
+                      <p className="text-xl text-stardust mb-6">You scored <span className="text-bitcoin font-bold">{score}</span> out of {practiceQuestions.length}</p>
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={() => startPractice(practiceMode)}
+                          className="px-6 py-3 bg-gradient-to-r from-burnt to-bitcoin text-void font-bold rounded-xl hover:opacity-90 transition-opacity"
+                        >
+                          Practice Again
+                        </button>
+                        <button
+                          onClick={() => setPracticeMode(null)}
+                          className="px-6 py-3 bg-white/10 text-pure font-bold rounded-xl hover:bg-white/20 transition-colors"
+                        >
+                          Change Mode
+                        </button>
+                      </div>
                     </div>
-                  </>
+                  ) : (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-8 relative">
+                      <div className="text-center text-stardust font-mono text-sm mb-6 flex justify-between items-center">
+                        <span>Question {practiceIndex + 1} of {practiceQuestions.length}</span>
+                        <span>Score: {score}</span>
+                      </div>
+                      
+                      <div className="mb-8 text-center">
+                        <p className="text-stardust text-sm uppercase tracking-widest mb-2 font-mono">{practiceQuestions[practiceIndex].questionPrefix}</p>
+                        <h3 className="text-4xl font-bold text-pure">{practiceQuestions[practiceIndex].word.word}</h3>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {practiceQuestions[practiceIndex].options.map((option, idx) => {
+                          const isSelected = selectedOption === option;
+                          const isCorrect = option === practiceQuestions[practiceIndex].correctAnswer;
+                          const showCorrect = selectedOption !== null && isCorrect;
+                          const showWrong = isSelected && !isCorrect;
+                          
+                          let btnClass = "w-full text-left p-4 rounded-xl border transition-all font-medium ";
+                          if (selectedOption === null) {
+                            btnClass += "border-white/10 bg-white/5 hover:bg-white/10 text-pure hover:border-bitcoin/50";
+                          } else if (showCorrect) {
+                            btnClass += "border-green-500/50 bg-green-500/10 text-green-400";
+                          } else if (showWrong) {
+                            btnClass += "border-red-500/50 bg-red-500/10 text-red-400";
+                          } else {
+                            btnClass += "border-white/5 bg-white/5 text-stardust opacity-50";
+                          }
+
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => handleOptionSelect(option)}
+                              disabled={selectedOption !== null}
+                              className={btnClass}
+                            >
+                              {option}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      
+                      {selectedOption !== null && (
+                        <div className="mt-8 flex justify-center animate-in fade-in slide-in-from-bottom-2">
+                          <button
+                            onClick={nextPractice}
+                            className="px-8 py-3 bg-gradient-to-r from-burnt to-bitcoin hover:from-burnt/90 hover:to-bitcoin/90 text-void font-bold rounded-xl flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(247,147,26,0.3)]"
+                          >
+                            {practiceIndex < practiceQuestions.length - 1 ? 'Next Question' : 'View Results'} <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
                 ) : (
                   <div className="text-center py-20 text-stardust">
-                    <p>No previous words to practice yet. Learn some daily words first!</p>
+                    <p>Not enough daily words available yet. Check today's words first!</p>
                   </div>
                 )}
               </div>

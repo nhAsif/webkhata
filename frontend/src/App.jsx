@@ -17,6 +17,7 @@ import StudentProfile from './pages/StudentProfile';
 import Payments from './pages/Payments';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import Vocabulary from './pages/Vocabulary';
 
 // Parent portal pages
 import ParentLogin from './pages/parent/ParentLogin';
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="homework" element={<Homework />} />
             <Route path="results" element={<Results />} />
             <Route path="payments" element={<Payments />} />
+            <Route path="vocabulary" element={<Vocabulary />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
           </Route>

@@ -315,3 +315,17 @@ class StudentVocabularyProgress(Base):
 
     student = relationship("Student")
     word = relationship("VocabularyWord")
+
+
+class StudentVocabularyPracticeResult(Base):
+    __tablename__ = "student_vocabulary_practice_results"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    date = Column(Date, nullable=False, default=func.current_date())
+    mode = Column(String, nullable=False)
+    score = Column(Integer, nullable=False)
+    total_questions = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    student = relationship("Student")

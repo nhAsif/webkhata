@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ChangePasswordModal from '../../components/ChangePasswordModal';
@@ -32,6 +32,15 @@ export default function ParentLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  // Prefetch daily vocabulary on portal load
+  useEffect(() => {
+    import('../../api/vocabulary').then(({ getDailyVocabulary }) => {
+      getDailyVocabulary().catch(() => {
+        // Silently fail, it will retry when they actually visit the page
+      });
+    });
+  }, []);
 
   const handleLogout = () => {
     logout();
