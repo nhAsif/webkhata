@@ -31,44 +31,42 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-void bg-grid-pattern flex items-center justify-center p-4 relative overflow-hidden font-body">
-      {/* Ambient Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-bitcoin/10 rounded-full blur-[150px] pointer-events-none" />
-
-      {/* Spinning Orbitals for 3D depth */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[800px] h-[800px]">
-        <div className="absolute inset-0 border border-white/5 rounded-full animate-spin-slow" />
-        <div className="absolute inset-10 border border-bitcoin/10 rounded-full animate-spin-reverse" />
-        <div className="absolute inset-20 border border-gold/5 rounded-full animate-spin-slow" />
+    <div className="min-h-screen bg-notebook-grid flex items-center justify-center p-4 relative overflow-hidden font-body">
+      {/* Floating details for visual interest (Stickers) */}
+      <div className="absolute top-[15%] right-[10%] bg-[#FFD93D] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] rotate-6 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
+        SSC & JSC 📝
+      </div>
+      <div className="absolute bottom-[20%] left-[8%] bg-[#C4B5FD] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] -rotate-12 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
+        TUTOR LEDGER 📚
       </div>
 
-      <div className="w-full max-w-md bg-matter/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_0_50px_-10px_rgba(247,147,26,0.15)] relative z-10 transition-all duration-300 hover:border-bitcoin/30 animate-float">
+      <div className="w-full max-w-md bg-white border-4 border-black rounded-none p-8 shadow-[12px_12px_0px_0px_var(--neo-shadow)] relative z-10 hover:-translate-y-1 hover:shadow-[16px_16px_0px_0px_var(--neo-shadow)] transition-all duration-200">
         
         {/* Logo and Brand */}
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-burnt to-bitcoin rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(247,147,26,0.4)]">
-              <BookOpen className="w-6 h-6 text-pure" />
+            <div className="w-12 h-12 bg-[#FF6B6B] border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+              <BookOpen className="w-6 h-6 text-black stroke-[3px]" />
             </div>
-            <span className="font-heading font-bold text-2xl bg-gradient-to-r from-pure to-bitcoin bg-clip-text text-transparent tracking-tight">
+            <span className="font-heading font-black text-3xl text-black tracking-tighter uppercase">
               WebKhata
             </span>
           </div>
-          <p className="text-xs font-semibold text-stardust font-mono uppercase tracking-widest">
+          <p className="text-[12px] font-black text-black/60 font-heading uppercase tracking-widest bg-[#FFD93D] px-3 py-1 border-2 border-black rotate-1 shadow-[2px_2px_0px_0px_var(--neo-shadow)] mt-1">
             Tutor Management Portal
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm mb-6 flex items-start gap-2.5">
-            <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="bg-[#FF6B6B] border-4 border-black text-black p-4 rounded-none text-sm mb-6 flex items-start gap-2.5 shadow-[4px_4px_0px_0px_var(--neo-shadow)]">
+            <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5 text-black stroke-[3px]" />
+            <span className="font-black uppercase tracking-tight">{error}</span>
           </div>
         )}
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust" htmlFor="username">Username</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="username">Username</label>
             <Input
               id="username"
               type="text"
@@ -81,7 +79,7 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust" htmlFor="password">Password</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="password">Password</label>
             <Input
               id="password"
               type="password"
@@ -96,21 +94,18 @@ export default function Login() {
             type="submit"
             variant="primary"
             size="lg"
-            className="w-full mt-2"
+            className="w-full mt-2 cursor-pointer"
             disabled={loading}
           >
-            {loading ? (
-              <span className="w-5 h-5 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
-            ) : null}
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
 
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
+            <div className="w-full border-t-4 border-black"></div>
           </div>
-          <span className="relative px-3 bg-matter text-[10px] text-stardust font-mono uppercase tracking-wider">
+          <span className="relative px-4 bg-white border-2 border-black text-xs font-black text-black font-heading uppercase tracking-wider shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
             or
           </span>
         </div>
@@ -118,17 +113,17 @@ export default function Login() {
         <div className="text-center">
           <a 
             href="/parent/login" 
-            className="text-xs font-semibold text-bitcoin hover:text-gold hover:underline transition-colors font-mono uppercase tracking-wider"
+            className="text-xs font-black text-black bg-[#C4B5FD] border-2 border-black px-4 py-2 hover:bg-[#C4B5FD]/90 hover:shadow-[3px_3px_0px_0px_var(--neo-shadow)] hover:active:translate-x-[3px] hover:active:translate-y-[3px] hover:active:shadow-none transition-all duration-100 font-heading uppercase tracking-wider inline-block shadow-[3px_3px_0px_0px_var(--neo-shadow)]"
           >
             👪 Switch to Parent Portal
           </a>
         </div>
 
-        <div className="mt-8 p-4 bg-void/50 border border-white/5 rounded-xl text-xs text-stardust font-body">
-          <strong className="text-bitcoin font-semibold">Default Credentials:</strong>{' '}
-          <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded text-pure">admin</span>
+        <div className="mt-8 p-4 bg-[#FFD93D]/25 border-4 border-black rounded-none text-xs text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)]">
+          <strong className="text-black font-black uppercase tracking-wider">Default Credentials:</strong>{' '}
+          <span className="font-mono bg-white border border-black px-1.5 py-0.5 text-black font-bold">admin</span>
           {' / '}
-          <span className="font-mono bg-white/5 px-1.5 py-0.5 rounded text-pure">changeme</span>
+          <span className="font-mono bg-white border border-black px-1.5 py-0.5 text-black font-bold">changeme</span>
         </div>
       </div>
     </div>

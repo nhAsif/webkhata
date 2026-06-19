@@ -1,65 +1,272 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&display=swap');
-
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+:root {
+  /* Dynamic Neo-brutalist Core variables */
+  --neo-ink: #D1D1D6; /* Soft silver-gray text */
+  --neo-canvas: #2A2A2D; /* Dim slate canvas */
+  --neo-card: #333336; /* Dim card surface */
+  --neo-shadow: #151516; /* Dim offset shadows */
+  --neo-border: #151516; /* Dim borders */
+  
+  --neo-grid-line: rgba(255, 255, 255, 0.04);
+  --neo-ruled-line: rgba(255, 255, 255, 0.06);
+
+  /* Background Neutral - Cream Paper Canvas */
+  --neutral-primary-soft: var(--neo-card);
+  --neutral-primary: var(--neo-canvas);
+  --neutral-primary-medium: #222225; /* Dimmed medium neutral */
+  --neutral-primary-strong: var(--neo-canvas);
+  
+  --neutral-secondary-soft: var(--neo-canvas);
+  --neutral-secondary: #4A4A4F; /* Soft muted violet gray */
+  --neutral-secondary-medium: #4A4A4F;
+  --neutral-secondary-strong: #4A4A4F;
+  
+  --neutral-tertiary-soft: #4A4A4F;
+  --neutral-tertiary: #4A4A4F;
+  --neutral-tertiary-medium: #4A4A4F;
+  --neutral-quaternary: #FFD93D; /* Vivid Yellow highlighter accent */
+  --quaternary-medium: #FFD93D;
+  --gray: var(--neo-ink);
+
+  /* Background Brand - Hot Red margin ink */
+  --brand-softer: #FF6B6B;
+  --brand-soft: #FF6B6B;
+  --brand: #FF6B6B;
+  --brand-medium: #FF6B6B;
+  --brand-strong: var(--neo-ink);
+
+  /* Background Status */
+  --success-soft: #C4B5FD;
+  --success: #C4B5FD;
+  --success-medium: #C4B5FD;
+  --success-strong: var(--neo-ink);
+
+  --danger-soft: #FF6B6B;
+  --danger: #FF6B6B;
+  --danger-medium: #FF6B6B;
+  --danger-strong: var(--neo-ink);
+
+  --warning-soft: #FFD93D;
+  --warning: #FFD93D;
+  --warning-medium: #FFD93D;
+  --warning-strong: var(--neo-ink);
+
+  /* Background Utility & Accents */
+  --dark: var(--neo-ink);
+  --dark-strong: var(--neo-ink);
+  --disabled: #2C2C2F;
+  
+  --purple: #C4B5FD;
+  --sky: #C4B5FD;
+  --teal: #C4B5FD;
+  --pink: #FF6B6B;
+  --cyan: #FFD93D;
+  --fuchsia: #C4B5FD;
+  --indigo: #C4B5FD;
+  --orange: #FFD93D;
+
+  /* Text Colors - Dynamic ink */
+  --white: #FFFFFF;
+  --black: var(--neo-ink);
+  --heading: var(--neo-ink);
+  --body: var(--neo-ink);
+  --body-subtle: var(--neo-ink);
+
+  --fg-brand-subtle: #FF6B6B;
+  --fg-brand: var(--neo-ink);
+  --fg-brand-strong: var(--neo-ink);
+
+  --fg-success: var(--neo-ink);
+  --fg-success-strong: var(--neo-ink);
+  --fg-danger: var(--neo-ink);
+  --fg-danger-strong: var(--neo-ink);
+  --fg-warning-subtle: var(--neo-ink);
+  --fg-warning: var(--neo-ink);
+  --fg-disabled: #888888;
+
+  --fg-yellow: var(--neo-ink);
+  --fg-info: var(--neo-ink);
+  --fg-purple: var(--neo-ink);
+  --fg-purple-strong: var(--neo-ink);
+  --fg-cyan: var(--neo-ink);
+  --fg-indigo: var(--neo-ink);
+  --fg-pink: var(--neo-ink);
+  --fg-lime: var(--neo-ink);
+
+  /* Border Colors - Dynamic ink borders */
+  --border-dark: var(--neo-border);
+  --border-buffer: var(--neo-canvas);
+  --border-buffer-medium: var(--neo-canvas);
+  --border-buffer-strong: var(--neo-canvas);
+  --border-muted: var(--neo-border);
+  --border-light-subtle: var(--neo-border);
+  --border-light: var(--neo-border);
+  --border-light-medium: var(--neo-border);
+  --border-default-subtle: var(--neo-border);
+  --border-default: var(--neo-border);
+  --border-default-medium: var(--neo-border);
+  --border-default-strong: var(--neo-border);
+
+  --border-success-subtle: var(--neo-border);
+  --border-success: var(--neo-border);
+  --border-danger-subtle: var(--neo-border);
+  --border-danger: var(--neo-border);
+  --border-warning-subtle: var(--neo-border);
+  --border-warning: var(--neo-border);
+  --border-brand-subtle: var(--neo-border);
+  --border-brand-light: var(--neo-border);
+  --border-brand: var(--neo-border);
+  --border-dark-subtle: var(--neo-border);
+  --border-purple: var(--neo-border);
+  --border-orange: var(--neo-border);
+
+  /* Box Shadows - Dynamic ink shadows */
+  --shadow-2xs: 2px 2px 0px 0px var(--neo-shadow);
+  --shadow-xs: 4px 4px 0px 0px var(--neo-shadow);
+  --shadow-sm: 4px 4px 0px 0px var(--neo-shadow);
+  --shadow-md: 8px 8px 0px 0px var(--neo-shadow);
+  --shadow-lg: 12px 12px 0px 0px var(--neo-shadow);
+  --shadow-xl: 16px 16px 0px 0px var(--neo-shadow);
+  --shadow-2xl: 20px 20px 0px 0px var(--neo-shadow);
+
+  --leaf-pattern-opacity: 0.08;
+}
+
+:root.dark {
+  /* Cyber-Brutalism Slate Blackboard Style */
+  --neo-ink: #FFFFFF;
+  --neo-canvas: #121212;
+  --neo-card: #1C1C1E;
+  --neo-shadow: #FFFFFF;
+  --neo-border: #000000;
+  
+  --neo-grid-line: rgba(255, 255, 255, 0.08);
+  --neo-ruled-line: rgba(255, 255, 255, 0.12);
+
+  --neutral-primary-medium: #1C1C1E;
+  --disabled: #2C2C2E;
+  --fg-disabled: #666666;
+
+  --leaf-pattern-opacity: 0.04;
+}
+
+/* Override stark white card backgrounds to Moleskine paper cards in light mode & slate cards in dark mode */
+.bg-white {
+  background-color: var(--neo-card) !important;
+}
+
 @layer base {
   body {
-    @apply bg-void text-pure font-body min-h-screen antialiased;
-    background-color: #030304;
+    @apply bg-void text-body font-body min-h-screen antialiased;
+    background-color: var(--neo-canvas);
+    background-size: 30px 30px;
+    background-image: 
+      linear-gradient(to right, var(--neo-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--neo-grid-line) 1px, transparent 1px);
   }
 }
 
 @layer utilities {
-  .font-heading {
-    font-family: 'Space Grotesk', 'Noto Sans Bengali', sans-serif;
-  }
-  .font-body {
-    font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
-  }
-  .font-mono {
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Grid pattern — covers full viewport via fixed attachment */
-  .bg-grid-pattern {
-    background-size: 50px 50px;
-    background-image:
-      linear-gradient(to right, rgba(30, 41, 59, 0.35) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
-    background-attachment: fixed;
+  /* Dynamic Grid Background - Slate blackboard in dark, Purple graph in light */
+  .bg-leaf-pattern {
+    background-size: 30px 30px;
+    background-image: 
+      linear-gradient(to right, var(--neo-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--neo-grid-line) 1px, transparent 1px);
+    background-color: var(--neo-canvas);
   }
 
-  .holographic-gradient {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Ruled Notebook Paper Line Pattern */
+  .bg-notebook-ruled {
+    background-size: 100% 28px;
+    background-image: linear-gradient(to bottom, transparent 27px, var(--neo-ruled-line) 27px);
+    background-color: var(--neo-canvas);
+  }
+
+  /* Red Margin Line for Notebook feel */
+  .notebook-margin {
+    position: relative;
+  }
+  .notebook-margin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 45px;
+    width: 2px;
+    background-color: #FF6B6B; /* Khata red margin rule */
+    pointer-events: none;
+  }
+
+  /* Halftone Dots */
+  .bg-halftone {
+    background-image: radial-gradient(var(--neo-halftone) 1.5px, transparent 1.5px);
+    background-size: 16px 16px;
+  }
+
+  /* Scalloped edge decorative background divider */
+  .scalloped-divider {
+    height: 12px;
+    background-image: radial-gradient(circle at 6px -3px, transparent 6px, var(--neo-canvas) 6px);
+    background-size: 12px 12px;
+    border-bottom: 4px solid var(--neo-ink);
+  }
+
+  /* Bouncy springy transitions */
+  .springy-bounce {
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
-/* Custom Scrollbars */
+/* Custom Scrollbars to fit the dynamic blackboard/notebook ledger theme */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #030304;
+  background: var(--neo-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: var(--neo-ink);
   border-radius: 9999px;
+  border: 2px solid var(--neo-canvas);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #F7931A;
+  background: var(--brand);
 }
 
-/* For React Toast Hot Notifications styling to fit dark/orange theme */
+/* Toast styling override to suit our color palette */
 .go3130504588 {
-  background-color: #0F1115 !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(247, 147, 26, 0.2) !important;
-  border-radius: 9999px !important;
-  font-family: 'Inter', sans-serif !important;
-  box-shadow: 0 0 15px rgba(247, 147, 26, 0.1) !important;
+  background-color: var(--neo-card) !important;
+  color: var(--neo-ink) !important;
+  border: 2px solid var(--neo-ink) !important;
+  border-radius: 0px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  box-shadow: var(--shadow-md) !important;
 }
+
+/* Force dark text and icon readability on solid bright brand/warning backgrounds */
+.bg-\[\#FFD93D\],
+.bg-\[\#FF6B6B\],
+.bg-\[\#C4B5FD\],
+.hover\:bg-\[\#FFD93D\]:hover,
+.hover\:bg-\[\#FF6B6B\]:hover,
+.hover\:bg-\[\#C4B5FD\]:hover,
+.active\:bg-\[\#FFD93D\]:active,
+.active\:bg-\[\#FF6B6B\]:active,
+.active\:bg-\[\#C4B5FD\]:active {
+  --neo-ink: #000000 !important;
+  color: #000000 !important;
+}
+
+.bg-\[\#FFD93D\] *,
+.bg-\[\#FF6B6B\] *,
+.bg-\[\#C4B5FD\] *,
+.hover\:bg-\[\#FFD93D\]:hover *,
+.hover\:bg-\[\#FF6B6B\]:hover *,
+.hover\:bg-\[\#C4B5FD\]:hover * {
+  --neo-ink: #000000 !important;
+}
+

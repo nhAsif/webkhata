@@ -50,7 +50,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     >
       <form onSubmit={handleSubmit} className="space-y-4 font-body">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-stardust">Current Password</label>
+          <label className="text-sm font-black text-black uppercase tracking-wider">Current Password</label>
           <Input
             type="password"
             value={currentPassword}
@@ -59,7 +59,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-stardust">New Password</label>
+          <label className="text-sm font-black text-black uppercase tracking-wider">New Password</label>
           <Input
             type="password"
             value={newPassword}
@@ -69,7 +69,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-stardust">Confirm New Password</label>
+          <label className="text-sm font-black text-black uppercase tracking-wider">Confirm New Password</label>
           <Input
             type="password"
             value={confirmPassword}
@@ -79,7 +79,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           />
         </div>
         
-        <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+        <div className="flex justify-end gap-3 pt-4 border-t-4 border-black mt-6">
           <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

@@ -2,22 +2,26 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 font-body font-medium transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-full',
+  'inline-flex items-center justify-center gap-2 font-heading font-bold select-none cursor-pointer transition-all duration-100 rounded-none border-black focus-visible:outline-none focus-visible:bg-[#FFD93D] focus-visible:border-black disabled:bg-disabled disabled:text-fg-disabled disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
   {
     variants: {
       variant: {
-        primary: 'bg-gradient-to-r from-burnt to-bitcoin text-pure uppercase tracking-wider font-semibold shadow-[0_0_20px_-5px_rgba(234,88,12,0.5)] hover:scale-105 hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)]',
-        outline: 'border-2 border-pure/20 text-pure hover:border-pure hover:bg-pure/10',
-        secondary: 'bg-matter border border-white/10 text-pure hover:border-pure/50 hover:bg-pure/5',
-        ghost: 'bg-transparent text-pure hover:bg-pure/10 hover:text-bitcoin',
-        link: 'bg-transparent text-bitcoin hover:underline p-0 h-auto',
-        success: 'bg-green-500/20 border border-green-500/50 text-green-400 hover:bg-green-500 hover:text-pure hover:shadow-[0_0_15px_rgba(34,197,94,0.4)]',
-        danger: 'bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500 hover:text-pure hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]',
+        primary: 'bg-[#FF6B6B] text-black border-4 hover:bg-[#FF6B6B]/90',
+        brand: 'bg-[#FF6B6B] text-black border-4 hover:bg-[#FF6B6B]/90',
+        secondary: 'bg-[#FFD93D] text-black border-4 hover:bg-[#FFD93D]/90',
+        outline: 'bg-white text-black border-4 hover:bg-neutral-100',
+        ghost: 'bg-transparent text-black border-2 border-transparent hover:border-black hover:bg-[#C4B5FD] hover:shadow-[4px_4px_0px_0px_var(--neo-shadow)] hover:active:translate-x-[4px] hover:active:translate-y-[4px] hover:active:shadow-none transition-all duration-100',
+        link: 'bg-transparent text-black underline hover:text-[#FF6B6B] p-0 h-auto border-0 shadow-none hover:shadow-none active:translate-x-0 active:translate-y-0',
+        success: 'bg-[#C4B5FD] text-black border-4 hover:bg-[#C4B5FD]/90',
+        danger: 'bg-[#FF6B6B] text-black border-4 hover:bg-[#FF6B6B]/90',
+        warning: 'bg-[#FFD93D] text-black border-4 hover:bg-[#FFD93D]/90',
       },
       size: {
-        default: 'h-11 px-6 text-sm',
-        sm: 'h-9 px-4 text-xs',
-        lg: 'h-12 px-8 text-base',
+        xs: 'h-8 px-3 text-xs border-2 shadow-[2px_2px_0px_0px_var(--neo-shadow)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        sm: 'h-10 px-4.5 text-sm border-4 shadow-[4px_4px_0px_0px_var(--neo-shadow)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+        default: 'h-12 px-[26px] text-[15px] border-4 shadow-[4px_4px_0px_0px_var(--neo-shadow)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+        lg: 'h-14 px-8 text-base border-4 shadow-[6px_6px_0px_0px_var(--neo-shadow)] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none',
+        xl: 'h-16 px-10 text-lg border-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] active:translate-x-[8px] active:translate-y-[8px] active:shadow-none',
       },
     },
     defaultVariants: {
@@ -27,12 +31,21 @@ const buttonVariants = cva(
   }
 );
 
-export default function Button({ className, variant, size, ...props }) {
+export default function Button({ className, variant = 'primary', size = 'default', children, arrow = false, ...props }) {
+  const isCta = variant === 'primary' || arrow;
+  
   return (
     <button
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className }), 'group')}
       {...props}
-    />
+    >
+      <span>{children}</span>
+      {isCta && (
+        <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 ml-1 text-base leading-none">
+          →
+        </span>
+      )}
+    </button>
   );
 }
 export { buttonVariants };

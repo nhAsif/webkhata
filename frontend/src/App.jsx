@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -32,78 +33,80 @@ import ParentVocabulary from './pages/parent/ParentVocabulary';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/parent/login" element={<ParentLogin />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/parent/login" element={<ParentLogin />} />
 
-          {/* Tutor routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute role="tutor">
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="students" element={<Students />} />
-            <Route path="students/:id" element={<StudentProfile />} />
-            <Route path="batches" element={<Batches />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="fees" element={<Fees />} />
-            <Route path="homework" element={<Homework />} />
-            <Route path="results" element={<Results />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="vocabulary" element={<Vocabulary />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
+            {/* Tutor routes */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute role="tutor">
+                  <Layout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="students" element={<Students />} />
+              <Route path="students/:id" element={<StudentProfile />} />
+              <Route path="batches" element={<Batches />} />
+              <Route path="attendance" element={<Attendance />} />
+              <Route path="fees" element={<Fees />} />
+              <Route path="homework" element={<Homework />} />
+              <Route path="results" element={<Results />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="vocabulary" element={<Vocabulary />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
 
-          {/* Parent portal routes */}
-          <Route
-            path="/parent"
-            element={
-              <ProtectedRoute role="parent">
-                <ParentLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<ParentDashboard />} />
-            <Route path="attendance" element={<ParentAttendance />} />
-            <Route path="fees" element={<ParentFees />} />
-            <Route path="routine" element={<ParentRoutine />} />
-            <Route path="homework" element={<ParentHomework />} />
-            <Route path="results" element={<ParentResults />} />
-            <Route path="vocabulary" element={<ParentVocabulary />} />
-          </Route>
+            {/* Parent portal routes */}
+            <Route
+              path="/parent"
+              element={
+                <ProtectedRoute role="parent">
+                  <ParentLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<ParentDashboard />} />
+              <Route path="attendance" element={<ParentAttendance />} />
+              <Route path="fees" element={<ParentFees />} />
+              <Route path="routine" element={<ParentRoutine />} />
+              <Route path="homework" element={<ParentHomework />} />
+              <Route path="results" element={<ParentResults />} />
+              <Route path="vocabulary" element={<ParentVocabulary />} />
+            </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </BrowserRouter>
 
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#181c24',
-            color: '#f0f2f8',
-            border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: '10px',
-            fontSize: '14px',
-          },
-          success: {
-            iconTheme: { primary: '#10b981', secondary: '#181c24' },
-          },
-          error: {
-            iconTheme: { primary: '#ef4444', secondary: '#181c24' },
-          },
-        }}
-      />
-    </AuthProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: '#181c24',
+              color: '#f0f2f8',
+              border: '1px solid rgba(255,255,255,0.07)',
+              borderRadius: '10px',
+              fontSize: '14px',
+            },
+            success: {
+              iconTheme: { primary: '#10b981', secondary: '#181c24' },
+            },
+            error: {
+              iconTheme: { primary: '#ef4444', secondary: '#181c24' },
+            },
+          }}
+        />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -22,32 +22,32 @@ export default function Modal({ isOpen, onClose, title, children, footer, size =
 
   return (
     <div 
-      className="fixed inset-0 z-[1000] flex items-center justify-center bg-void/85 backdrop-blur-sm p-4 animate-fade-in"
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div
         className={cn(
-          "w-full rounded-2xl border border-white/10 bg-matter shadow-[0_0_50px_-10px_rgba(247,147,26,0.2)] flex flex-col transition-all duration-300 max-h-[90vh] overflow-hidden",
+          "w-full rounded-none bg-white shadow-[12px_12px_0px_0px_var(--neo-shadow)] flex flex-col transition-all max-h-[90vh] overflow-hidden border-4 border-black",
           maxWidths[size] || maxWidths.md
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h2 className="text-lg font-heading font-semibold text-pure tracking-tight">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4.5 border-b-4 border-black bg-[#C4B5FD]">
+          <h2 className="text-xl font-heading font-black text-black tracking-tighter uppercase">{title}</h2>
           <button 
-            className="text-stardust hover:text-bitcoin hover:bg-white/5 transition-all duration-200 text-sm p-1.5 rounded-lg"
+            className="w-8 h-8 rounded-none border-2 border-black bg-[#FF6B6B] text-black hover:bg-[#FF6B6B]/80 flex items-center justify-center transition-all duration-100 font-bold cursor-pointer shadow-[2px_2px_0px_0px_var(--neo-shadow)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             onClick={onClose}
           >
             ✕
           </button>
         </div>
         
-        <div className="px-6 py-5 overflow-y-auto text-sm text-pure/90">
+        <div className="px-6 py-6 overflow-y-auto text-base text-black font-bold leading-relaxed space-y-4">
           {children}
         </div>
         
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10 bg-void/40">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t-4 border-black bg-[#FFD93D]/10">
             {footer}
           </div>
         )}

@@ -21,37 +21,37 @@ export default function Dashboard() {
 
   const ALERT_STYLES = {
     overdue_fee: {
-      bg: 'bg-red-500/10 border-red-500/20 text-red-400',
-      icon: <DollarSign className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+      bg: 'bg-[#FF6B6B] border-4 border-black text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] rounded-none',
+      icon: <DollarSign className="w-5 h-5 text-black stroke-[3px] flex-shrink-0 mt-0.5" />
     },
     low_attendance: {
-      bg: 'bg-bitcoin/10 border-bitcoin/20 text-bitcoin',
-      icon: <AlertTriangle className="w-5 h-5 text-bitcoin flex-shrink-0 mt-0.5" />
+      bg: 'bg-[#FFD93D] border-4 border-black text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] rounded-none',
+      icon: <AlertTriangle className="w-5 h-5 text-black stroke-[3px] flex-shrink-0 mt-0.5" />
     },
     homework_due: {
-      bg: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-      icon: <ShieldAlert className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+      bg: 'bg-[#C4B5FD] border-4 border-black text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] rounded-none',
+      icon: <ShieldAlert className="w-5 h-5 text-black stroke-[3px] flex-shrink-0 mt-0.5" />
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="mb-6 font-body">
-        <h1 className="text-3xl md:text-4xl font-heading font-bold text-pure tracking-tight">
-          Welcome to <span className="bg-gradient-to-r from-[#F7931A] to-[#FFD600] bg-clip-text text-transparent">Dashboard</span>
+        <h1 className="text-3xl md:text-5xl font-heading font-black text-black tracking-tighter uppercase">
+          Welcome to <span className="bg-[#FFD93D] px-3 py-1 border-4 border-black inline-block -rotate-1 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">WebKhata</span>
         </h1>
-        <p className="text-sm text-stardust mt-1 font-body">
+        <p className="text-sm text-black font-body font-bold mt-4">
           Overview of your tutor activity and metrics
         </p>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {loading ? (
           [...Array(8)].map((_, i) => (
-            <div key={i} className="h-28 bg-matter border border-white/10 rounded-2xl animate-pulse p-5 space-y-3">
-              <div className="h-3.5 bg-white/5 rounded w-2/3" />
-              <div className="h-8 bg-white/5 rounded w-1/2" />
+            <div key={i} className="h-28 bg-white border-4 border-black rounded-none animate-pulse p-5 space-y-3 shadow-[8px_8px_0px_0px_var(--neo-shadow)]">
+              <div className="h-4 bg-[#C4B5FD]/20 border border-black rounded-none w-2/3" />
+              <div className="h-8 bg-[#FFD93D]/20 border border-black rounded-none w-1/2" />
             </div>
           ))
         ) : stats ? (
@@ -59,50 +59,50 @@ export default function Dashboard() {
             <StatCard
               label="Active Students"
               value={stats.total_active_students}
-              icon={<Users className="w-5 h-5 text-bitcoin" />}
-              color="#F7931A"
+              icon={<Users className="w-5 h-5" />}
+              color="#FF6B6B"
             />
             <StatCard
               label="Total Students"
               value={stats.total_students ?? stats.total_active_students}
-              icon={<Users className="w-5 h-5 text-gold" />}
-              color="#FFD600"
+              icon={<Users className="w-5 h-5" />}
+              color="#FFD93D"
             />
             <StatCard
               label="Today's Sessions"
               value={stats.todays_sessions}
-              icon={<Calendar className="w-5 h-5 text-gold" />}
-              color="#FFD600"
+              icon={<Calendar className="w-5 h-5" />}
+              color="#FFD93D"
             />
             <StatCard
               label="Attendance Rate"
               value={`${stats.attendance_rate}%`}
-              icon={<ShieldAlert className="w-5 h-5 text-gold" />}
-              color={stats.attendance_rate >= 75 ? '#10b981' : '#F7931A'}
+              icon={<ShieldAlert className="w-5 h-5" />}
+              color={stats.attendance_rate >= 75 ? '#C4B5FD' : '#FFD93D'}
             />
             <StatCard
               label="Monthly Expected"
               value={`৳${(stats.total_monthly_expected ?? stats.monthly_collection ?? 0).toLocaleString()}`}
-              icon={<Wallet className="w-5 h-5 text-bitcoin" />}
-              color="#F7931A"
+              icon={<Wallet className="w-5 h-5" />}
+              color="#C4B5FD"
             />
             <StatCard
               label="Total Due"
               value={`৳${(stats.total_due ?? 0).toLocaleString()}`}
               icon={<TrendingUp className="w-5 h-5" />}
-              color="#ef4444"
+              color="#FF6B6B"
             />
             <StatCard
               label="Total Paid"
               value={`৳${(stats.total_paid ?? stats.monthly_collection ?? 0).toLocaleString()}`}
-              icon={<TrendingDown className="w-5 h-5 text-green-400" />}
-              color="#10b981"
+              icon={<TrendingDown className="w-5 h-5" />}
+              color="#C4B5FD"
             />
             <StatCard
               label="Outstanding"
               value={`৳${(stats.outstanding_balance ?? 0).toLocaleString()}`}
               icon={<DollarSign className="w-5 h-5" />}
-              color={(stats.outstanding_balance ?? 0) > 0 ? '#ef4444' : '#10b981'}
+              color={(stats.outstanding_balance ?? 0) > 0 ? '#FF6B6B' : '#C4B5FD'}
             />
           </>
         ) : null}
@@ -111,36 +111,36 @@ export default function Dashboard() {
       {/* Alerts */}
       {!loading && alerts.length > 0 && (
         <Card hover={false}>
-          <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl font-heading font-semibold text-pure">
+          <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FFD93D]/10">
+            <CardTitle className="flex items-center gap-2 text-xl font-heading font-black text-black">
               <span>🔔</span> Active Alerts
             </CardTitle>
-            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-500/20 text-red-400 border border-red-500/30 font-mono flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            <span className="px-3 py-1 text-xs font-black uppercase rounded-none bg-[#FF6B6B] text-black border-4 border-black flex items-center gap-1.5 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
               </span>
               {alerts.length} urgent
             </span>
           </CardHeader>
-          <CardContent className="pt-6 space-y-3">
+          <CardContent className="pt-6 space-y-4">
             {alerts.map((alert, i) => {
               const style = ALERT_STYLES[alert.type] || {
-                bg: 'bg-white/5 border-white/10 text-pure',
-                icon: <AlertTriangle className="w-5 h-5 text-stardust flex-shrink-0" />
+                bg: 'bg-white border-4 border-black text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] rounded-none',
+                icon: <AlertTriangle className="w-5 h-5 text-black stroke-[3px] flex-shrink-0" />
               };
               return (
                 <div
                   key={i}
-                  className={`flex items-start gap-3.5 p-4 rounded-xl border ${style.bg} transition-all duration-300 hover:scale-[1.005]`}
+                  className={`flex items-start gap-3.5 p-4 border-4 ${style.bg} transition-all duration-100 hover:scale-[1.005]`}
                 >
                   {style.icon}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-pure leading-relaxed">{alert.message}</div>
+                    <div className="text-sm font-bold text-black leading-relaxed">{alert.message}</div>
                     {alert.student_id && (
                       <a
                         href={`/students/${alert.student_id}`}
-                        className="text-xs font-semibold text-bitcoin hover:underline hover:text-gold transition-colors mt-1.5 inline-flex items-center gap-1 font-mono"
+                        className="text-xs font-black text-black underline hover:text-black/75 transition-colors mt-2 inline-flex items-center gap-1 font-heading uppercase tracking-wider"
                       >
                         View student details ➔
                       </a>
@@ -155,12 +155,12 @@ export default function Dashboard() {
 
       {!loading && alerts.length === 0 && (
         <Card hover={false}>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400 mb-4 shadow-[0_0_15px_rgba(34,197,94,0.15)]">
-              <Sparkles className="w-5 h-5" />
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center bg-white">
+            <div className="w-12 h-12 rounded-none bg-[#C4B5FD] border-4 border-black flex items-center justify-center text-black mb-4 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+              <Sparkles className="w-5 h-5 stroke-[3px]" />
             </div>
-            <div className="text-lg font-heading font-semibold text-pure">All clear!</div>
-            <div className="text-sm text-stardust mt-1">No alerts at the moment. Keep up the great work!</div>
+            <div className="text-xl font-heading font-black text-black uppercase tracking-tight">All clear!</div>
+            <div className="text-sm text-black/75 font-bold mt-1.5">No alerts at the moment. Keep up the great work!</div>
           </CardContent>
         </Card>
       )}
