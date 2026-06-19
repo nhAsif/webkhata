@@ -31,6 +31,7 @@ pyvenv.cfg
 .venv
 backend/.env
 dailyword.md
+backend/uploads/*
 newfeature.md
 # SQLite/Database
 *.db

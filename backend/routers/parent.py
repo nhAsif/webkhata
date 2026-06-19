@@ -42,6 +42,7 @@ def get_profile(
             "subjects": json.loads(student.subjects) if isinstance(student.subjects, str) else student.subjects,
             "enrollment_date": str(student.enrollment_date),
             "status": student.status,
+            "photo_path": student.photo_path,
         },
         "batches": [{"id": b.id, "name": b.name, "subject": b.subject, "time_slot": b.time_slot} for b in batches],
     }

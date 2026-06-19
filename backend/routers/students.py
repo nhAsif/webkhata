@@ -2,10 +2,13 @@ import json
 import math
 import random
 import string
+import os
+import shutil
+import uuid
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session
 
 from auth import require_tutor
@@ -230,6 +233,48 @@ def update_student_status(
     db.commit()
     db.refresh(student)
     return student
+
+
+@router.post("/{student_id}/photo", response_model=schemas.StudentResponse)
+def upload_student_photo(
+    student_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_tutor),
+):
+    student = db.query(models.Student).filter(models.Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{student_id}_{uuid.uuid4().hex}.{ext}"
+    
+    upload_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads", "profiles")
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    file_path = os.path.join(upload_dir, filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    if student.photo_path:
+        old_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), student.photo_path)
+        if os.path.exists(old_path):
+            try:
+                os.remove(old_path)
+            except Exception:
+                pass
+
+    student.photo_path = f"uploads/profiles/{filename}"
+    db.commit()
+    db.refresh(student)
+    
+    user = db.query(models.User).filter(models.User.student_id == student.id, models.User.role == "parent").first()
+    setattr(student, "parent_username", user.username if user else None)
+    return student
+
 
 
 @router.get("/{student_id}/financial", response_model=schemas.StudentFinancial)

@@ -56,8 +56,14 @@ export default function ParentDashboard() {
         <Card className="bg-matter border-white/10 mb-6">
           <CardContent className="p-6">
             <div className="flex gap-6 items-center flex-wrap">
-              <div className="w-16 h-16 rounded-full bg-bitcoin/20 text-bitcoin flex items-center justify-center text-3xl flex-shrink-0 shadow-[0_0_15px_rgba(247,147,26,0.2)] border border-bitcoin/30">
-                👨‍🎓
+              <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-bitcoin/20 to-gold/20 shadow-[0_0_15px_rgba(247,147,26,0.2)] border border-bitcoin/30 flex-shrink-0">
+                {student.photo_path ? (
+                  <img src={`/${student.photo_path}`} alt={student.name} className="w-full h-full object-cover" />
+                ) : (
+                  <svg className="w-8 h-8 text-bitcoin/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                )}
               </div>
               <div>
                 <div className="text-xl font-heading text-pure font-bold">{student.name}</div>

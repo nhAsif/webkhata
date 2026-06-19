@@ -95,15 +95,24 @@ export default function StudentProfile() {
 
   return (
     <div className="space-y-6 font-body">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <Button 
           variant="secondary" 
           size="sm" 
-          className="h-9 w-9 p-0 rounded-lg flex items-center justify-center"
+          className="h-9 w-9 p-0 rounded-lg flex items-center justify-center shrink-0"
           onClick={() => navigate('/students')}
         >
           <ArrowLeft className="w-4 h-4 text-pure" />
         </Button>
+        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border-2 border-white/10 shrink-0">
+          {student.photo_path ? (
+            <img src={`/${student.photo_path}`} alt={student.name} className="w-full h-full object-cover" />
+          ) : (
+            <svg className="w-8 h-8 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
+        </div>
         <div>
           <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">{student.name}</h1>
           <p className="text-xs text-stardust mt-0.5 flex items-center gap-1.5 uppercase tracking-wider font-mono">

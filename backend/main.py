@@ -171,6 +171,13 @@ from routers.settings import router as settings_router
 app.include_router(settings_router)
 
 
+# ─── Uploads ─────────────────────────────────────────────────────────────────
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+
 # ─── Static Files (React Build) ───────────────────────────────────────────────
 
 from fastapi.responses import FileResponse

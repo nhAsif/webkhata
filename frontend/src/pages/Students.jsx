@@ -43,6 +43,8 @@ export default function Students() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // 'add' | 'edit' | null
   const [form, setForm] = useState(EMPTY_FORM);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editId, setEditId] = useState(null);
   const navigate = useNavigate();
@@ -57,6 +59,8 @@ export default function Students() {
   const openAdd = () => {
     setForm(EMPTY_FORM);
     setEditId(null);
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setModal('add');
   };
 
@@ -74,6 +78,8 @@ export default function Students() {
       start_date: s.start_date || new Date().toISOString().split('T')[0],
     });
     setEditId(s.id);
+    setPhotoFile(null);
+    setPhotoPreview(s.photo_path ? `/${s.photo_path}` : null);
     setModal('edit');
   };
 
@@ -81,13 +87,24 @@ export default function Students() {
     e.preventDefault();
     setSaving(true);
     try {
+      let studentId = editId;
       if (modal === 'add') {
-        await api.post('/students', form);
+        const res = await api.post('/students', form);
+        studentId = res.data.id;
         toast.success('Student added successfully');
       } else {
-        await api.put(`/students/${editId}`, form);
+        await api.put(`/students/${studentId}`, form);
         toast.success('Student updated');
       }
+
+      if (photoFile) {
+        const formData = new FormData();
+        formData.append('file', photoFile);
+        await api.post(`/students/${studentId}/photo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+
       setModal(null);
       load();
     } catch (err) {
@@ -111,7 +128,26 @@ export default function Students() {
     load();
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const columns = [
+    { key: 'photo', label: 'Photo', render: (s) => (
+      <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 shrink-0">
+        {s.photo_path ? (
+          <img src={`/${s.photo_path}`} alt={s.name} className="w-full h-full object-cover" />
+        ) : (
+          <svg className="w-5 h-5 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        )}
+      </div>
+    )},
     { key: 'name', label: 'Name', render: (s) => (
       <Button
         variant="link"
@@ -216,6 +252,28 @@ export default function Students() {
         }
       >
         <form id="student-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex flex-col items-center gap-3 pb-2 border-b border-white/5">
+            <div className="relative group w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-blue-500/10 to-purple-500/10 border-2 border-dashed border-white/10 flex items-center justify-center transition-colors hover:border-bitcoin/50">
+              {photoPreview ? (
+                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <svg className="w-8 h-8 text-stardust/50 group-hover:text-bitcoin/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              )}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                <span className="text-xs font-medium text-white">Upload</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-stardust">Profile Picture (Optional)</p>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-stardust">Full Name *</label>
