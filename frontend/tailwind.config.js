@@ -7,23 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#030304',
-        matter: '#0F1115',
-        pure: '#FFFFFF',
-        stardust: '#94A3B8',
-        boundary: '#1E293B',
-        bitcoin: '#F7931A',
-        burnt: '#EA580C',
-        gold: '#FFD600',
+        void: '#F0F0F0',
+        matter: '#FFFFFF',
+        pure: '#121212',
+        stardust: '#4B5563',
+        boundary: '#121212',
+        bitcoin: '#D02020', // Bauhaus Red
+        burnt: '#1040C0',   // Bauhaus Blue
+        gold: '#F0C020',    // Bauhaus Yellow
       },
       fontFamily: {
-        heading: ["'Space Grotesk'", "sans-serif"],
-        body: ["'Inter'", "sans-serif"],
+        heading: ["'Outfit'", "sans-serif"],
+        body: ["'Outfit'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
       animation: {
-        'spin-slow': 'spin 10s linear infinite',
-        'spin-reverse': 'spin-reverse 15s linear infinite',
+        'spin-slow': 'spin 15s linear infinite',
+        'spin-reverse': 'spin-reverse 20s linear infinite',
         'float': 'float 8s ease-in-out infinite',
       },
       keyframes: {

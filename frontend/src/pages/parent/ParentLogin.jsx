@@ -31,44 +31,51 @@ export default function ParentLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-void bg-grid-pattern flex items-center justify-center p-4 relative overflow-hidden font-body">
-      {/* Ambient Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-bitcoin/10 rounded-full blur-[150px] pointer-events-none" />
+    <div className="min-h-screen bg-void bg-grid-pattern flex items-center justify-center p-4 relative overflow-hidden font-body text-[#121212]">
+      {/* Bauhaus Constructivist Background Compositions */}
+      <div className="absolute top-[-100px] right-[-100px] w-96 h-96 rounded-full bg-[#1040C0] opacity-10 border-4 border-black pointer-events-none" />
+      <div className="absolute bottom-[-150px] left-[-150px] w-[500px] h-[500px] bg-[#D02020] opacity-10 border-4 border-black rotate-45 pointer-events-none" />
+      <div className="absolute bottom-1/4 right-[-100px] w-80 h-80 bg-[#F0C020] opacity-10 border-4 border-black [clip-path:polygon(50%_0%,_0%_100%,_100%_100%)] pointer-events-none" />
+      <div className="absolute top-[10%] left-[-80px] w-64 h-64 bg-[#121212] opacity-5 border-4 border-black pointer-events-none" />
 
-      {/* Spinning Orbitals for 3D depth */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[800px] h-[800px]">
-        <div className="absolute inset-0 border border-white/5 rounded-full animate-spin-slow" />
-        <div className="absolute inset-10 border border-bitcoin/10 rounded-full animate-spin-reverse" />
-        <div className="absolute inset-20 border border-gold/5 rounded-full animate-spin-slow" />
+      {/* Massive Display Text Behind Card (Constructivist Poster Style) */}
+      <div className="hidden lg:block absolute left-12 top-12 font-heading font-black text-8xl text-[#121212]/5 uppercase tracking-tighter select-none pointer-events-none leading-none">
+        KNOWLEDGE<br />IS<br />POWER
+      </div>
+      <div className="hidden lg:block absolute right-12 bottom-12 font-heading font-black text-8xl text-[#121212]/5 text-right uppercase tracking-tighter select-none pointer-events-none leading-none">
+        PARENT<br />PORTAL
       </div>
 
-      <div className="w-full max-w-md bg-matter/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_0_50px_-10px_rgba(247,147,26,0.15)] relative z-10 transition-all duration-300 hover:border-bitcoin/30 animate-float">
+      <div className="w-full max-w-md bg-white border-4 border-black p-8 shadow-[10px_10px_0px_0px_#121212] relative z-10 rounded-none transition-all duration-300 hover:shadow-[14px_14px_0px_0px_#121212]">
         
         {/* Logo and Brand */}
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-burnt to-bitcoin rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(247,147,26,0.4)]">
-              <Users className="w-6 h-6 text-pure" />
+            {/* Geometric Logo */}
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded-full bg-[#D02020] border border-black" />
+              <div className="w-4 h-4 bg-[#1040C0] border border-black" />
+              <div className="w-4 h-4 bg-[#F0C020] border border-black [clip-path:polygon(50%_0%,_0%_100%,_100%_100%)]" />
             </div>
-            <span className="font-heading font-bold text-2xl bg-gradient-to-r from-pure to-bitcoin bg-clip-text text-transparent tracking-tight">
+            <span className="font-heading font-black text-3xl text-[#121212] uppercase tracking-tighter">
               Parent Portal
             </span>
           </div>
-          <p className="text-xs font-semibold text-stardust font-mono uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-gray-500 font-mono uppercase tracking-widest">
             View your child's progress
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm mb-6 flex items-start gap-2.5">
-            <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="bg-[#D02020]/10 border-2 border-[#D02020] text-[#D02020] p-3.5 rounded-none text-xs mb-6 flex items-start gap-2.5 font-mono uppercase font-bold tracking-wider shadow-[2px_2px_0px_0px_#121212]">
+            <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust" htmlFor="username">Username</label>
+            <label className="text-xs font-black uppercase tracking-wider text-gray-700 font-mono" htmlFor="username">Username</label>
             <Input
               id="username"
               type="text"
@@ -81,7 +88,7 @@ export default function ParentLogin() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust" htmlFor="parent-password">Password</label>
+            <label className="text-xs font-black uppercase tracking-wider text-gray-700 font-mono" htmlFor="parent-password">Password</label>
             <Input
               id="parent-password"
               type="password"
@@ -100,7 +107,7 @@ export default function ParentLogin() {
             disabled={loading}
           >
             {loading ? (
-              <span className="w-5 h-5 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
+              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
             ) : null}
             {loading ? 'Signing in...' : 'View My Child\'s Progress'}
           </Button>
@@ -108,9 +115,9 @@ export default function ParentLogin() {
 
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
+            <div className="w-full border-t-2 border-black/10"></div>
           </div>
-          <span className="relative px-3 bg-matter text-[10px] text-stardust font-mono uppercase tracking-wider">
+          <span className="relative px-3 bg-white text-[10px] font-black text-gray-500 font-mono uppercase tracking-wider">
             or
           </span>
         </div>
@@ -118,7 +125,7 @@ export default function ParentLogin() {
         <div className="text-center">
           <a 
             href="/login" 
-            className="text-xs font-semibold text-bitcoin hover:text-gold hover:underline transition-colors font-mono uppercase tracking-wider"
+            className="inline-block text-xs font-black text-[#1040C0] hover:text-[#D02020] hover:underline transition-colors font-mono uppercase tracking-wider"
           >
             👨‍🏫 Switch to Tutor Login
           </a>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&display=swap');
 
 @import "tailwindcss";
 @config "../tailwind.config.js";
@@ -6,60 +6,68 @@
 @layer base {
   body {
     @apply bg-void text-pure font-body min-h-screen antialiased;
-    background-color: #030304;
+    background-color: #F0F0F0;
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: 'Space Grotesk', 'Noto Sans Bengali', sans-serif;
+    font-family: 'Outfit', 'Noto Sans Bengali', sans-serif;
   }
   .font-body {
-    font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
+    font-family: 'Outfit', 'Noto Sans Bengali', sans-serif;
   }
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Grid pattern — covers full viewport via fixed attachment */
+  /* Dot grid — covers full viewport via fixed attachment */
   .bg-grid-pattern {
-    background-size: 50px 50px;
-    background-image:
-      linear-gradient(to right, rgba(30, 41, 59, 0.35) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-image: radial-gradient(rgba(18, 18, 18, 0.08) 1.5px, transparent 1.5px);
     background-attachment: fixed;
   }
 
   .holographic-gradient {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #121212;
   }
 }
 
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #030304;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #F7931A;
+/* Custom Scrollbars - Standard compliant first */
+:root {
+  --scrollbar-thumb: #121212;
+  --scrollbar-track: #E0E0E0;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
 }
 
-/* For React Toast Hot Notifications styling to fit dark/orange theme */
+/* Legacy fallback for WebKit/Blink browsers when scrollbar-color is not supported */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D02020;
+  }
+}
+
+/* For React Toast Hot Notifications styling to fit Bauhaus theme */
 .go3130504588 {
-  background-color: #0F1115 !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(247, 147, 26, 0.2) !important;
-  border-radius: 9999px !important;
-  font-family: 'Inter', sans-serif !important;
-  box-shadow: 0 0 15px rgba(247, 147, 26, 0.1) !important;
+  background-color: #FFFFFF !important;
+  color: #121212 !important;
+  border: 3px solid #121212 !important;
+  border-radius: 0px !important;
+  font-family: 'Outfit', sans-serif !important;
+  box-shadow: 4px 4px 0px 0px #121212 !important;
 }

@@ -2,35 +2,41 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 font-body font-medium transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-full',
+  'inline-flex items-center justify-center gap-2 font-heading font-bold uppercase tracking-wider select-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-[#121212]',
   {
     variants: {
       variant: {
-        primary: 'bg-gradient-to-r from-burnt to-bitcoin text-pure uppercase tracking-wider font-semibold shadow-[0_0_20px_-5px_rgba(234,88,12,0.5)] hover:scale-105 hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)]',
-        outline: 'border-2 border-pure/20 text-pure hover:border-pure hover:bg-pure/10',
-        secondary: 'bg-matter border border-white/10 text-pure hover:border-pure/50 hover:bg-pure/5',
-        ghost: 'bg-transparent text-pure hover:bg-pure/10 hover:text-bitcoin',
-        link: 'bg-transparent text-bitcoin hover:underline p-0 h-auto',
-        success: 'bg-green-500/20 border border-green-500/50 text-green-400 hover:bg-green-500 hover:text-pure hover:shadow-[0_0_15px_rgba(34,197,94,0.4)]',
-        danger: 'bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500 hover:text-pure hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]',
+        primary: 'bg-[#D02020] text-white shadow-[3px_3px_0px_0px_#121212] hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        secondary: 'bg-[#1040C0] text-white shadow-[3px_3px_0px_0px_#121212] hover:bg-[#1040C0]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        yellow: 'bg-[#F0C020] text-[#121212] shadow-[3px_3px_0px_0px_#121212] hover:bg-[#F0C020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        outline: 'bg-white text-[#121212] shadow-[3px_3px_0px_0px_#121212] hover:bg-gray-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        ghost: 'border-transparent bg-transparent text-[#121212] hover:bg-gray-100 active:bg-gray-200',
+        link: 'border-transparent bg-transparent text-[#1040C0] hover:underline p-0 h-auto',
+        success: 'bg-[#F0C020] text-[#121212] shadow-[3px_3px_0px_0px_#121212] hover:bg-[#F0C020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        danger: 'bg-[#D02020] text-white shadow-[3px_3px_0px_0px_#121212] hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
       },
       size: {
         default: 'h-11 px-6 text-sm',
         sm: 'h-9 px-4 text-xs',
         lg: 'h-12 px-8 text-base',
       },
+      shape: {
+        square: 'rounded-none',
+        pill: 'rounded-full',
+      }
     },
     defaultVariants: {
       variant: 'primary',
       size: 'default',
+      shape: 'square',
     },
   }
 );
 
-export default function Button({ className, variant, size, ...props }) {
+export default function Button({ className, variant, size, shape, ...props }) {
   return (
     <button
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, shape, className }))}
       {...props}
     />
   );
