@@ -104,11 +104,11 @@ export default function StudentProfile() {
         >
           <ArrowLeft className="w-4 h-4 text-pure" />
         </Button>
-        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border-2 border-white/10 shrink-0">
+        <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border-2 border-white/10 shrink-0">
           {student.photo_path ? (
             <img src={`/${student.photo_path}`} alt={student.name} className="w-full h-full object-cover" />
           ) : (
-            <svg className="w-8 h-8 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-12 h-12 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           )}
