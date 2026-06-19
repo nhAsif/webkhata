@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardContent } from '../../components/Card';
 import { Input } from '../../components/Input';
+import { CheckCircle2, XCircle, Clock, Calendar, BarChart2 } from 'lucide-react';
 
 const STATUS_COLORS = {
   present: { bg: 'bg-[#4ADE80]', color: 'text-black', border: 'border-2 border-black', label: 'P' },
@@ -52,10 +53,22 @@ export default function ParentAttendance() {
 
       {data?.summary && (
         <div className="flex flex-wrap gap-2.5 mb-6">
-          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">✅ Present: {data.summary.present}</span>
-          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">❌ Absent: {data.summary.absent}</span>
-          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FFD93D] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">⏰ Late: {data.summary.late}</span>
-          <span className="inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#C4B5FD] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">📅 Sessions: {data.summary.total_sessions}</span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <CheckCircle2 className="w-3.5 h-3.5 stroke-[3px]" />
+            Present: {data.summary.present}
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <XCircle className="w-3.5 h-3.5 stroke-[3px]" />
+            Absent: {data.summary.absent}
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FFD93D] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Clock className="w-3.5 h-3.5 stroke-[3px]" />
+            Late: {data.summary.late}
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#C4B5FD] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Calendar className="w-3.5 h-3.5 stroke-[2.5px]" />
+            Sessions: {data.summary.total_sessions}
+          </span>
           <span
             className={`inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
               data.summary.attendance_rate >= 75
@@ -63,7 +76,10 @@ export default function ParentAttendance() {
                 : 'bg-[#FF6B6B] text-black'
             }`}
           >
-            📊 {data.summary.attendance_rate}% Rate
+            <span className="flex items-center gap-1.5">
+              <BarChart2 className="w-3.5 h-3.5 stroke-[3px]" />
+              {data.summary.attendance_rate}% Rate
+            </span>
           </span>
         </div>
       )}

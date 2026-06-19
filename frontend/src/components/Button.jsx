@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
 import { cn } from '../utils/cn';
+import { ArrowRight } from 'lucide-react';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 font-heading font-bold select-none cursor-pointer transition-all duration-100 rounded-none border-black focus-visible:outline-none focus-visible:bg-[#FFD93D] focus-visible:border-black disabled:bg-disabled disabled:text-fg-disabled disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
@@ -41,9 +42,7 @@ export default function Button({ className, variant = 'primary', size = 'default
     >
       <span>{children}</span>
       {isCta && (
-        <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 ml-1 text-base leading-none">
-          →
-        </span>
+        <ArrowRight className="w-4 h-4 ml-1 inline-block transition-transform duration-200 group-hover:translate-x-1" />
       )}
     </button>
   );

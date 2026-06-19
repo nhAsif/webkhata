@@ -5,7 +5,7 @@ import Modal from '../components/Modal';
 import { Card, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select } from '../components/Input';
-import { CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Loader2, BarChart2, Users, ClipboardList } from 'lucide-react';
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -151,7 +151,10 @@ export default function Attendance() {
           </p>
         </div>
         <Button variant="secondary" onClick={() => setSummaryModal(true)}>
-          📊 Monthly Summary
+          <span className="flex items-center gap-2">
+            <BarChart2 className="w-4 h-4 stroke-[3px]" />
+            Monthly Summary
+          </span>
         </Button>
       </div>
 
@@ -201,17 +204,20 @@ export default function Attendance() {
                 <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/5 text-stardust border-white/10">
                   {students.length} students
                 </span>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">
-                  ✅ {presentCount} present
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 stroke-[3px]" />
+                  {presentCount} present
                 </span>
                 {absentCount > 0 && (
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">
-                    ❌ {absentCount} absent
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1.5">
+                    <XCircle className="w-3.5 h-3.5 stroke-[3px]" />
+                    {absentCount} absent
                   </span>
                 )}
                 {lateCount > 0 && (
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                    ⏰ {lateCount} late
+                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 stroke-[3px]" />
+                    {lateCount} late
                   </span>
                 )}
                 <div className="flex-1" />
@@ -228,8 +234,8 @@ export default function Attendance() {
                 ))}
               </div>
             ) : students.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10">
-                <div className="text-3xl mb-2">👥</div>
+              <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10 text-stardust">
+                <Users className="w-8 h-8 mb-2 text-stardust stroke-[2px]" />
                 <div className="text-sm font-heading text-pure">No students in this batch</div>
               </div>
             ) : (
@@ -284,8 +290,8 @@ export default function Attendance() {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10">
-          <div className="text-4xl mb-4">📋</div>
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10 text-stardust">
+          <ClipboardList className="w-12 h-12 mb-4 text-stardust stroke-[1.5px]" />
           <div className="text-lg font-heading text-pure">Select a batch to mark attendance</div>
           <p className="text-sm text-stardust mt-1">All students will be auto-marked present</p>
         </div>

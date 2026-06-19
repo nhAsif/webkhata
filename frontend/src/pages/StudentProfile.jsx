@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import { Input, Textarea } from '../components/Input';
 import toast from 'react-hot-toast';
-import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, PlusCircle } from 'lucide-react';
+import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, PlusCircle, UserX } from 'lucide-react';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -71,7 +71,9 @@ export default function StudentProfile() {
   if (!student) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center font-body">
-        <div className="text-4xl mb-3">❓</div>
+        <div className="text-black mb-3">
+          <UserX className="w-12 h-12 stroke-[2px]" />
+        </div>
         <div className="text-lg font-heading font-semibold text-pure mb-4">Student not found</div>
         <Button variant="secondary" onClick={() => navigate('/students')}>
           <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Students

@@ -6,6 +6,7 @@ import Modal from '../components/Modal';
 import { Card, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select, Textarea } from '../components/Input';
+import { Check, X, AlertTriangle } from 'lucide-react';
 
 const STATUS_OPTS = ['not_submitted', 'submitted', 'late'];
 const STATUS_BADGE = {
@@ -14,9 +15,9 @@ const STATUS_BADGE = {
   late: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
 };
 const STATUS_ICON = {
-  submitted: '✓',
-  not_submitted: '✗',
-  late: '⚠',
+  submitted: <Check className="w-3.5 h-3.5 stroke-[3px]" />,
+  not_submitted: <X className="w-3.5 h-3.5 stroke-[3px]" />,
+  late: <AlertTriangle className="w-3.5 h-3.5 stroke-[3px]" />,
 };
 
 function today() {
@@ -124,8 +125,8 @@ export default function Homework() {
     { key: 'due_date', label: 'Due Date', render: (hw) => {
       const overdue = new Date(hw.due_date) < new Date() && hw.due_date !== today();
       return (
-        <span className={`font-mono text-sm ${overdue ? 'text-red-400 font-medium' : 'text-stardust'}`}>
-          {hw.due_date} {overdue ? '⚠' : ''}
+        <span className={`font-mono text-sm flex items-center gap-1.5 ${overdue ? 'text-red-400 font-medium' : 'text-stardust'}`}>
+          {hw.due_date} {overdue && <AlertTriangle className="w-4 h-4 text-red-400 stroke-[3px]" />}
         </span>
       );
     }},
@@ -293,7 +294,10 @@ export default function Homework() {
                         });
                       }}
                     >
-                      {STATUS_ICON[s]} {s.replace('_', ' ')}
+                      <span className="flex items-center gap-1.5">
+                        {STATUS_ICON[s]}
+                        <span>{s.replace('_', ' ')}</span>
+                      </span>
                     </button>
                   ))}
                 </div>

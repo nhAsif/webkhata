@@ -9,7 +9,8 @@ import {
   ChevronRight, 
   Shuffle, 
   RefreshCw,
-  Calendar
+  Calendar,
+  Info
 } from 'lucide-react';
 import { 
   getDailyVocabulary, 
@@ -247,7 +248,7 @@ export default function ParentVocabulary() {
     }
     
     if (eligibleWords.length < 4) {
-      toast('Not enough daily words with this property to generate practice!', { icon: 'ℹ️' });
+      toast('Not enough daily words with this property to generate practice!', { icon: <Info className="w-5 h-5 text-blue-500 stroke-[3px]" /> });
       setPracticeMode(null);
       setPracticeQuestions([]);
       return;

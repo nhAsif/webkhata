@@ -13,48 +13,54 @@ import {
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 function StatBadge({ label, value, sub, color, icon }) {
+  const colorMap = {
+    red: 'bg-[#FF6B6B]',
+    yellow: 'bg-[#FFD93D]',
+    green: 'bg-[#C4B5FD]', // success/green uses lavender
+    indigo: 'bg-[#BAE6FD]', // sky blue for Collected
+  };
+  const bgClass = colorMap[color] || 'bg-white';
+
   return (
-    <Card className={`border-${color}-500/30 shadow-[0_0_18px_-6px_rgba(var(--tw-shadow-color),0.3)] shadow-${color}-500/20`}>
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="text-xs text-stardust font-mono uppercase tracking-wider mb-1.5">{label}</div>
-            <div className={`text-2xl font-bold font-mono text-${color}-400`}>{value}</div>
-            {sub && <div className="text-xs text-stardust mt-1">{sub}</div>}
-          </div>
-          <div className={`p-2.5 rounded-xl bg-${color}-500/10 text-${color}-400`}>{icon}</div>
+    <div className={`p-5 border-4 border-black text-black ${bgClass} shadow-[4px_4px_0px_0px_var(--neo-shadow)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--neo-shadow)] transition-all duration-150`}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-mono font-black uppercase tracking-wider text-black/75 mb-1.5">{label}</div>
+          <div className="text-2xl md:text-3xl font-black font-heading tracking-tight text-black">{value}</div>
+          {sub && <div className="text-[11px] font-bold font-body text-black/60 mt-1">{sub}</div>}
         </div>
-      </CardContent>
-    </Card>
+        <div className="p-2 border-2 border-black bg-white/40 text-black shadow-[2px_2px_0px_0px_var(--neo-shadow)]">{icon}</div>
+      </div>
+    </div>
   );
 }
 
 // ─── Cycle Status Badge ───────────────────────────────────────────────────────
 function CycleBadge({ isPaid }) {
   return isPaid
-    ? <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-green-500/15 text-green-400 border-green-500/30 uppercase tracking-wide">
-        <Check className="w-3 h-3" /> Paid
+    ? <span className="inline-flex items-center gap-1 border-2 border-black bg-[#C4B5FD] text-black px-2.5 py-0.5 text-[11px] font-black font-mono uppercase tracking-wide shadow-[1px_1px_0px_var(--neo-shadow)]">
+        <Check className="w-3 h-3 stroke-[3px]" /> Paid
       </span>
-    : <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-red-500/15 text-red-400 border-red-500/30 uppercase tracking-wide">
-        <X className="w-3 h-3" /> Unpaid
+    : <span className="inline-flex items-center gap-1 border-2 border-black bg-[#FF6B6B] text-black px-2.5 py-0.5 text-[11px] font-black font-mono uppercase tracking-wide shadow-[1px_1px_0px_var(--neo-shadow)]">
+        <X className="w-3 h-3 stroke-[3px]" /> Unpaid
       </span>;
 }
 
 // ─── Fee Status Badge (for student row) ───────────────────────────────────────
 function FeeStatusBadge({ unpaid }) {
   if (unpaid === 0) return (
-    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-green-500/15 text-green-400 border-green-500/30">
-      <CheckCircle2 className="w-3 h-3" /> Clear
+    <span className="inline-flex items-center gap-1 border-2 border-black bg-[#C4B5FD] text-black px-2.5 py-0.5 text-[11px] font-black font-mono shadow-[2px_2px_0px_var(--neo-shadow)]">
+      <CheckCircle2 className="w-3 h-3 stroke-[2.5px]" /> Clear
     </span>
   );
   if (unpaid === 1) return (
-    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-yellow-500/15 text-yellow-400 border-yellow-500/30">
-      <Clock className="w-3 h-3" /> {unpaid} Pending
+    <span className="inline-flex items-center gap-1 border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-[11px] font-black font-mono shadow-[2px_2px_0px_var(--neo-shadow)]">
+      <Clock className="w-3 h-3 stroke-[2.5px]" /> {unpaid} Pending
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold font-mono border bg-red-500/15 text-red-400 border-red-500/30">
-      <AlertCircle className="w-3 h-3" /> {unpaid} Pending
+    <span className="inline-flex items-center gap-1 border-2 border-black bg-[#FF6B6B] text-black px-2.5 py-0.5 text-[11px] font-black font-mono shadow-[2px_2px_0px_var(--neo-shadow)]">
+      <AlertCircle className="w-3 h-3 stroke-[2.5px]" /> {unpaid} Pending
     </span>
   );
 }
@@ -120,7 +126,7 @@ export default function Fees() {
         payment_date: markForm.payment_date || null,
         notes: markForm.notes || null,
       });
-      toast.success(`Cycle #${markCycle.cycle_number} marked as paid ✓`);
+      toast.success(`Cycle #${markCycle.cycle_number} marked as paid`);
       setMarkModal(false);
       // Refresh cycles
       const res = await api.get(`/fees/student/${detailStudent.student_id}`);
@@ -148,13 +154,16 @@ export default function Fees() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-bounce-spring">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Fee Cycles</h1>
-          <p className="text-stardust text-sm mt-1">Cycle-based fee collection — 30-day billing periods</p>
-        </div>
+      <div className="border-b-4 border-black pb-4 mb-2">
+        <h1 className="text-3xl md:text-4xl font-heading font-black text-black uppercase tracking-tight flex items-center gap-3">
+          <DollarSign className="w-8 h-8 md:w-10 md:h-10 text-black bg-[#FFD93D] border-4 border-black shadow-[3px_3px_0px_var(--neo-shadow)] p-1.5 stroke-[2.5px] springy-bounce" />
+          Fee Cycles
+        </h1>
+        <p className="text-black/70 font-body font-bold text-sm mt-2">
+          Cycle-based fee collection — 30-day billing periods
+        </p>
       </div>
 
       {/* Stats */}
@@ -165,86 +174,88 @@ export default function Fees() {
             value={stats.students_with_due}
             sub={`of ${stats.total_students} active`}
             color="red"
-            icon={<AlertCircle className="w-5 h-5" />}
+            icon={<AlertCircle className="w-5 h-5 stroke-[2.5px]" />}
           />
           <StatBadge
             label="Unpaid Cycles"
             value={stats.total_unpaid_cycles}
             sub={`৳${(stats.total_pending ?? 0).toLocaleString()} pending`}
             color="yellow"
-            icon={<Clock className="w-5 h-5" />}
+            icon={<Clock className="w-5 h-5 stroke-[2.5px]" />}
           />
           <StatBadge
             label="Paid Cycles"
             value={stats.total_paid_cycles}
             sub={`of ${stats.total_completed_cycles} completed`}
             color="green"
-            icon={<CheckCircle2 className="w-5 h-5" />}
+            icon={<CheckCircle2 className="w-5 h-5 stroke-[2.5px]" />}
           />
           <StatBadge
             label="Collected"
             value={`৳${(stats.total_collected ?? 0).toLocaleString()}`}
             sub={`৳${(stats.total_pending ?? 0).toLocaleString()} pending`}
             color="indigo"
-            icon={<DollarSign className="w-5 h-5" />}
+            icon={<DollarSign className="w-5 h-5 stroke-[2.5px]" />}
           />
         </div>
       )}
 
       {/* Dashboard Table */}
-      <Card>
-        <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg font-heading text-pure">
-            <Users className="w-5 h-5 text-bitcoin" /> Students with Pending Fees
+      <Card className="hover:shadow-[12px_12px_0px_var(--neo-shadow)]">
+        <CardHeader className="flex-row items-center justify-between pb-4 bg-[#BAE6FD]/20">
+          <CardTitle className="flex items-center gap-2.5 text-lg font-heading text-black">
+            <Users className="w-6 h-6 text-black stroke-[2.5px]" /> Students with Pending Fees
           </CardTitle>
-          <span className="text-xs font-mono text-stardust bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+          <span className="text-xs font-black font-mono text-black border-2 border-black bg-white px-2.5 py-1 shadow-[2px_2px_0px_var(--neo-shadow)]">
             {dashboard.length} student{dashboard.length !== 1 ? 's' : ''}
           </span>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-8 space-y-3 animate-pulse">
+            <div className="p-8 space-y-4 animate-pulse">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-14 bg-white/5 rounded-xl" />
+                <div key={i} className="h-14 bg-black/5 border-2 border-black/20" />
               ))}
             </div>
           ) : dashboard.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="text-4xl mb-3">🎉</div>
-              <div className="text-lg font-heading font-semibold text-pure mb-1">All fees are clear!</div>
-              <p className="text-stardust text-sm">No students have pending fee cycles.</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center p-6">
+              <div className="p-4 border-4 border-black bg-[#C4B5FD] shadow-[4px_4px_0px_var(--neo-shadow)] mb-4">
+                <CheckCircle2 className="w-10 h-10 text-black stroke-[2.5px]" />
+              </div>
+              <div className="text-xl font-heading font-black text-black uppercase tracking-tight">All fees are clear!</div>
+              <p className="text-black/60 text-sm font-bold font-body mt-1">No students have pending fee cycles.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[640px] whitespace-nowrap">
                 <thead>
-                  <tr className="bg-void/40 border-y border-white/10">
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Student</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Monthly Fee</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Completed</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Unpaid</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Amount Due</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono" />
+                  <tr className="bg-[#FAF6EE] border-b-4 border-black">
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Student</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Monthly Fee</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Completed</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Unpaid</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Amount Due</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider border-r border-black/10">Status</th>
+                    <th className="px-6 py-4 text-xs font-black text-black uppercase font-mono tracking-wider" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y-2 divide-black/10 bg-white">
                   {dashboard.map((row) => (
                     <tr
                       key={row.student_id}
-                      className="hover:bg-white/5 transition-all cursor-pointer group"
+                      className="hover:bg-[#FFD93D]/10 transition-colors cursor-pointer group"
                       onClick={() => openStudentDetail(row)}
                     >
-                      <td className="px-6 py-4">
-                        <span className="font-medium text-pure text-sm group-hover:text-bitcoin transition-colors">{row.student_name}</span>
+                      <td className="px-6 py-4 border-r border-black/5">
+                        <span className="font-black text-black text-sm group-hover:text-[#FF6B6B] transition-colors">{row.student_name}</span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-stardust">৳{row.monthly_fee.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-sm font-mono text-pure">{row.completed_cycles}</td>
-                      <td className="px-6 py-4 text-sm font-bold font-mono text-red-400">{row.unpaid_cycles}</td>
-                      <td className="px-6 py-4 text-sm font-bold font-mono text-red-400">৳{row.amount_due.toLocaleString()}</td>
-                      <td className="px-6 py-4"><FeeStatusBadge unpaid={row.unpaid_cycles} /></td>
+                      <td className="px-6 py-4 text-sm font-black font-mono text-black/80 border-r border-black/5">৳{row.monthly_fee.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm font-bold font-mono text-black border-r border-black/5">{row.completed_cycles}</td>
+                      <td className="px-6 py-4 text-sm font-black font-mono text-[#FF6B6B] border-r border-black/5">{row.unpaid_cycles}</td>
+                      <td className="px-6 py-4 text-sm font-black font-mono text-[#FF6B6B] border-r border-black/5">৳{row.amount_due.toLocaleString()}</td>
+                      <td className="px-6 py-4 border-r border-black/5"><FeeStatusBadge unpaid={row.unpaid_cycles} /></td>
                       <td className="px-6 py-4 text-right">
-                        <ChevronRight className="w-4 h-4 text-stardust group-hover:text-bitcoin transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-black group-hover:translate-x-1 group-hover:text-[#FF6B6B] transition-all" />
                       </td>
                     </tr>
                   ))}
@@ -263,75 +274,74 @@ export default function Fees() {
       >
         {cyclesLoading ? (
           <div className="space-y-3 animate-pulse py-4">
-            {[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-white/5 rounded-xl" />)}
+            {[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-black/5 border-2 border-black/20" />)}
           </div>
         ) : cycles.length === 0 ? (
-          <div className="py-10 text-center text-stardust">No cycles found.</div>
+          <div className="py-10 text-center font-bold text-black/60">No cycles found.</div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Summary row */}
             {(() => {
               const total = cycles.length;
               const paid = cycles.filter(c => c.is_paid).length;
               const unpaid = total - paid;
-              const student = dashboard.find(d => d.student_id === detailStudent?.student_id);
               return (
                 <div className="grid grid-cols-3 gap-3 mb-2">
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-                    <div className="text-xs text-stardust font-mono uppercase mb-1">Completed</div>
-                    <div className="text-xl font-bold text-pure font-mono">{total}</div>
+                  <div className="bg-[#BAE6FD] border-2 border-black p-3 text-center shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
+                    <div className="text-[10px] text-black/70 font-mono uppercase font-black tracking-wider mb-1">Completed</div>
+                    <div className="text-xl font-black text-black font-mono">{total}</div>
                   </div>
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-center">
-                    <div className="text-xs text-stardust font-mono uppercase mb-1">Paid</div>
-                    <div className="text-xl font-bold text-green-400 font-mono">{paid}</div>
+                  <div className="bg-[#C4B5FD] border-2 border-black p-3 text-center shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
+                    <div className="text-[10px] text-black/70 font-mono uppercase font-black tracking-wider mb-1">Paid</div>
+                    <div className="text-xl font-black text-black font-mono">{paid}</div>
                   </div>
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
-                    <div className="text-xs text-stardust font-mono uppercase mb-1">Unpaid</div>
-                    <div className="text-xl font-bold text-red-400 font-mono">{unpaid}</div>
+                  <div className="bg-[#FF6B6B] border-2 border-black p-3 text-center shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
+                    <div className="text-[10px] text-black/70 font-mono uppercase font-black tracking-wider mb-1">Unpaid</div>
+                    <div className="text-xl font-black text-black font-mono">{unpaid}</div>
                   </div>
                 </div>
               );
             })()}
 
             {/* Cycles list */}
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
               {cycles.map((cycle) => (
                 <div
                   key={cycle.id}
-                  className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border-2 border-black gap-3 transition-all ${
                     cycle.is_paid
-                      ? 'bg-green-500/5 border-green-500/20'
-                      : 'bg-red-500/5 border-red-500/20'
+                      ? 'bg-[#C4B5FD]/10 hover:bg-[#C4B5FD]/20 border-black'
+                      : 'bg-[#FF6B6B]/10 hover:bg-[#FF6B6B]/20 border-black'
                   }`}
                 >
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-pure font-mono">Cycle #{cycle.cycle_number}</span>
+                      <span className="text-sm font-black text-black font-mono">Cycle #{cycle.cycle_number}</span>
                       <CycleBadge isPaid={cycle.is_paid} />
                     </div>
-                    <div className="text-xs text-stardust font-mono flex items-center gap-1.5">
-                      <Calendar className="w-3 h-3" />
+                    <div className="text-xs text-black/60 font-mono font-bold flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 stroke-[2.5px] text-black/50" />
                       {formatDate(cycle.cycle_start_date)} → {formatDate(cycle.cycle_end_date)}
                     </div>
-                    <div className="text-xs font-mono text-pure/70">
+                    <div className="text-xs font-mono font-bold text-black">
                       ৳{cycle.fee_amount.toLocaleString()}
                       {cycle.is_paid && cycle.payment_date && (
-                        <span className="text-green-400 ml-2">Paid {formatDate(cycle.payment_date)}</span>
+                        <span className="text-emerald-800 ml-2 font-black">Paid {formatDate(cycle.payment_date)}</span>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-1.5 items-end">
+                  <div className="flex flex-col gap-1.5 items-end self-start sm:self-auto">
                     {!cycle.is_paid ? (
                       <Button
-                        variant="primary"
-                        size="sm"
+                        variant="secondary"
+                        size="xs"
                         onClick={() => openMarkPaid(cycle)}
                       >
-                        <Check className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                        <Check className="w-3.5 h-3.5" /> Mark Paid
                       </Button>
                     ) : (
                       <button
-                        className="text-xs text-stardust hover:text-red-400 transition-colors font-mono underline underline-offset-2"
+                        className="text-xs font-black text-black hover:text-[#FF6B6B] transition-colors font-mono underline underline-offset-2 cursor-pointer"
                         onClick={() => handleMarkUnpaid(cycle)}
                       >
                         Mark Unpaid
@@ -352,9 +362,9 @@ export default function Fees() {
         title={`Mark Paid — Cycle #${markCycle?.cycle_number}`}
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setMarkModal(false)}>Cancel</Button>
-            <Button variant="primary" form="mark-paid-form" type="submit" disabled={marking}>
-              {marking ? <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1.5" />}
+            <Button variant="outline" size="sm" onClick={() => setMarkModal(false)}>Cancel</Button>
+            <Button variant="secondary" size="sm" form="mark-paid-form" type="submit" disabled={marking}>
+              {marking ? <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1.5 stroke-[2.5px]" />}
               Confirm Payment
             </Button>
           </div>
@@ -362,17 +372,17 @@ export default function Fees() {
       >
         {markCycle && (
           <form id="mark-paid-form" onSubmit={handleMarkPaid} className="space-y-4">
-            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-sm text-green-400 flex items-center gap-3">
-              <DollarSign className="w-5 h-5 shrink-0" />
+            <div className="bg-[#C4B5FD] border-2 border-black p-4 text-black flex items-center gap-3 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+              <DollarSign className="w-6 h-6 shrink-0 stroke-[2.5px]" />
               <div>
-                <div className="font-bold font-mono">৳{markCycle.fee_amount?.toLocaleString()}</div>
-                <div className="text-xs text-green-400/70 mt-0.5">
+                <div className="font-black font-heading text-lg">৳{markCycle.fee_amount?.toLocaleString()}</div>
+                <div className="text-xs font-mono font-black text-black/75 mt-0.5">
                   {formatDate(markCycle.cycle_start_date)} → {formatDate(markCycle.cycle_end_date)}
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Payment Date</label>
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Payment Date</label>
               <Input
                 type="date"
                 value={markForm.payment_date}
@@ -380,7 +390,7 @@ export default function Fees() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Notes (optional)</label>
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Notes (optional)</label>
               <Textarea
                 value={markForm.notes}
                 onChange={(e) => setMarkForm(f => ({ ...f, notes: e.target.value }))}

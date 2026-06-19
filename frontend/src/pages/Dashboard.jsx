@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../api/client';
 import StatCard from '../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
-import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkles, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkles, TrendingUp, TrendingDown, Wallet, Bell, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -113,7 +113,7 @@ export default function Dashboard() {
         <Card hover={false} className="notebook-spirals bg-white">
           <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FFD93D]/10">
             <CardTitle className="flex items-center gap-2 text-xl font-heading font-black text-black">
-              <span>🔔</span> Active Alerts
+              <Bell className="w-5 h-5 text-black stroke-[3px]" /> Active Alerts
             </CardTitle>
             <span className="px-3 py-1 text-xs font-black uppercase rounded-none bg-[#FF6B6B] text-black border-4 border-black flex items-center gap-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <span className="relative flex h-2.5 w-2.5">
@@ -142,7 +142,7 @@ export default function Dashboard() {
                         href={`/students/${alert.student_id}`}
                         className="text-xs font-black text-black underline hover:text-black/75 transition-colors mt-2 inline-flex items-center gap-1 font-heading uppercase tracking-wider"
                       >
-                        View student details ➔
+                        View student details <ArrowRight className="w-4 h-4 text-black stroke-[3px]" />
                       </a>
                     )}
                   </div>

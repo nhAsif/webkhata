@@ -171,7 +171,9 @@ export default function Reports() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center bg-white">
-              <div className="text-4xl mb-3">📊</div>
+              <div className="text-black mb-3">
+                <BarChart2 className="w-12 h-12 stroke-[2px]" />
+              </div>
               <div className="text-lg font-heading font-black text-black mb-1">No data for this period</div>
               <div className="text-sm text-black/60 font-bold">Try selecting a different month or adding students with fees.</div>
             </div>

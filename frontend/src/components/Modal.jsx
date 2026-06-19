@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { cn } from '../utils/cn';
+import { X } from 'lucide-react';
 
 export default function Modal({ isOpen, onClose, title, children, footer, size = 'md' }) {
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function Modal({ isOpen, onClose, title, children, footer, size =
             className="w-8 h-8 rounded-none border-2 border-black bg-[#FF6B6B] text-black hover:bg-[#FF6B6B]/80 flex items-center justify-center transition-all duration-100 font-bold cursor-pointer shadow-[2px_2px_0px_0px_var(--neo-shadow)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             onClick={onClose}
           >
-            ✕
+            <X className="w-4 h-4 stroke-[3px]" />
           </button>
         </div>
         

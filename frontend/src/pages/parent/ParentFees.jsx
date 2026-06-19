@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
+import { AlertTriangle, Receipt } from 'lucide-react';
 
 function CycleBadge({ isPaid }) {
   return isPaid
@@ -95,7 +96,7 @@ export default function ParentFees() {
           </div>
           {(summary?.pending_amount ?? 0) > 0 && (
             <div className="bg-[#FF6B6B]/10 border-2 border-black p-4 flex items-center gap-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <span className="text-2xl">⚠️</span>
+              <AlertTriangle className="w-6 h-6 text-red-600 stroke-[3px]" />
               <div>
                 <div className="text-sm font-black text-red-700 font-heading uppercase tracking-tight">Pending Amount</div>
                 <div className="text-xl font-mono font-black text-red-600">
@@ -115,7 +116,9 @@ export default function ParentFees() {
         <CardContent className="p-0">
           {!data?.cycles?.length ? (
             <div className="flex flex-col items-center justify-center py-12 text-center bg-white">
-              <div className="text-4xl mb-4">📜</div>
+              <div className="text-black mb-4">
+                <Receipt className="w-12 h-12 stroke-[2px]" />
+              </div>
               <div className="text-black font-heading font-black text-lg uppercase tracking-tight">No fee cycles yet</div>
               <div className="text-black/60 font-body text-sm font-semibold mt-1">Cycles are generated every 30 days from your start date.</div>
             </div>

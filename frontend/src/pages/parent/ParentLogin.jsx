@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { Input } from '../../components/Input';
 import Button from '../../components/Button';
-import { Users, ShieldAlert } from 'lucide-react';
+import { Users, ShieldAlert, TrendingUp, GraduationCap } from 'lucide-react';
 
 export default function ParentLogin() {
   const [username, setUsername] = useState('');
@@ -34,10 +34,14 @@ export default function ParentLogin() {
     <div className="min-h-screen bg-notebook-grid flex items-center justify-center p-4 relative overflow-hidden font-body">
       {/* Floating details for visual interest (Stickers) */}
       <div className="absolute top-[15%] right-[10%] bg-[#FFD93D] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] rotate-6 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
-        PARENT ACCESS 👪
+        <span className="flex items-center gap-2">
+          PARENT ACCESS <Users className="w-6 h-6 text-black stroke-[3px]" />
+        </span>
       </div>
       <div className="absolute bottom-[20%] left-[8%] bg-[#C4B5FD] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] -rotate-12 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
-        KIDS PROGRESS 📈
+        <span className="flex items-center gap-2">
+          KIDS PROGRESS <TrendingUp className="w-6 h-6 text-black stroke-[3px]" />
+        </span>
       </div>
 
       <div className="w-full max-w-md bg-white border-4 border-black rounded-none p-8 shadow-[12px_12px_0px_0px_var(--neo-shadow)] relative z-10 hover:-translate-y-1 hover:shadow-[16px_16px_0px_0px_var(--neo-shadow)] transition-all duration-200">
@@ -115,7 +119,10 @@ export default function ParentLogin() {
             href="/login" 
             className="text-xs font-black text-black bg-[#C4B5FD] border-2 border-black px-4 py-2 hover:bg-[#C4B5FD]/90 hover:shadow-[3px_3px_0px_0px_var(--neo-shadow)] hover:active:translate-x-[3px] hover:active:translate-y-[3px] hover:active:shadow-none transition-all duration-100 font-heading uppercase tracking-wider inline-block shadow-[3px_3px_0px_0px_var(--neo-shadow)]"
           >
-            👨‍🏫 Switch to Tutor Login
+            <span className="flex items-center justify-center gap-2">
+              <GraduationCap className="w-4 h-4 text-black stroke-[3px]" />
+              Switch to Tutor Login
+            </span>
           </a>
         </div>
       </div>

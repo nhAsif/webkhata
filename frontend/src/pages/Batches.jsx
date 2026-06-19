@@ -454,9 +454,11 @@ export default function Batches() {
           </div>
 
           {batchStudents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 border-4 border-black bg-[#FAF6EE] text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-3xl mb-2">👥</div>
-              <div className="text-sm font-semibold text-black">No students yet</div>
+            <div className="flex flex-col items-center justify-center py-10 border-4 border-black bg-[#FAF6EE] text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-black">
+              <div className="mb-2">
+                <Users className="w-8 h-8 stroke-[2px]" />
+              </div>
+              <div className="text-sm font-semibold">No students yet</div>
               <div className="text-xs text-black/65 mt-1">Select a student from the dropdown above to add them.</div>
             </div>
           ) : (
@@ -511,7 +513,10 @@ export default function Batches() {
             {/* Active days notice */}
             {schedule.length > 0 && (
               <div className="p-3 bg-[#FAF6EE] border-2 border-black text-xs text-black/75 flex items-center gap-2 flex-wrap">
-                <span className="font-mono uppercase font-bold text-black">📅 Active days:</span>
+                <span className="font-mono uppercase font-bold text-black flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 stroke-[2.5px]" />
+                  Active days:
+                </span>
                 {schedule.map((d) => (
                   <span key={d} className="inline-flex px-2 py-0.5 border-2 border-black bg-[#FFD93D] text-black font-mono text-[10px] uppercase font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                     {DAY_LABELS[d] || d}
@@ -573,7 +578,7 @@ export default function Batches() {
                                 className="text-[10px] opacity-60 hover:opacity-100 hover:text-red-400 transition-colors"
                                 title={`Remove ${subj}`}
                               >
-                                ✕
+                                <X className="w-3 h-3 stroke-[3px]" />
                               </button>
                             </span>
                           ))}

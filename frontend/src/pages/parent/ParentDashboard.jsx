@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import StatCard from '../../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
-import { CheckSquare, Calendar, BookOpen, Clock } from 'lucide-react';
+import { CheckSquare, Calendar, BookOpen, Clock, Coffee } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ParentDashboard() {
@@ -107,7 +107,10 @@ export default function ParentDashboard() {
       {profile?.batches?.length > 0 && (
         <Card className="bg-neutral-primary-soft border-2 border-border-default mb-6">
           <CardHeader>
-            <CardTitle className="font-heading text-heading font-bold">📚 Enrolled Batches</CardTitle>
+            <CardTitle className="font-heading text-heading font-bold flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-black stroke-[3px]" />
+              Enrolled Batches
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <div className="flex flex-col gap-3">
@@ -153,8 +156,9 @@ export default function ParentDashboard() {
                   </div>
 
                   {isOff ? (
-                    <span className="text-body-subtle text-sm italic font-body">
-                      🏖️ No classes today
+                    <span className="text-body-subtle text-sm italic font-body flex items-center gap-1.5">
+                      <Coffee className="w-4 h-4 stroke-[2px]" />
+                      No classes today
                     </span>
                   ) : (
                     <div className="flex gap-2 flex-wrap">

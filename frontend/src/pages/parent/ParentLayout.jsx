@@ -14,7 +14,8 @@ import {
   Key,
   Menu,
   X,
-  BookOpen
+  BookOpen,
+  Sparkles
 } from 'lucide-react';
 
 const PARENT_NAV = [
@@ -141,8 +142,10 @@ export default function ParentLayout() {
             {/* Centered Yellow Sticker */}
             <div className="flex-1 flex justify-center">
               <div className="relative bg-[#FFD93D] text-black font-heading font-black text-sm md:text-base px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] -rotate-1 hover:rotate-0 transition-transform duration-200">
-                <span className="relative z-10 select-none uppercase tracking-wider font-black">
-                  🌸 Parent Portal 🌸
+                <span className="relative z-10 select-none uppercase tracking-wider font-black flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-black stroke-[3px]" />
+                  Parent Portal
+                  <Sparkles className="w-5 h-5 text-black stroke-[3px]" />
                 </span>
               </div>
             </div>

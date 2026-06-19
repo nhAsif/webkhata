@@ -7,6 +7,7 @@ import Modal from '../components/Modal';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select } from '../components/Input';
+import { ClipboardList, TrendingUp, BarChart2, PenSquare } from 'lucide-react';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -158,7 +159,12 @@ export default function Results() {
           <p className="text-stardust text-sm mt-1">Exam scores and academic progress</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => setBulkModal(true)}>📋 Bulk Entry</Button>
+          <Button variant="secondary" onClick={() => setBulkModal(true)}>
+            <span className="flex items-center gap-1.5">
+              <ClipboardList className="w-4 h-4 stroke-[3px]" />
+              Bulk Entry
+            </span>
+          </Button>
           <Button variant="primary" onClick={() => setAddModal(true)}>+ Add Result</Button>
         </div>
       </div>
@@ -186,7 +192,10 @@ export default function Results() {
       {filterStudent && chartData.length > 0 && (
         <Card className="mb-4">
           <CardHeader>
-            <CardTitle>📈 Progress Chart</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-black stroke-[3px]" />
+              Progress Chart
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
@@ -224,7 +233,9 @@ export default function Results() {
         />
       ) : (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10">
-          <div className="text-4xl mb-4">📊</div>
+          <div className="text-black mb-4">
+            <BarChart2 className="w-12 h-12 stroke-[2px]" />
+          </div>
           <div className="text-lg font-heading text-pure">Select a student to view results</div>
         </div>
       )}
@@ -411,7 +422,9 @@ export default function Results() {
 
         {!bulkBatch && (
           <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10 mt-4">
-            <div className="text-3xl mb-2">📝</div>
+            <div className="text-black mb-2">
+              <PenSquare className="w-8 h-8 stroke-[2px]" />
+            </div>
             <div className="text-sm text-pure font-heading">Select a batch to enter scores</div>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Input } from './Input';
 import Button from './Button';
+import { Search, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function DataTable({
   columns,
@@ -53,8 +54,8 @@ export default function DataTable({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 border-b-4 border-black bg-[#FFD93D]/10">
         {searchKeys.length > 0 && (
           <div className="relative w-full sm:max-w-xs">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-black text-sm font-bold">
-              🔍
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-black">
+              <Search className="w-4 h-4 stroke-[3px]" />
             </span>
             <Input
               type="text"
@@ -71,7 +72,9 @@ export default function DataTable({
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-6 text-center bg-white">
-          <div className="text-5xl mb-3">📭</div>
+          <div className="text-black mb-3">
+            <Inbox className="w-12 h-12 stroke-[2px]" />
+          </div>
           <div className="text-xl font-heading font-black text-black uppercase tracking-tight">{emptyTitle}</div>
           {emptyDesc && <div className="text-sm text-black/70 font-bold mt-1.5 max-w-sm">{emptyDesc}</div>}
           {emptyAction && <div className="mt-4">{emptyAction}</div>}
@@ -122,7 +125,7 @@ export default function DataTable({
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                 >
-                  ‹
+                  <ChevronLeft className="w-4 h-4 stroke-[3px]" />
                 </Button>
                 {[...Array(totalPages)].map((_, i) => {
                   const isActive = page === i + 1;
@@ -144,7 +147,7 @@ export default function DataTable({
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                 >
-                  ›
+                  <ChevronRight className="w-4 h-4 stroke-[3px]" />
                 </Button>
               </div>
             </div>
