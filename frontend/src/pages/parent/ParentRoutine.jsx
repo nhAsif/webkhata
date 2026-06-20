@@ -143,7 +143,7 @@ export default function ParentRoutine() {
                           {subjects.map((sub) => (
                             <span
                               key={sub}
-                              className="border-2 border-black bg-[#C4B5FD] text-black px-3 py-1 text-xs font-black font-mono uppercase tracking-wide shadow-[2px_2px_0px_var(--neo-shadow)] hover:scale-105 transition-transform cursor-default"
+                              className="border-2 border-black bg-[#C4B5FD] text-black px-4 py-1.5 text-sm font-black font-mono uppercase tracking-wide shadow-[3px_3px_0px_var(--neo-shadow)] hover:scale-105 transition-transform cursor-default"
                             >
                               {sub}
                             </span>

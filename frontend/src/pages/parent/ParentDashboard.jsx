@@ -262,40 +262,40 @@ export default function ParentDashboard() {
                 return (
                   <div className="space-y-6">
                     {/* Today's Timetable Slip */}
-                    <div className="border-2 border-[#181B20] bg-[#FAF6EE] p-5 shadow-[4px_4px_0px_0px_#181B20] relative overflow-hidden">
-                      <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#1B3B6F]" />
-                      <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="border-4 border-[#181B20] bg-[#FAF6EE] p-6 shadow-[6px_6px_0px_0px_#181B20] relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-[8px] bg-[#1B3B6F]" />
+                      <div className="flex items-center justify-between flex-wrap gap-2 pt-2">
                         <div>
-                          <span className="text-[9px] font-mono text-black/50 uppercase font-black tracking-wider block">
+                          <span className="text-xs font-mono text-black/60 uppercase font-black tracking-widest block mb-1">
                             Today's Timetable
                           </span>
-                          <span className="text-xl font-display font-black text-black uppercase tracking-tight">
+                          <span className="text-2xl md:text-3xl font-display font-black text-black uppercase tracking-tight">
                             {todayDate.toLocaleDateString('en-US', { weekday: 'long' })}
                           </span>
                         </div>
-                        <span className="border-2 border-dashed border-[#1B3B6F] text-[#1B3B6F] font-heading font-black text-[10px] px-2 py-0.5 uppercase tracking-wider rotate-[2deg]">
+                        <span className="border-4 border-dashed border-[#1B3B6F] text-[#1B3B6F] font-heading font-black text-sm px-3 py-1.5 uppercase tracking-wider rotate-[2deg]">
                           {today}
                         </span>
                       </div>
 
-                      <div className="h-[1.5px] bg-gradient-to-r from-[#181B20]/15 via-transparent to-transparent my-3" />
+                      <div className="h-[2px] bg-gradient-to-r from-[#181B20]/25 via-transparent to-transparent my-4" />
 
                       {isTodayOff ? (
-                        <div className="flex items-center gap-3 py-1 px-2 bg-white/40 border border-dashed border-[#181B20]/15">
-                          <Coffee className="w-5 h-5 text-[#E5A93B] shrink-0" />
-                          <span className="text-black/50 text-xs font-bold font-heading italic">
+                        <div className="flex items-center gap-4 py-2 px-3 bg-white/40 border-2 border-dashed border-[#181B20]/20">
+                          <Coffee className="w-6 h-6 text-[#E5A93B] shrink-0" />
+                          <span className="text-black/60 text-sm font-bold font-heading italic">
                             No classes scheduled for today.
                           </span>
-                          <div className="rubber-stamp stamp-orange text-[9px] font-black font-heading ml-auto rotate-[3deg]">
+                          <div className="rubber-stamp stamp-orange text-xs font-black font-heading ml-auto rotate-[3deg] px-2.5 py-1">
                             HOLIDAY
                           </div>
                         </div>
                       ) : (
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-3 flex-wrap">
                           {todaySubjects.map((sub, idx) => (
                             <span 
                               key={idx} 
-                              className="border-2 border-[#181B20] bg-[#C4B5FD] text-black px-3 py-0.5 text-xs font-mono font-black shadow-2xs hover:-translate-y-0.5 transition-transform"
+                              className="border-2 border-[#181B20] bg-[#C4B5FD] text-black px-4 py-1.5 text-sm font-mono font-black shadow-[3px_3px_0px_0px_#181B20] hover:-translate-y-0.5 transition-transform"
                             >
                               {sub}
                             </span>
@@ -305,40 +305,40 @@ export default function ParentDashboard() {
                     </div>
 
                     {/* Tomorrow's Timetable Slip */}
-                    <div className="border-2 border-[#181B20] bg-[#FAF6EE] p-5 shadow-[4px_4px_0px_0px_#181B20] relative overflow-hidden">
-                      <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#C0392B]" />
-                      <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="border-4 border-[#181B20] bg-[#FAF6EE] p-6 shadow-[6px_6px_0px_0px_#181B20] relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-[8px] bg-[#C0392B]" />
+                      <div className="flex items-center justify-between flex-wrap gap-2 pt-2">
                         <div>
-                          <span className="text-[9px] font-mono text-black/50 uppercase font-black tracking-wider block">
+                          <span className="text-xs font-mono text-black/60 uppercase font-black tracking-widest block mb-1">
                             Tomorrow's Timetable
                           </span>
-                          <span className="text-xl font-display font-black text-black uppercase tracking-tight">
+                          <span className="text-2xl md:text-3xl font-display font-black text-black uppercase tracking-tight">
                             {tomorrowDate.toLocaleDateString('en-US', { weekday: 'long' })}
                           </span>
                         </div>
-                        <span className="border-2 border-dashed border-[#C0392B] text-[#C0392B] font-heading font-black text-[10px] px-2 py-0.5 uppercase tracking-wider rotate-[-2deg]">
+                        <span className="border-4 border-dashed border-[#C0392B] text-[#C0392B] font-heading font-black text-sm px-3 py-1.5 uppercase tracking-wider rotate-[-2deg]">
                           {tomorrow}
                         </span>
                       </div>
 
-                      <div className="h-[1.5px] bg-gradient-to-r from-[#181B20]/15 via-transparent to-transparent my-3" />
+                      <div className="h-[2px] bg-gradient-to-r from-[#181B20]/25 via-transparent to-transparent my-4" />
 
                       {isTomorrowOff ? (
-                        <div className="flex items-center gap-3 py-1 px-2 bg-white/40 border border-dashed border-[#181B20]/15">
-                          <Coffee className="w-5 h-5 text-[#E5A93B] shrink-0" />
-                          <span className="text-black/50 text-xs font-bold font-heading italic">
+                        <div className="flex items-center gap-4 py-2 px-3 bg-white/40 border-2 border-dashed border-[#181B20]/20">
+                          <Coffee className="w-6 h-6 text-[#E5A93B] shrink-0" />
+                          <span className="text-black/60 text-sm font-bold font-heading italic">
                             No classes scheduled for tomorrow.
                           </span>
-                          <div className="rubber-stamp stamp-orange text-[9px] font-black font-heading ml-auto rotate-[3deg]">
+                          <div className="rubber-stamp stamp-orange text-xs font-black font-heading ml-auto rotate-[3deg] px-2.5 py-1">
                             HOLIDAY
                           </div>
                         </div>
                       ) : (
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-3 flex-wrap">
                           {tomorrowSubjects.map((sub, idx) => (
                             <span 
                               key={idx} 
-                              className="border-2 border-[#181B20] bg-[#FFD93D] text-black px-3 py-0.5 text-xs font-mono font-black shadow-2xs hover:-translate-y-0.5 transition-transform"
+                              className="border-2 border-[#181B20] bg-[#FFD93D] text-black px-4 py-1.5 text-sm font-mono font-black shadow-[3px_3px_0px_0px_#181B20] hover:-translate-y-0.5 transition-transform"
                             >
                               {sub}
                             </span>

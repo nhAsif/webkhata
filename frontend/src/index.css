@@ -141,7 +141,7 @@
 
 @layer base {
   body {
-    @apply bg-void text-body font-body min-h-screen antialiased;
+    @apply bg-void text-body font-body font-bold min-h-screen antialiased;
     background-color: var(--neo-canvas);
     background-size: 30px 30px;
     background-image: 
@@ -278,7 +278,7 @@
   .rubber-stamp {
     position: relative;
     border: 3px dashed currentColor;
-    font-family: 'Baloo 2', 'Zilla Slab', serif;
+    font-family: 'Space Grotesk', 'Noto Sans Bengali', sans-serif;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.05em;
