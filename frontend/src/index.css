@@ -243,6 +243,210 @@
   .springy-bounce {
     transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
+
+  /* Polaroid Frame */
+  .polaroid-frame {
+    background: #ffffff;
+    padding: 12px;
+    padding-bottom: 24px;
+    border: 3px solid var(--neo-border);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-1.5deg);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+  .polaroid-frame:hover {
+    transform: rotate(1.5deg) scale(1.03);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Tape Marking */
+  .tape-marking {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 70px;
+    height: 20px;
+    background-color: rgba(245, 235, 200, 0.85);
+    border-left: 1px dashed rgba(0,0,0,0.1);
+    border-right: 1px dashed rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
+    z-index: 10;
+  }
+
+  /* Rubber Ledger Stamps */
+  .rubber-stamp {
+    position: relative;
+    border: 3px dashed currentColor;
+    font-family: 'Baloo 2', 'Zilla Slab', serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    transform: rotate(-3deg);
+    opacity: 0.9;
+    mix-blend-mode: multiply;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .rubber-stamp::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid currentColor;
+    margin: 2px;
+    border-radius: 2px;
+  }
+  .rubber-stamp:hover {
+    transform: rotate(2deg) scale(1.06);
+    opacity: 1;
+  }
+  .rubber-stamp:active {
+    transform: scale(0.94);
+  }
+
+  /* Stamp variants */
+  .stamp-blue {
+    color: #1B3B6F;
+  }
+  .stamp-red {
+    color: #C0392B;
+  }
+  .stamp-green {
+    color: #1E4636;
+  }
+  .stamp-orange {
+    color: #D48C00;
+  }
+
+  /* Paperclip styling */
+  .paperclip {
+    position: absolute;
+    top: -18px;
+    right: 28px;
+    width: 20px;
+    height: 42px;
+    background-color: #CBD5E1;
+    border: 2px solid var(--neo-border);
+    border-radius: 10px;
+    z-index: 20;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.12);
+    transition: transform 0.2s ease;
+  }
+  .paperclip::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 10px;
+    border: 2px solid var(--neo-border);
+    border-radius: 6px;
+    border-bottom: none;
+  }
+  .wiggle-on-hover:hover .paperclip {
+    animation: wiggle 0.4s ease infinite alternate;
+  }
+
+  @keyframes wiggle {
+    0% { transform: rotate(-4deg) translateY(0); }
+    100% { transform: rotate(6deg) translateY(-2px); }
+  }
+
+  /* Sticky Pushpin */
+  .pushpin {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 5px 5px, #FF3B30, #A80A0A);
+    border: 2.5px solid var(--neo-border);
+    border-radius: 50%;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.25), 1px 1px 0px var(--neo-border);
+    z-index: 25;
+    transition: transform 0.2s ease;
+  }
+  .pushpin::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 7px;
+    background-color: #94A3B8;
+    border: 1px solid var(--neo-border);
+  }
+  .wiggle-on-hover:hover .pushpin {
+    transform: translateX(-50%) rotate(12deg) translateY(-1px);
+  }
+
+  /* Binder rings connecting cover to page (decorative side holes) */
+  .binder-spiral-side {
+    position: relative;
+  }
+  .binder-spiral-side::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: -12px;
+    width: 24px;
+    background: linear-gradient(180deg, 
+      transparent 0px,
+      #CBD5E1 5px,
+      #94A3B8 8px,
+      #475569 11px,
+      transparent 14px
+    );
+    background-size: 24px 28px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  /* Highlighter markup text link styling */
+  .highlight-marker {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+  }
+  .highlight-marker::after {
+    content: '';
+    position: absolute;
+    bottom: 1px;
+    left: -2px;
+    right: -2px;
+    height: 40%;
+    background-color: rgba(255, 217, 61, 0.4);
+    z-index: -1;
+    transition: height 0.15s ease, background-color 0.15s ease;
+    transform: rotate(-0.5deg);
+  }
+  .highlight-marker:hover::after {
+    height: 90%;
+    background-color: rgba(255, 217, 61, 0.7);
+  }
+
+  /* Page Flip Entrance animation */
+  .page-flip-enter {
+    animation: pageFlip 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    transform-origin: left center;
+  }
+
+  @keyframes pageFlip {
+    0% {
+      transform: perspective(1200px) rotateY(-8deg) translateX(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: perspective(1200px) rotateY(0deg) translateX(0);
+      opacity: 1;
+    }
+  }
 }
 
 /* Custom Scrollbars to fit the dynamic blackboard/notebook ledger theme */
