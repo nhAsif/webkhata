@@ -40,7 +40,7 @@ export default function Button({ className, variant = 'primary', size = 'default
       className={cn(buttonVariants({ variant, size, className }), 'group')}
       {...props}
     >
-      <span>{children}</span>
+      <span className="flex items-center gap-2">{children}</span>
       {isCta && (
         <ArrowRight className="w-4 h-4 ml-1 inline-block transition-transform duration-200 group-hover:translate-x-1" />
       )}
