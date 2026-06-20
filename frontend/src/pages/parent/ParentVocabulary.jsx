@@ -591,16 +591,19 @@ export default function ParentVocabulary() {
                         })}
                       </div>
                       
-                      {selectedOption !== null && (
-                        <div className="mt-8 flex justify-center animate-in fade-in slide-in-from-bottom-2">
-                          <button
-                            onClick={nextPractice}
-                            className="px-8 py-3 border-4 border-black bg-[#FFD93D] hover:bg-[#FFD93D]/95 text-black font-heading font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none flex items-center gap-2 transition-all cursor-pointer"
-                          >
-                            {practiceIndex < practiceQuestions.length - 1 ? 'Next Question' : 'View Results'} <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="mt-8 flex justify-center animate-in fade-in slide-in-from-bottom-2">
+                        <button
+                          onClick={nextPractice}
+                          disabled={selectedOption === null}
+                          className={`px-8 py-3 border-4 border-black font-heading font-bold flex items-center gap-2 transition-all ${
+                            selectedOption === null
+                              ? "bg-neutral-200 text-black/45 cursor-not-allowed opacity-60"
+                              : "bg-[#FFD93D] hover:bg-[#FFD93D]/95 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer"
+                          }`}
+                        >
+                          {practiceIndex < practiceQuestions.length - 1 ? 'Next Question' : 'View Results'} <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
+                        </button>
+                      </div>
                     </div>
                   )
                 ) : (
