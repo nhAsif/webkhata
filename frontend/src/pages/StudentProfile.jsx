@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import { Input, Textarea } from '../components/Input';
 import toast from 'react-hot-toast';
-import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, PlusCircle, UserX } from 'lucide-react';
+import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, UserX, Check, X } from 'lucide-react';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -23,9 +23,22 @@ export default function StudentProfile() {
   const [results, setResults] = useState([]);
   const [financial, setFinancial] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [payModal, setPayModal] = useState(false);
-  const [payForm, setPayForm] = useState({ amount: '', payment_date: new Date().toISOString().split('T')[0], notes: '' });
-  const [paying, setPaying] = useState(false);
+
+  // Cycle mark paid state
+  const [markModal, setMarkModal] = useState(false);
+  const [markCycle, setMarkCycle] = useState(null);
+  const [markForm, setMarkForm] = useState({ payment_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [marking, setMarking] = useState(false);
+
+  const loadFeesAndFinancial = () => {
+    Promise.all([
+      api.get(`/fees/student/${id}`),
+      api.get(`/students/${id}/financial`),
+    ]).then(([f, fin]) => {
+      setFees(f.data);
+      setFinancial(fin.data);
+    }).catch(() => {});
+  };
 
   useEffect(() => {
     Promise.all([
@@ -41,21 +54,34 @@ export default function StudentProfile() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
 
-  const handlePaySubmit = async (e) => {
+  const openMarkPaid = (cycle) => {
+    setMarkCycle(cycle);
+    setMarkForm({ payment_date: new Date().toISOString().split('T')[0], notes: '' });
+    setMarkModal(true);
+  };
+
+  const handleMarkPaid = async (e) => {
     e.preventDefault();
-    setPaying(true);
+    setMarking(true);
     try {
-      await api.post('/payments', { student_id: parseInt(id), ...payForm, amount: parseFloat(payForm.amount) });
-      toast.success('Payment recorded successfully');
-      setPayModal(false);
-      setPayForm({ amount: '', payment_date: new Date().toISOString().split('T')[0], notes: '' });
-      // Refresh financial data
-      api.get(`/students/${id}/financial`).then((r) => setFinancial(r.data)).catch(() => {});
-    } catch {
-      // handled by interceptor
-    } finally {
-      setPaying(false);
+      await api.post(`/fees/cycle/${markCycle.id}/mark-paid`, {
+        payment_date: markForm.payment_date || null,
+        notes: markForm.notes || null,
+      });
+      toast.success(`Cycle #${markCycle.cycle_number} marked as paid`);
+      setMarkModal(false);
+      loadFeesAndFinancial();
+    } catch {} finally {
+      setMarking(false);
     }
+  };
+
+  const handleMarkUnpaid = async (cycle) => {
+    try {
+      await api.post(`/fees/cycle/${cycle.id}/mark-unpaid`);
+      toast.success(`Cycle #${cycle.cycle_number} marked as unpaid`);
+      loadFeesAndFinancial();
+    } catch {}
   };
 
   if (loading) {
@@ -200,13 +226,6 @@ export default function StudentProfile() {
                 }`}>
                   {financial.status}
                 </span>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setPayModal(true)}
-                >
-                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" /> Add Payment
-                </Button>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
@@ -305,6 +324,7 @@ export default function StudentProfile() {
                     <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Amount</th>
                     <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Status</th>
                     <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Paid On</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-black bg-white">
@@ -322,6 +342,24 @@ export default function StudentProfile() {
                         }
                       </td>
                       <td className="px-6 py-3 text-sm text-stardust font-mono">{c.payment_date || '—'}</td>
+                      <td className="px-6 py-3 text-right">
+                        {!c.is_paid ? (
+                          <Button
+                            variant="secondary"
+                            size="xs"
+                            onClick={() => openMarkPaid(c)}
+                          >
+                            <Check className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                          </Button>
+                        ) : (
+                          <button
+                            className="text-xs font-black text-black hover:text-[#FF6B6B] transition-colors font-mono underline underline-offset-2 cursor-pointer"
+                            onClick={() => handleMarkUnpaid(c)}
+                          >
+                            Mark Unpaid
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -331,53 +369,51 @@ export default function StudentProfile() {
         </Card>
       )}
 
-      {/* Add Payment Modal */}
+      {/* Mark Paid Modal */}
       <Modal
-        isOpen={payModal}
-        onClose={() => setPayModal(false)}
-        title="Record Payment"
+        isOpen={markModal}
+        onClose={() => setMarkModal(false)}
+        title={`Mark Paid — Cycle #${markCycle?.cycle_number}`}
         footer={
-          <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={() => setPayModal(false)}>Cancel</Button>
-            <Button variant="primary" form="pay-form" type="submit" disabled={paying}>
-              {paying ? <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" /> : null}
-              Save Payment
+          <div className="flex gap-3 justify-end w-full">
+            <Button variant="outline" size="sm" onClick={() => setMarkModal(false)}>Cancel</Button>
+            <Button variant="secondary" size="sm" form="mark-paid-form" type="submit" disabled={marking}>
+              {marking ? <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1.5 stroke-[2.5px]" />}
+              Confirm Payment
             </Button>
           </div>
         }
       >
-        <form id="pay-form" onSubmit={handlePaySubmit} className="space-y-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Amount (৳) *</label>
-            <Input
-              type="number"
-              min="1"
-              step="0.01"
-              value={payForm.amount}
-              onChange={(e) => setPayForm((f) => ({ ...f, amount: e.target.value }))}
-              required
-              placeholder="e.g. 500"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Payment Date *</label>
-            <Input
-              type="date"
-              value={payForm.payment_date}
-              onChange={(e) => setPayForm((f) => ({ ...f, payment_date: e.target.value }))}
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Notes (optional)</label>
-            <Textarea
-              value={payForm.notes}
-              onChange={(e) => setPayForm((f) => ({ ...f, notes: e.target.value }))}
-              placeholder="e.g. Cash payment for June"
-              rows={2}
-            />
-          </div>
-        </form>
+        {markCycle && (
+          <form id="mark-paid-form" onSubmit={handleMarkPaid} className="space-y-4">
+            <div className="bg-[#C4B5FD] border-2 border-black p-4 text-black flex items-center gap-3 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
+              <DollarSign className="w-6 h-6 shrink-0 stroke-[2.5px]" />
+              <div>
+                <div className="font-black font-heading text-lg">৳{markCycle.fee_amount?.toLocaleString()}</div>
+                <div className="text-xs font-mono font-black text-black/75 mt-0.5">
+                  {markCycle.cycle_start_date} → {markCycle.cycle_end_date}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Payment Date</label>
+              <Input
+                type="date"
+                value={markForm.payment_date}
+                onChange={(e) => setMarkForm(f => ({ ...f, payment_date: e.target.value }))}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Notes (optional)</label>
+              <Textarea
+                value={markForm.notes}
+                onChange={(e) => setMarkForm(f => ({ ...f, notes: e.target.value }))}
+                placeholder="e.g. Cash payment received"
+                rows={2}
+              />
+            </div>
+          </form>
+        )}
       </Modal>
     </div>
   );

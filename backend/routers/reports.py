@@ -27,12 +27,12 @@ def _compute_student_financial(student: models.Student, db: Session) -> schemas.
 
     total_due = completed_cycles * student.monthly_fee
 
-    payments = (
-        db.query(models.Payment)
-        .filter(models.Payment.student_id == student.id)
+    paid_cycles = (
+        db.query(models.StudentFeeCycle)
+        .filter(models.StudentFeeCycle.student_id == student.id, models.StudentFeeCycle.is_paid == True)
         .all()
     )
-    total_paid = sum(p.amount for p in payments)
+    total_paid = sum(c.fee_amount for c in paid_cycles)
 
     # Outstanding balance is never negative
     outstanding_balance = max(0.0, total_due - total_paid)
@@ -91,29 +91,29 @@ def monthly_collection_report(
         total_due = completed_cycles * student.monthly_fee
 
         # Total paid overall (for outstanding_balance)
-        all_payments = (
-            db.query(models.Payment)
-            .filter(models.Payment.student_id == student.id)
+        paid_cycles = (
+            db.query(models.StudentFeeCycle)
+            .filter(models.StudentFeeCycle.student_id == student.id, models.StudentFeeCycle.is_paid == True)
             .all()
         )
-        total_paid_all = sum(p.amount for p in all_payments)
+        total_paid_all = sum(c.fee_amount for c in paid_cycles)
         outstanding_balance = max(0.0, total_due - total_paid_all)
 
         # Paid within the requested calendar month (for the report column)
         if month:
             try:
                 year_str, mon_str = month.split("-")
-                month_payments = [
-                    p for p in all_payments
-                    if p.payment_date.year == int(year_str)
-                    and p.payment_date.month == int(mon_str)
+                month_cycles = [
+                    c for c in paid_cycles
+                    if c.payment_date and c.payment_date.year == int(year_str)
+                    and c.payment_date.month == int(mon_str)
                 ]
             except (ValueError, AttributeError):
-                month_payments = all_payments
+                month_cycles = paid_cycles
         else:
-            month_payments = all_payments
+            month_cycles = paid_cycles
 
-        total_paid_this_month = sum(p.amount for p in month_payments)
+        total_paid_this_month = sum(c.fee_amount for c in month_cycles)
 
         # Status label
         if outstanding_balance == 0.0:

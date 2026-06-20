@@ -150,7 +150,6 @@ from routers.homework import router as homework_router
 from routers.results import router as results_router
 from routers.dashboard import router as dashboard_router
 from routers.parent import router as parent_router
-from routers.payments import router as payments_router
 from routers.reports import router as reports_router
 from routers.vocabulary import router as vocabulary_router
 
@@ -164,7 +163,6 @@ app.include_router(homework_router)
 app.include_router(results_router)
 app.include_router(dashboard_router)
 app.include_router(parent_router)
-app.include_router(payments_router)
 app.include_router(reports_router)
 app.include_router(vocabulary_router)
 from routers.settings import router as settings_router

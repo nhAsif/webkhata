@@ -14,7 +14,6 @@ import Fees from './pages/Fees';
 import Homework from './pages/Homework';
 import Results from './pages/Results';
 import StudentProfile from './pages/StudentProfile';
-import Payments from './pages/Payments';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Vocabulary from './pages/Vocabulary';
@@ -57,7 +56,6 @@ export default function App() {
               <Route path="fees" element={<Fees />} />
               <Route path="homework" element={<Homework />} />
               <Route path="results" element={<Results />} />
-              <Route path="payments" element={<Payments />} />
               <Route path="vocabulary" element={<Vocabulary />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />

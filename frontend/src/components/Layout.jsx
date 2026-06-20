@@ -16,7 +16,6 @@ import {
   Menu,
   X,
   Calendar,
-  Wallet,
   BarChart2,
   Settings as SettingsIcon,
   Book
@@ -30,7 +29,6 @@ const NAV_ITEMS = [
   { to: '/fees', icon: CreditCard, label: 'Fees' },
   { to: '/homework', icon: FileText, label: 'Homework' },
   { to: '/results', icon: TrendingUp, label: 'Results' },
-  { to: '/payments', icon: Wallet, label: 'Payments' },
   { to: '/vocabulary', icon: Book, label: 'Vocabulary' },
   { to: '/reports', icon: BarChart2, label: 'Reports' },
   { to: '/settings', icon: SettingsIcon, label: 'Settings' },

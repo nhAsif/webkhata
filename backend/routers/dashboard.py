@@ -75,9 +75,10 @@ def get_stats(
             cycles = 0
         total_due += cycles * student.monthly_fee
 
-    # total_paid = sum of all Payment records
-    all_payments = db.query(models.Payment).all()
-    total_paid = sum(p.amount for p in all_payments)
+    # total_paid = sum of all paid cycles
+    total_paid = db.query(models.StudentFeeCycle).filter(
+        models.StudentFeeCycle.is_paid == True
+    ).with_entities(func.coalesce(func.sum(models.StudentFeeCycle.fee_amount), 0.0)).scalar() or 0.0
 
     outstanding_balance = max(0.0, total_due - total_paid)
 
