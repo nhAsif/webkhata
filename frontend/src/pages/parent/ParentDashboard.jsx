@@ -10,6 +10,7 @@ export default function ParentDashboard() {
   const [attendance, setAttendance] = useState(null);
   const [vocabStats, setVocabStats] = useState(null);
   const [routine, setRoutine] = useState(null);
+  const [quote, setQuote] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +18,14 @@ export default function ParentDashboard() {
       api.get('/parent/profile'),
       api.get('/parent/attendance'),
       api.get('/vocabulary/progress/stats').catch(() => ({ data: null })),
-      api.get('/parent/routine').catch(() => ({ data: null }))
-    ]).then(([p, a, v, r]) => {
+      api.get('/parent/routine').catch(() => ({ data: null })),
+      api.get('/dashboard/quote').catch(() => ({ data: { quote: null } }))
+    ]).then(([p, a, v, r, q]) => {
       setProfile(p.data);
       setAttendance(a.data);
       setVocabStats(v.data);
       setRoutine(r.data);
+      if (q && q.data) setQuote(q.data.quote);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -58,6 +61,26 @@ export default function ParentDashboard() {
           Here is your academic overview for this week
         </p>
       </div>
+
+      {/* Quote Section */}
+      {quote && (
+        <div className="bg-[#C4B5FD] border-4 border-black p-4 mb-8 shadow-[4px_4px_0px_0px_var(--neo-shadow)] relative overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="absolute top-2 right-2 text-black/10">
+            <Sparkles className="w-16 h-16 stroke-[2px]" />
+          </div>
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="bg-white border-2 border-black p-1.5 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+               <Sparkles className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <p className="font-heading font-black text-xl italic uppercase tracking-tight">"{quote.split('-')[0]?.trim()}"</p>
+              {quote.includes('-') && (
+                <p className="text-sm font-bold mt-1 text-black/80 font-body">— {quote.split('-').slice(1).join('-').trim()}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Redesigned Student Welcome Card - Pinned Polaroid slip */}
       {student && (

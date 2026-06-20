@@ -7,15 +7,18 @@ import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkle
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [alerts, setAlerts] = useState([]);
+  const [quote, setQuote] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/dashboard/stats'),
       api.get('/dashboard/alerts'),
-    ]).then(([s, a]) => {
+      api.get('/dashboard/quote').catch(err => ({ data: { quote: null } }))
+    ]).then(([s, a, q]) => {
       setStats(s.data);
       setAlerts(a.data);
+      if (q && q.data) setQuote(q.data.quote);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -44,6 +47,26 @@ export default function Dashboard() {
           Overview of your tutor activity and metrics
         </p>
       </div>
+
+      {/* Quote Section */}
+      {quote && (
+        <div className="bg-[#C4B5FD] border-4 border-black p-4 mb-8 shadow-[4px_4px_0px_0px_var(--neo-shadow)] relative overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="absolute top-2 right-2 text-black/10">
+            <Sparkles className="w-16 h-16 stroke-[2px]" />
+          </div>
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="bg-white border-2 border-black p-1.5 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+               <Sparkles className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <p className="font-heading font-black text-xl italic uppercase tracking-tight">"{quote.split('-')[0]?.trim()}"</p>
+              {quote.includes('-') && (
+                <p className="text-sm font-bold mt-1 text-black/80 font-body">— {quote.split('-').slice(1).join('-').trim()}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

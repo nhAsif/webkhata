@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, BackgroundTasks
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -9,8 +9,70 @@ from auth import require_tutor
 from database import get_db
 import models
 import schemas
+from config import settings
+from google import genai
+import datetime
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
+
+client = None
+if settings.GEMINI_API_KEY:
+    try:
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    except Exception as e:
+        print(f"Error initializing Gemini client in dashboard: {e}")
+
+import random
+
+_cached_quotes = []
+_cached_quote_date = None
+_is_fetching_quotes = False
+
+FALLBACK_QUOTES = [
+    "শিক্ষা হল সবচেয়ে শক্তিশালী অস্ত্র, যা দিয়ে তুমি বিশ্বকে বদলে দিতে পারো। - নেলসন ম্যান্ডেলা",
+    "জ্ঞানই শক্তি। - ফ্রান্সিস বেকন",
+    "যাঁরা পড়াশোনা করে, তাঁরাই বিশ্ব জয় করে। - এ. পি. জে. আব্দুল কালাম",
+    "শিক্ষার শেকড়ের স্বাদ তেতো হলেও এর ফল মিষ্টি। - অ্যারিস্টটল",
+    "একটি ভালো বই একশ জন ভালো বন্ধুর সমান। - এ. পি. জে. আব্দুল কালাম"
+]
+
+def fetch_quotes_background():
+    global _cached_quotes, _cached_quote_date, _is_fetching_quotes
+    try:
+        if not client:
+            _is_fetching_quotes = False
+            return
+            
+        prompt = "Generate 10 short, inspiring, and motivational educational quotes in Bengali (Bangla) by famous people (e.g. APJ Abdul Kalam, Nelson Mandela, Rabindranath Tagore, Einstein) for students. Provide only the quote text and the author, like 'Quote - Author'. Separate each quote with a newline. Do not include quote marks."
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        text = response.text.strip()
+        lines = [line.strip() for line in text.split('\n') if line.strip() and '-' in line]
+        
+        cleaned = [line.replace('"', '').replace('\"', '') for line in lines]
+        if len(cleaned) > 0:
+            _cached_quotes = cleaned
+            _cached_quote_date = datetime.date.today()
+    except Exception as e:
+        print(f"Failed to fetch background quotes: {e}")
+    finally:
+        _is_fetching_quotes = False
+
+@router.get("/quote")
+def get_daily_quote(background_tasks: BackgroundTasks):
+    global _cached_quotes, _cached_quote_date, _is_fetching_quotes
+    today = datetime.date.today()
+    
+    if _cached_quotes and _cached_quote_date == today:
+        return {"quote": random.choice(_cached_quotes)}
+        
+    if not _is_fetching_quotes:
+        _is_fetching_quotes = True
+        background_tasks.add_task(fetch_quotes_background)
+        
+    return {"quote": random.choice(FALLBACK_QUOTES)}
 
 
 @router.get("/stats", response_model=schemas.DashboardStats)
