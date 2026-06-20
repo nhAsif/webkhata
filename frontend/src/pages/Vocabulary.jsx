@@ -137,7 +137,12 @@ export default function Vocabulary() {
                 <div key={item.id} className="bg-white border-4 border-black p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 relative overflow-hidden flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-2 mb-2">
-                      <h3 className="text-2xl font-heading font-black text-black uppercase tracking-tight">{word.word}</h3>
+                      <h3 className="text-2xl font-heading font-black text-black uppercase tracking-tight">
+                        {word.word}
+                        {word.bangla_pronunciation && (
+                          <span className="text-lg text-black/60 font-body ml-2 capitalize normal-case">({word.bangla_pronunciation})</span>
+                        )}
+                      </h3>
                       <span className="px-2 py-0.5 border-2 border-black bg-[#C4B5FD]/30 text-black text-[10px] uppercase tracking-wider font-mono font-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                         {word.part_of_speech}
                       </span>

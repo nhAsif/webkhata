@@ -43,7 +43,12 @@ function WordCard({ item, onBookmarkToggle, isBookmarked }) {
 
       <div>
         <div className="mb-2">
-          <h3 className="text-2xl font-heading font-black text-black uppercase tracking-tight pr-12">{word.word}</h3>
+          <h3 className="text-2xl font-heading font-black text-black uppercase tracking-tight pr-12">
+            {word.word}
+            {word.bangla_pronunciation && (
+              <span className="text-lg text-black/60 font-body ml-2 normal-case">({word.bangla_pronunciation})</span>
+            )}
+          </h3>
           <div className="mt-2">
             <span className="inline-block px-2.5 py-0.5 border-2 border-black bg-[#C4B5FD]/30 text-black text-[10px] uppercase tracking-wider font-mono font-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
               {word.part_of_speech}
@@ -557,7 +562,12 @@ export default function ParentVocabulary() {
                       
                       <div className="mb-8 text-center">
                         <p className="text-black/55 text-xs uppercase tracking-widest mb-2 font-mono font-bold">{practiceQuestions[practiceIndex].questionPrefix}</p>
-                        <h3 className="text-4xl font-heading font-black text-black uppercase tracking-tight">{practiceQuestions[practiceIndex].word.word}</h3>
+                        <h3 className="text-4xl font-heading font-black text-black uppercase tracking-tight">
+                          {practiceQuestions[practiceIndex].word.word}
+                          {practiceQuestions[practiceIndex].word.bangla_pronunciation && (
+                            <span className="text-2xl text-black/60 font-body ml-3 normal-case block sm:inline mt-2 sm:mt-0">({practiceQuestions[practiceIndex].word.bangla_pronunciation})</span>
+                          )}
+                        </h3>
                       </div>
                       
                       <div className="space-y-3">

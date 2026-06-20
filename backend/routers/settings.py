@@ -94,3 +94,25 @@ async def restore_backup(file: UploadFile = File(...), current_user: User = Depe
         raise HTTPException(status_code=500, detail=f"Failed to restore backup: {str(e)}")
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+@router.post("/refetch-quotes")
+async def refetch_quotes(current_user: User = Depends(require_tutor)):
+    from routers.dashboard import clear_quotes_cache, fetch_quotes_background
+    clear_quotes_cache()
+    fetch_quotes_background()
+    return {"message": "Quotes refetched successfully"}
+
+@router.post("/refetch-words")
+async def refetch_words(db: Session = Depends(get_db), current_user: User = Depends(require_tutor)):
+    from models import DailyVocabularySet
+    from datetime import date
+    from routers.vocabulary import get_daily_vocabulary
+    
+    today = date.today()
+    db.query(DailyVocabularySet).filter(DailyVocabularySet.date == today).delete()
+    db.commit()
+    
+    # Fetch instantly
+    get_daily_vocabulary(db, current_user)
+    
+    return {"message": "Words refetched instantly"}

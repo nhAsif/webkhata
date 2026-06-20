@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Download, Upload, AlertTriangle, ShieldCheck, Database } from 'lucide-react';
+import { Download, Upload, AlertTriangle, ShieldCheck, Database, RefreshCw, Quote, BookOpen } from 'lucide-react';
 import api from '../api/client';
 import toast from 'react-hot-toast';
 import Button from '../components/Button';
@@ -8,6 +8,34 @@ export default function Settings() {
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const fileInputRef = useRef(null);
+  const [isRefetchingQuotes, setIsRefetchingQuotes] = useState(false);
+  const [isRefetchingWords, setIsRefetchingWords] = useState(false);
+
+  const handleRefetchQuotes = async () => {
+    try {
+      setIsRefetchingQuotes(true);
+      await api.post('/settings/refetch-quotes');
+      toast.success('Daily quotes refetched successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to refetch quotes.');
+    } finally {
+      setIsRefetchingQuotes(false);
+    }
+  };
+
+  const handleRefetchWords = async () => {
+    try {
+      setIsRefetchingWords(true);
+      await api.post('/settings/refetch-words', {}, { timeout: 60000 });
+      toast.success("Today's words regenerated successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to regenerate today's words.");
+    } finally {
+      setIsRefetchingWords(false);
+    }
+  };
 
   const handleBackup = async () => {
     try {
@@ -160,6 +188,69 @@ export default function Settings() {
               <div className="mt-4 flex items-start gap-2.5 text-[11px] text-[#FF6B6B] bg-[#FF6B6B]/10 p-3.5 border-2 border-black font-semibold">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 stroke-[3px] text-black" />
                 <p>Restoring will overwrite all current data. Make sure you have a recent backup before proceeding.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Content Management Section */}
+        <div className="bg-white border-4 border-black p-6 relative overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-100">
+          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+            <RefreshCw className="w-32 h-32 text-black" />
+          </div>
+          
+          <h2 className="text-xl font-heading font-black text-black mb-3 flex items-center gap-2 uppercase tracking-tight">
+            <RefreshCw className="w-5 h-5 text-black stroke-[3px]" />
+            Manual Refresh
+          </h2>
+          <p className="text-sm text-black/70 font-body font-semibold mb-6">
+            Force the system to refetch or regenerate daily content like quotes and vocabulary words.
+          </p>
+
+          <div className="space-y-4">
+            {/* Refetch Quotes Button */}
+            <div className="bg-[#FAF6EE] border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-heading font-black text-black text-base uppercase flex items-center gap-2">
+                    <Quote className="w-4 h-4 stroke-[3px]" />
+                    Refetch Quotes
+                  </h3>
+                  <p className="text-xs text-black/60 font-bold mt-1">Fetch new quotes from the AI to display on the dashboard.</p>
+                </div>
+                <Button
+                  onClick={handleRefetchQuotes}
+                  disabled={isRefetchingQuotes}
+                  variant="primary"
+                  size="sm"
+                  className="whitespace-nowrap"
+                >
+                  <RefreshCw className={`w-4 h-4 stroke-[3px] ${isRefetchingQuotes ? 'animate-spin' : ''}`} />
+                  {isRefetchingQuotes ? 'Refetching...' : 'Refetch'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Refetch Words Button */}
+            <div className="bg-[#FAF6EE] border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-heading font-black text-black text-base uppercase flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 stroke-[3px]" />
+                    Regenerate Words
+                  </h3>
+                  <p className="text-xs text-black/60 font-bold mt-1">Regenerate today's vocabulary words instantly via AI.</p>
+                </div>
+                <Button
+                  onClick={handleRefetchWords}
+                  disabled={isRefetchingWords}
+                  variant="primary"
+                  size="sm"
+                  className="whitespace-nowrap"
+                >
+                  <RefreshCw className={`w-4 h-4 stroke-[3px] ${isRefetchingWords ? 'animate-spin' : ''}`} />
+                  {isRefetchingWords ? 'Regenerating...' : 'Regenerate'}
+                </Button>
               </div>
             </div>
           </div>

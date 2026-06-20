@@ -281,6 +281,7 @@ class VocabularyWord(Base):
     antonyms = Column(String, nullable=True)
     example_sentence = Column(Text, nullable=True)
     bangla_sentence_meaning = Column(Text, nullable=True)
+    bangla_pronunciation = Column(String, nullable=True)
     created_at = Column(DateTime, default=func.now())
 
 

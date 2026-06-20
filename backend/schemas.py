@@ -565,6 +565,7 @@ class VocabularyWordResponse(BaseModel):
     antonyms: Optional[str]
     example_sentence: Optional[str]
     bangla_sentence_meaning: Optional[str]
+    bangla_pronunciation: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

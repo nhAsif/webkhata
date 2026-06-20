@@ -74,6 +74,12 @@ def get_daily_quote(background_tasks: BackgroundTasks):
         
     return {"quote": random.choice(FALLBACK_QUOTES)}
 
+def clear_quotes_cache():
+    global _cached_quotes, _cached_quote_date, _is_fetching_quotes
+    _cached_quotes = []
+    _cached_quote_date = None
+    _is_fetching_quotes = False
+
 
 @router.get("/stats", response_model=schemas.DashboardStats)
 def get_stats(

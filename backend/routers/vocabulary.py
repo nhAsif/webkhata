@@ -41,6 +41,7 @@ Each object must have the following keys exactly:
 - "antonyms" (string, comma separated list)
 - "example_sentence" (string, an English example sentence)
 - "bangla_sentence_meaning" (string, the Bengali translation of the example sentence)
+- "bangla_pronunciation" (string, the pronunciation of the English word written in Bengali script)
 """
 
 def fetch_words_from_gemini():
@@ -112,11 +113,18 @@ def get_daily_vocabulary(db: Session = Depends(get_db), current_user: models.Use
                     synonyms=data.get('synonyms', ''),
                     antonyms=data.get('antonyms', ''),
                     example_sentence=data.get('example_sentence', ''),
-                    bangla_sentence_meaning=data.get('bangla_sentence_meaning', '')
+                    bangla_sentence_meaning=data.get('bangla_sentence_meaning', ''),
+                    bangla_pronunciation=data.get('bangla_pronunciation', '')
                 )
                 db.add(word_obj)
                 db.commit()
                 db.refresh(word_obj)
+            else:
+                # Update pronunciation if it's missing
+                if not word_obj.bangla_pronunciation and data.get('bangla_pronunciation'):
+                    word_obj.bangla_pronunciation = data.get('bangla_pronunciation')
+                    db.commit()
+                    db.refresh(word_obj)
             
             # Check if it is already in today's set
             existing_daily = db.query(models.DailyVocabularySet).filter(
