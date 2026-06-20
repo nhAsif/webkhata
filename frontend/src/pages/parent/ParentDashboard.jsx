@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { CheckSquare, Calendar, BookOpen, Clock, Coffee, Sparkles, Star, Award, Bookmark, ArrowRight, Smile } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 
 export default function ParentDashboard() {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [vocabStats, setVocabStats] = useState(null);
@@ -53,12 +55,12 @@ export default function ParentDashboard() {
       {/* Header section with hand-drawn character */}
       <div className="relative mb-6">
         <h1 className="text-3xl md:text-4xl font-heading text-black font-black flex items-center gap-2">
-          Hello, {student ? student.name.split(' ')[0] : 'Student'}!
+          {t("Hello, ")}{student ? student.name.split(' ')[0] : t('Student')}!
           <Smile className="w-8 h-8 md:w-9 md:h-9 text-[#E5A93B] stroke-[3px] inline-block animate-bounce origin-bottom-right" />
         </h1>
         <p className="text-[#C0392B] font-mono text-xs uppercase tracking-wider font-bold mt-1.5 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#C0392B]" />
-          Here is your academic overview for this week
+          {t("Here is your academic overview for this week")}
         </p>
       </div>
 
@@ -113,12 +115,12 @@ export default function ParentDashboard() {
                   {student.name}
                 </h2>
                 <span className="border-4 border-dashed border-[#C0392B]/70 text-[#C0392B] text-[9px] font-heading font-black uppercase px-2 py-0.5 rotate-[1.5deg] tracking-wider">
-                  STUDENT ID: #LK-{student.id || '26A'}
+                  {t("Student ID")}: #LK-{student.id || '26A'}
                 </span>
               </div>
               
               <p className="text-xs font-bold text-black/60 mt-1 font-mono uppercase tracking-wide">
-                Class Level {student.class_level} · SSC Candidate
+                {t("Grade")} {student.class_level} · SSC Candidate
               </p>
 
               {/* Hand-drawn style horizontal separator */}
@@ -126,21 +128,21 @@ export default function ParentDashboard() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4 bg-[#FAF6EE] p-4 border-2 border-dashed border-[#181B20]/30 rounded-xs">
                 <div className="flex flex-col items-center md:items-start">
-                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">Academic Status</span>
+                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">{t("Academic Status")}</span>
                   <span className="text-xs font-heading font-black text-[#1E4636] flex items-center gap-1.5 mt-0.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#1E4636] inline-block animate-pulse" />
-                    Enrolled Active
+                    {t("Enrolled Active")}
                   </span>
                 </div>
                 <div className="flex flex-col items-center md:items-start">
-                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">Enrollment Date</span>
+                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">{t("Enrollment Date")}</span>
                   <span className="text-xs font-heading font-black text-black/80 mt-0.5 font-mono">{student.enrollment_date}</span>
                 </div>
                 <div className="flex flex-col items-center md:items-start">
-                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">Active Subjects</span>
+                  <span className="text-[10px] font-mono text-black/50 uppercase font-black tracking-wide">{t("Active Subjects")}</span>
                   <span className="text-xs font-heading font-black text-black/80 mt-0.5 flex items-center gap-1">
                     <Award className="w-3.5 h-3.5 text-[#E5A93B]" />
-                    {student.subjects?.length || 0} Syllabus Courses
+                    {student.subjects?.length || 0} {t("Syllabus Courses")}
                   </span>
                 </div>
               </div>
@@ -169,7 +171,7 @@ export default function ParentDashboard() {
           <div className="absolute inset-0 bg-notebook-ruled opacity-10 pointer-events-none" />
           
           <span className="block text-[10px] font-mono text-black/50 uppercase font-black tracking-widest text-center">
-            Attendance Rate
+            {t("Attendance Rate")}
           </span>
           <div className="text-center mt-3">
             <span className={cn(
@@ -180,7 +182,7 @@ export default function ParentDashboard() {
             </span>
           </div>
           <span className="block text-[10px] font-bold text-center mt-4 text-[#C0392B] font-mono">
-            {attendanceRate >= 75 ? 'Excellent standing' : 'Action needed (<75%)'}
+            {attendanceRate >= 75 ? t('Excellent standing') : t('Action needed (<75%)')}
           </span>
         </div>
 
@@ -190,15 +192,15 @@ export default function ParentDashboard() {
           <div className="absolute inset-0 bg-notebook-ruled opacity-10 pointer-events-none" />
 
           <span className="block text-[10px] font-mono text-black/50 uppercase font-black tracking-widest text-center">
-            Classes Present
+            {t("Classes Present")}
           </span>
           <div className="text-center mt-3">
             <span className="rubber-stamp stamp-blue text-2xl font-black px-3 py-1">
-              {attendance?.summary.present ?? '—'} sessions
+              {attendance?.summary.present ?? '—'} {t("sessions")}
             </span>
           </div>
           <span className="block text-[10px] font-bold text-center mt-4 text-black/50 font-mono">
-            Out of {attendance?.summary?.total ?? '—'} classes
+            {t("Out of")} {attendance?.summary?.total ?? '—'} {t("classes")}
           </span>
         </div>
 
@@ -208,15 +210,15 @@ export default function ParentDashboard() {
           <div className="absolute inset-0 bg-notebook-ruled opacity-10 pointer-events-none" />
 
           <span className="block text-[10px] font-mono text-black/50 uppercase font-black tracking-widest text-center">
-            Batches Enrolled
+            {t("Batches Enrolled")}
           </span>
           <div className="text-center mt-3">
             <span className="rubber-stamp stamp-orange text-2xl font-black px-3 py-1">
-              {profile?.batches?.length ?? '0'} groups
+              {profile?.batches?.length ?? '0'} {t("groups")}
             </span>
           </div>
           <span className="block text-[10px] font-bold text-center mt-4 text-[#1B3B6F] font-mono">
-            Weekly academic schedule
+            {t("Weekly academic schedule")}
           </span>
         </div>
       </div>
@@ -229,7 +231,7 @@ export default function ParentDashboard() {
             <CardHeader className="bg-[#FAF6EE] border-b-4 border-[#181B20] py-4 px-6 flex items-center gap-2">
               <Bookmark className="w-5 h-5 text-[#C0392B]" />
               <CardTitle className="font-heading text-lg font-black text-black uppercase">
-                Active Enrolled Batches
+                {t("Active Enrolled Batches")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 flex-1 bg-white">
@@ -245,7 +247,7 @@ export default function ParentDashboard() {
                         {b.name}
                       </div>
                       <div className="text-[10px] text-[#C0392B] font-mono font-black uppercase mt-1">
-                        Subject Course · {b.subject}
+                        {t("Subject Course · ")}{b.subject}
                       </div>
                     </div>
                     <span className="border-2 border-black bg-[#E5A93B] text-black px-2.5 py-0.5 text-[10px] font-mono font-black uppercase shadow-2xs">
@@ -264,7 +266,7 @@ export default function ParentDashboard() {
             <CardHeader className="bg-[#FAF6EE] border-b-4 border-[#181B20] py-4 px-6 flex items-center gap-2">
               <Clock className="w-5 h-5 text-[#1B3B6F]" />
               <CardTitle className="font-heading text-lg font-black text-black uppercase">
-                Academic Timetable
+                {t("Academic Timetable")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 flex-1 bg-white flex flex-col gap-6 justify-center">
@@ -290,14 +292,14 @@ export default function ParentDashboard() {
                       <div className="flex items-center justify-between flex-wrap gap-2 pt-2">
                         <div>
                           <span className="text-xs font-mono text-black/60 uppercase font-black tracking-widest block mb-1">
-                            Today's Timetable
+                            {t("Today's Timetable")}
                           </span>
                           <span className="text-2xl md:text-3xl font-display font-black text-black uppercase tracking-tight">
-                            {todayDate.toLocaleDateString('en-US', { weekday: 'long' })}
+                            {t(todayDate.toLocaleDateString('en-US', { weekday: 'long' }))}
                           </span>
                         </div>
                         <span className="border-4 border-dashed border-[#1B3B6F] text-[#1B3B6F] font-heading font-black text-sm px-3 py-1.5 uppercase tracking-wider rotate-[2deg]">
-                          {today}
+                          {t(today)}
                         </span>
                       </div>
 
@@ -307,10 +309,10 @@ export default function ParentDashboard() {
                         <div className="flex items-center gap-4 py-2 px-3 bg-white/40 border-2 border-dashed border-[#181B20]/20">
                           <Coffee className="w-6 h-6 text-[#E5A93B] shrink-0" />
                           <span className="text-black/60 text-sm font-bold font-heading italic">
-                            No classes scheduled for today.
+                            {t("No classes scheduled for today.")}
                           </span>
                           <div className="rubber-stamp stamp-orange text-xs font-black font-heading ml-auto rotate-[3deg] px-2.5 py-1">
-                            HOLIDAY
+                            {t("HOLIDAY")}
                           </div>
                         </div>
                       ) : (
@@ -320,7 +322,7 @@ export default function ParentDashboard() {
                               key={idx} 
                               className="border-2 border-[#181B20] bg-[#C4B5FD] text-black px-4 py-1.5 text-sm font-mono font-black shadow-[3px_3px_0px_0px_#181B20] hover:-translate-y-0.5 transition-transform"
                             >
-                              {sub}
+                              {t(sub)}
                             </span>
                           ))}
                         </div>
@@ -333,14 +335,14 @@ export default function ParentDashboard() {
                       <div className="flex items-center justify-between flex-wrap gap-2 pt-2">
                         <div>
                           <span className="text-xs font-mono text-black/60 uppercase font-black tracking-widest block mb-1">
-                            Tomorrow's Timetable
+                            {t("Tomorrow's Timetable")}
                           </span>
                           <span className="text-2xl md:text-3xl font-display font-black text-black uppercase tracking-tight">
-                            {tomorrowDate.toLocaleDateString('en-US', { weekday: 'long' })}
+                            {t(tomorrowDate.toLocaleDateString('en-US', { weekday: 'long' }))}
                           </span>
                         </div>
                         <span className="border-4 border-dashed border-[#C0392B] text-[#C0392B] font-heading font-black text-sm px-3 py-1.5 uppercase tracking-wider rotate-[-2deg]">
-                          {tomorrow}
+                          {t(tomorrow)}
                         </span>
                       </div>
 
@@ -350,10 +352,10 @@ export default function ParentDashboard() {
                         <div className="flex items-center gap-4 py-2 px-3 bg-white/40 border-2 border-dashed border-[#181B20]/20">
                           <Coffee className="w-6 h-6 text-[#E5A93B] shrink-0" />
                           <span className="text-black/60 text-sm font-bold font-heading italic">
-                            No classes scheduled for tomorrow.
+                            {t("No classes scheduled for tomorrow.")}
                           </span>
                           <div className="rubber-stamp stamp-orange text-xs font-black font-heading ml-auto rotate-[3deg] px-2.5 py-1">
-                            HOLIDAY
+                            {t("HOLIDAY")}
                           </div>
                         </div>
                       ) : (
@@ -363,7 +365,7 @@ export default function ParentDashboard() {
                               key={idx} 
                               className="border-2 border-[#181B20] bg-[#FFD93D] text-black px-4 py-1.5 text-sm font-mono font-black shadow-[3px_3px_0px_0px_#181B20] hover:-translate-y-0.5 transition-transform"
                             >
-                              {sub}
+                              {t(sub)}
                             </span>
                           ))}
                         </div>
@@ -389,18 +391,18 @@ export default function ParentDashboard() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-dashed border-[#181B20]/20 pb-4">
               <div>
                 <span className="text-[10px] font-mono text-[#C0392B] uppercase font-black tracking-widest block mb-0.5">
-                  Daily Brain Exercise
+                  {t("Daily Brain Exercise")}
                 </span>
                 <CardTitle className="font-heading text-xl md:text-2xl font-black text-black uppercase flex items-center gap-2">
                   <BookOpen className="w-5.5 h-5.5 text-black stroke-[2.5px]" />
-                  Today's English Vocabulary
+                  {t("Today's English Vocabulary")}
                 </CardTitle>
               </div>
 
               {/* Progress marker stroke */}
               <div className="flex flex-col items-start md:items-end">
                 <span className="text-[9px] font-mono text-black/50 uppercase font-black mb-1">
-                  Card Progress: {vocabStats.today_viewed} / {vocabStats.today_total} Words
+                  {t("Card Progress: ")} {vocabStats.today_viewed} / {vocabStats.today_total} {t("Words")}
                 </span>
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-36 bg-gray-200 border-2 border-black rounded-none overflow-hidden relative p-[1px]">
@@ -418,7 +420,7 @@ export default function ParentDashboard() {
 
             <div className="flex items-center justify-between flex-wrap gap-4 mt-6">
               <p className="text-sm font-heading font-bold text-black/80 max-w-lg leading-relaxed">
-                Review and memorize <span className="highlight-marker font-black text-black"> {vocabStats.today_total} contextual English words</span> curated for secondary level academic preparation today.
+                {t("Review and memorize ")} <span className="highlight-marker font-black text-black">{vocabStats.today_total}{t(" Words")}</span> {t(" curated for secondary level academic preparation today.")}
               </p>
 
               <div className="flex gap-3 sm:mt-0 flex-wrap">
@@ -426,7 +428,7 @@ export default function ParentDashboard() {
                   to="/parent/vocabulary"
                   className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-[#C0392B] text-white border-4 border-[#181B20] font-heading font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_#181B20] hover:bg-[#C0392B]/95 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all duration-100 cursor-pointer select-none"
                 >
-                  View Vocabulary Cards
+                  {t("View Vocabulary Cards")}
                   <ArrowRight className="w-3.5 h-3.5 text-white stroke-[3px]" />
                 </Link>
                 <Link 
@@ -434,7 +436,7 @@ export default function ParentDashboard() {
                   state={{ tab: 'practice' }}
                   className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-[#E5A93B] text-black border-4 border-[#181B20] font-heading font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_#181B20] hover:bg-[#E5A93B]/95 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all duration-100 cursor-pointer select-none"
                 >
-                  Practice Test
+                  {t("Practice Test")}
                 </Link>
               </div>
             </div>

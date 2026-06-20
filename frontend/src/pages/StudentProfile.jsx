@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import { Input, Textarea } from '../components/Input';
 import toast from 'react-hot-toast';
 import { ArrowLeft, User, DollarSign, Award, Calendar, Landmark, CheckCircle, TrendingUp, Wallet, UserX, Check, X } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const GRADE_COLORS = {
   'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
@@ -16,6 +17,7 @@ const GRADE_COLORS = {
 };
 
 export default function StudentProfile() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
@@ -68,7 +70,7 @@ export default function StudentProfile() {
         payment_date: markForm.payment_date || null,
         notes: markForm.notes || null,
       });
-      toast.success(`Cycle #${markCycle.cycle_number} marked as paid`);
+      toast.success(t('Cycle marked as paid'));
       setMarkModal(false);
       loadFeesAndFinancial();
     } catch {} finally {
@@ -79,7 +81,7 @@ export default function StudentProfile() {
   const handleMarkUnpaid = async (cycle) => {
     try {
       await api.post(`/fees/cycle/${cycle.id}/mark-unpaid`);
-      toast.success(`Cycle #${cycle.cycle_number} marked as unpaid`);
+      toast.success(t('Cycle marked as unpaid'));
       loadFeesAndFinancial();
     } catch {}
   };
@@ -100,9 +102,9 @@ export default function StudentProfile() {
         <div className="text-black mb-3">
           <UserX className="w-12 h-12 stroke-[2px]" />
         </div>
-        <div className="text-lg font-heading font-semibold text-pure mb-4">Student not found</div>
+        <div className="text-lg font-heading font-semibold text-pure mb-4">{t('Student not found')}</div>
         <Button variant="secondary" onClick={() => navigate('/students')}>
-          <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Students
+          <ArrowLeft className="w-4 h-4 mr-1.5" /> {t('Back to Students')}
         </Button>
       </div>
     );
@@ -111,7 +113,7 @@ export default function StudentProfile() {
   const chartData = [...results]
     .sort((a, b) => a.exam_date.localeCompare(b.exam_date))
     .map((r) => ({
-      name: `${r.exam_name.slice(0, 8)} (${r.subject.slice(0, 4)})`,
+      name: `${r.exam_name.slice(0, 8)} (${t(r.subject).slice(0, 4)})`,
       score: Math.round((r.score / r.total_marks) * 100),
       grade: r.grade,
     }));
@@ -145,12 +147,12 @@ export default function StudentProfile() {
           <h1 className="text-3xl font-heading font-bold text-black tracking-tight">{student.name}</h1>
           <p className="text-xs text-black mt-0.5 flex items-center gap-1.5 uppercase tracking-wider font-mono">
             <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
-              {student.class_level}
+              {t(student.class_level)}
             </span>
             <span className={`border-2 border-black px-2 py-0.5 text-xs font-mono font-bold uppercase shadow-[2px_2px_0px_var(--neo-shadow)] ${
               student.status === 'active' ? 'bg-[#C4B5FD] text-black' : 'bg-[#FAF6EE] text-black/50'
             }`}>
-              {student.status}
+              {t(student.status)}
             </span>
           </p>
         </div>
@@ -160,40 +162,40 @@ export default function StudentProfile() {
       <Card hover={false}>
         <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FF6B6B]/10">
           <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
-            <User className="w-5 h-5 text-black stroke-[2.5px]" /> Personal Information
+            <User className="w-5 h-5 text-black stroke-[2.5px]" /> {t('Personal Info')}
           </CardTitle>
           <code className="text-xs bg-white border-2 border-black px-2.5 py-1 font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] text-black">
-            Parent Username: {student.parent_username || '—'}
+            {t('Parent Username')}: {student.parent_username || '—'}
           </code>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Guardian Name</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Guardian Name')}</span>
               <span className="text-sm font-bold text-black">{student.guardian_name}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Guardian Phone</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Guardian Phone')}</span>
               <span className="text-sm font-bold text-black font-mono">{student.guardian_phone}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Parent Username</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Parent Username')}</span>
               <span className="text-sm font-bold text-black font-mono">{student.parent_username || '—'}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Address</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Address')}</span>
               <span className="text-sm font-bold text-black">{student.address || '—'}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Enrolled Since</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Enrolled Since')}</span>
               <span className="text-sm font-bold text-black font-mono">{student.enrollment_date}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Subjects</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Subjects')}</span>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 {(Array.isArray(student.subjects) ? student.subjects : []).map((s) => (
                   <span key={s} className="border-2 border-black bg-[#C4B5FD] text-black px-2 py-0.5 text-[10px] font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] uppercase">
-                    {s}
+                    {t(s)}
                   </span>
                 ))}
               </div>
@@ -205,7 +207,7 @@ export default function StudentProfile() {
       {/* Stat Card */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
         <StatCard
-          label="Total Exams"
+          label={t('Total Exams')}
           value={results.length}
           icon={<Award className="w-5 h-5 text-bitcoin" />}
           color="#F7931A"
@@ -218,42 +220,42 @@ export default function StudentProfile() {
           <Card hover={false}>
             <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FF6B6B]/10">
               <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
-                <Wallet className="w-5 h-5 text-black stroke-[2.5px]" /> Financial Overview
+                <Wallet className="w-5 h-5 text-black stroke-[2.5px]" /> {t('Financial Overview')}
               </CardTitle>
               <div className="flex items-center gap-3">
                 <span className={`border-2 border-black px-2.5 py-0.5 text-xs font-mono font-bold uppercase shadow-[2px_2px_0px_var(--neo-shadow)] ${
                   financial.status === 'paid' ? 'bg-[#C4B5FD] text-black' : financial.status === 'partial' ? 'bg-[#FFD93D] text-black' : 'bg-[#FF6B6B] text-black'
                 }`}>
-                  {financial.status}
+                  {t(financial.status)}
                 </span>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Monthly Fee</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Monthly Fee')}</span>
                   <span className="text-lg font-bold text-black font-mono">৳{(financial.monthly_fee ?? 0).toLocaleString()}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Start Date</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Start Date')}</span>
                   <span className="text-sm font-bold text-black font-mono">{financial.start_date || '—'}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Completed Cycles</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Completed Cycles')}</span>
                   <span className="text-lg font-bold text-black font-mono">{totalCycles}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Paid Cycles</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Paid Cycles')}</span>
                   <span className="text-lg font-bold text-green-700 font-mono">{paidCycles}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Pending Cycles</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Pending Cycles')}</span>
                   <span className={`text-lg font-bold font-mono ${unpaidCycles === 0 ? 'text-green-700' : 'text-red-600'}`}>
                     {unpaidCycles}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Pending Amount</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">{t('Pending Amount')}</span>
                   <span className={`text-lg font-bold font-mono ${(financial.outstanding_balance ?? 0) === 0 ? 'text-green-700' : 'text-red-600'}`}>
                     ৳{(financial.outstanding_balance ?? 0).toLocaleString()}
                   </span>
@@ -269,7 +271,7 @@ export default function StudentProfile() {
         <Card hover={false}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-bitcoin" /> Academic Progress Graph
+              <TrendingUp className="w-5 h-5 text-bitcoin" /> {t('Academic Progress Graph')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
@@ -289,7 +291,7 @@ export default function StudentProfile() {
                       color: '#181B20',
                       fontFamily: 'Space Grotesk'
                     }}
-                    formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
+                    formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, t('Score')]}
                   />
                   <Line 
                     type="monotone" 
@@ -311,7 +313,7 @@ export default function StudentProfile() {
         <Card hover={false}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-heading font-semibold text-pure flex items-center gap-2">
-              <Landmark className="w-5 h-5 text-bitcoin" /> Fee Cycle History
+              <Landmark className="w-5 h-5 text-bitcoin" /> {t('Fee Cycle History')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -319,12 +321,12 @@ export default function StudentProfile() {
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-[#FAF6EE] border-b-4 border-black text-black">
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Cycle</th>
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Period</th>
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Amount</th>
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Paid On</th>
-                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono text-right">Actions</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">{t('Cycle')}</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">{t('Period')}</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">{t('Amount')}</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">{t('Status')}</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">{t('Paid On')}</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono text-right">{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-black bg-white">
@@ -337,8 +339,8 @@ export default function StudentProfile() {
                       <td className="px-6 py-3 text-sm text-black font-mono font-bold">৳{c.fee_amount.toLocaleString()}</td>
                       <td className="px-6 py-3">
                         {c.is_paid
-                          ? <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#C4B5FD] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">Paid</span>
-                          : <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#FF6B6B] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">Unpaid</span>
+                          ? <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#C4B5FD] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">{t('Paid')}</span>
+                          : <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#FF6B6B] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">{t('Unpaid')}</span>
                         }
                       </td>
                       <td className="px-6 py-3 text-sm text-stardust font-mono">{c.payment_date || '—'}</td>
@@ -349,14 +351,14 @@ export default function StudentProfile() {
                             size="xs"
                             onClick={() => openMarkPaid(c)}
                           >
-                            <Check className="w-3.5 h-3.5 mr-1" /> Mark Paid
+                            <Check className="w-3.5 h-3.5 mr-1" /> {t('Mark Paid')}
                           </Button>
                         ) : (
                           <button
                             className="text-xs font-black text-black hover:text-[#FF6B6B] transition-colors font-mono underline underline-offset-2 cursor-pointer"
                             onClick={() => handleMarkUnpaid(c)}
                           >
-                            Mark Unpaid
+                            {t('Mark Unpaid')}
                           </button>
                         )}
                       </td>
@@ -373,13 +375,13 @@ export default function StudentProfile() {
       <Modal
         isOpen={markModal}
         onClose={() => setMarkModal(false)}
-        title={`Mark Paid — Cycle #${markCycle?.cycle_number}`}
+        title={`${t('Mark Paid')} — ${t('Cycle')} #${markCycle?.cycle_number}`}
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="outline" size="sm" onClick={() => setMarkModal(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => setMarkModal(false)}>{t('Cancel')}</Button>
             <Button variant="secondary" size="sm" form="mark-paid-form" type="submit" disabled={marking}>
               {marking ? <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" /> : <Check className="w-4 h-4 mr-1.5 stroke-[2.5px]" />}
-              Confirm Payment
+              {t('Confirm Payment')}
             </Button>
           </div>
         }
@@ -396,7 +398,7 @@ export default function StudentProfile() {
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Payment Date</label>
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">{t('Payment Date')}</label>
               <Input
                 type="date"
                 value={markForm.payment_date}
@@ -404,11 +406,11 @@ export default function StudentProfile() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">Notes (optional)</label>
+              <label className="text-sm font-black font-heading text-black uppercase tracking-wider">{t('Notes (optional)')}</label>
               <Textarea
                 value={markForm.notes}
                 onChange={(e) => setMarkForm(f => ({ ...f, notes: e.target.value }))}
-                placeholder="e.g. Cash payment received"
+                placeholder={t('e.g. Cash payment received')}
                 rows={2}
               />
             </div>

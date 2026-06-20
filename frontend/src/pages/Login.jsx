@@ -4,9 +4,11 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { Input } from '../components/Input';
 import Button from '../components/Button';
+import { useTranslation } from '../contexts/LanguageContext';
 import { BookOpen, ShieldAlert, FileText, Book, Users } from 'lucide-react';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,11 +22,11 @@ export default function Login() {
     setLoading(true);
     try {
       await login(username, password);
-      toast.success('Welcome back!');
+      toast.success(t('Welcome back!'));
       navigate('/dashboard');
     } catch (err) {
       const msg = err.response?.data?.error || err.response?.data?.detail || 'Invalid credentials';
-      setError(msg);
+      setError(t(msg));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export default function Login() {
             </span>
           </div>
           <p className="text-[12px] font-black text-black/60 font-heading uppercase tracking-widest bg-[#FFD93D] px-3 py-1 border-2 border-black rotate-1 shadow-[2px_2px_0px_0px_var(--neo-shadow)] mt-1">
-            Tutor Management Portal
+            {t("Tutor Management Portal")}
           </p>
         </div>
 
@@ -70,11 +72,11 @@ export default function Login() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="username">Username</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="username">{t("Username")}</label>
             <Input
               id="username"
               type="text"
-              placeholder="Enter username"
+              placeholder={t("Enter username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -83,11 +85,11 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="password">Password</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="password">{t("Password")}</label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter password"
+              placeholder={t("Enter password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -101,7 +103,7 @@ export default function Login() {
             className="w-full mt-2 cursor-pointer"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? t('Signing in...') : t('Sign In')}
           </Button>
         </form>
 
@@ -110,7 +112,7 @@ export default function Login() {
             <div className="w-full border-t-4 border-black"></div>
           </div>
           <span className="relative px-4 bg-white border-2 border-black text-xs font-black text-black font-heading uppercase tracking-wider shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
-            or
+            {t("or")}
           </span>
         </div>
 
@@ -121,13 +123,13 @@ export default function Login() {
           >
             <span className="flex items-center justify-center gap-2">
               <Users className="w-4 h-4 text-black stroke-[3px]" />
-              Switch to Parent Portal
+              {t("Switch to Parent Portal")}
             </span>
           </a>
         </div>
 
         <div className="mt-8 p-4 bg-[#FFD93D]/25 border-4 border-black rounded-none text-xs text-black shadow-[4px_4px_0px_0px_var(--neo-shadow)]">
-          <strong className="text-black font-black uppercase tracking-wider">Default Credentials:</strong>{' '}
+          <strong className="text-black font-black uppercase tracking-wider">{t("Default Credentials:")}</strong>{' '}
           <span className="font-mono bg-white border border-black px-1.5 py-0.5 text-black font-bold">admin</span>
           {' / '}
           <span className="font-mono bg-white border border-black px-1.5 py-0.5 text-black font-bold">changeme</span>

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import api from '../api/client';
 import StatCard from '../components/StatCard';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
+import { useTranslation } from '../contexts/LanguageContext';
 import { AlertTriangle, DollarSign, Calendar, Users, Award, ShieldAlert, Sparkles, TrendingUp, TrendingDown, Wallet, Bell, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [quote, setQuote] = useState(null);
@@ -41,10 +43,10 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div className="mb-6 font-body">
         <h1 className="text-3xl md:text-5xl font-heading font-black text-black tracking-tighter uppercase">
-          Welcome to <span className="bg-[#FFD93D] px-3 py-1 border-4 border-black inline-block -rotate-1 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">WebKhata</span>
+          {t("Welcome to")} <span className="bg-[#FFD93D] px-3 py-1 border-4 border-black inline-block -rotate-1 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">WebKhata</span>
         </h1>
         <p className="text-sm text-black font-body font-bold mt-4">
-          Overview of your tutor activity and metrics
+          {t("Overview of your tutor activity and metrics")}
         </p>
       </div>
 
@@ -80,49 +82,49 @@ export default function Dashboard() {
         ) : stats ? (
           <>
             <StatCard
-              label="Active Students"
+              label={t("Active Students")}
               value={stats.total_active_students}
               icon={<Users className="w-5 h-5" />}
               color="#FF6B6B"
             />
             <StatCard
-              label="Total Students"
+              label={t("Total Students")}
               value={stats.total_students ?? stats.total_active_students}
               icon={<Users className="w-5 h-5" />}
               color="#FFD93D"
             />
             <StatCard
-              label="Today's Sessions"
+              label={t("Today's Sessions")}
               value={stats.todays_sessions}
               icon={<Calendar className="w-5 h-5" />}
               color="#FFD93D"
             />
             <StatCard
-              label="Attendance Rate"
+              label={t("Attendance Rate")}
               value={`${stats.attendance_rate}%`}
               icon={<ShieldAlert className="w-5 h-5" />}
               color={stats.attendance_rate >= 75 ? '#C4B5FD' : '#FFD93D'}
             />
             <StatCard
-              label="Monthly Expected"
+              label={t("Monthly Expected")}
               value={`৳${(stats.total_monthly_expected ?? stats.monthly_collection ?? 0).toLocaleString()}`}
               icon={<Wallet className="w-5 h-5" />}
               color="#C4B5FD"
             />
             <StatCard
-              label="Total Due"
+              label={t("Total Due")}
               value={`৳${(stats.total_due ?? 0).toLocaleString()}`}
               icon={<TrendingUp className="w-5 h-5" />}
               color="#FF6B6B"
             />
             <StatCard
-              label="Total Paid"
+              label={t("Total Paid")}
               value={`৳${(stats.total_paid ?? stats.monthly_collection ?? 0).toLocaleString()}`}
               icon={<TrendingDown className="w-5 h-5" />}
               color="#C4B5FD"
             />
             <StatCard
-              label="Outstanding"
+              label={t("Outstanding")}
               value={`৳${(stats.outstanding_balance ?? 0).toLocaleString()}`}
               icon={<DollarSign className="w-5 h-5" />}
               color={(stats.outstanding_balance ?? 0) > 0 ? '#FF6B6B' : '#C4B5FD'}
@@ -136,14 +138,14 @@ export default function Dashboard() {
         <Card hover={false} className="notebook-spirals bg-white">
           <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FFD93D]/10">
             <CardTitle className="flex items-center gap-2 text-xl font-heading font-black text-black">
-              <Bell className="w-5 h-5 text-black stroke-[3px]" /> Active Alerts
+              <Bell className="w-5 h-5 text-black stroke-[3px]" /> {t("Active Alerts")}
             </CardTitle>
             <span className="px-3 py-1 text-xs font-black uppercase rounded-none bg-[#FF6B6B] text-black border-4 border-black flex items-center gap-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
               </span>
-              {alerts.length} urgent
+              {alerts.length} {t("urgent")}
             </span>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
@@ -165,7 +167,7 @@ export default function Dashboard() {
                         href={`/students/${alert.student_id}`}
                         className="text-xs font-black text-black underline hover:text-black/75 transition-colors mt-2 inline-flex items-center gap-1 font-heading uppercase tracking-wider"
                       >
-                        View student details <ArrowRight className="w-4 h-4 text-black stroke-[3px]" />
+                        {t("View student details")} <ArrowRight className="w-4 h-4 text-black stroke-[3px]" />
                       </a>
                     )}
                   </div>
@@ -182,8 +184,8 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-none bg-[#C4B5FD] border-4 border-black flex items-center justify-center text-black mb-4 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
               <Sparkles className="w-5 h-5 stroke-[3px]" />
             </div>
-            <div className="text-xl font-heading font-black text-black uppercase tracking-tight">All clear!</div>
-            <div className="text-sm text-black/75 font-bold mt-1.5">No alerts at the moment. Keep up the great work!</div>
+            <div className="text-xl font-heading font-black text-black uppercase tracking-tight">{t("All clear!")}</div>
+            <div className="text-sm text-black/75 font-bold mt-1.5">{t("No alerts at the moment. Keep up the great work!")}</div>
           </div>
         </div>
       )}

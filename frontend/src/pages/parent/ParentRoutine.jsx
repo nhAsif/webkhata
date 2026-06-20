@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { BookOpen, Calendar, Clock, Coffee, ClipboardList, GraduationCap } from 'lucide-react';
 
 const DAYS_ORDER = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
 export default function ParentRoutine() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +19,7 @@ export default function ParentRoutine() {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="mb-6 border-b-4 border-black pb-4">
-          <h1 className="text-3xl font-heading font-black text-black uppercase tracking-tight">Weekly Routine</h1>
+          <h1 className="text-3xl font-heading font-black text-black uppercase tracking-tight">{t("Weekly Routine")}</h1>
         </div>
         <div className="bg-white border-4 border-black h-[400px] shadow-[8px_8px_0px_var(--neo-shadow)]" />
       </div>
@@ -36,10 +38,10 @@ export default function ParentRoutine() {
       <div className="border-b-4 border-black pb-4">
         <h1 className="text-3xl md:text-4xl font-heading font-black text-black uppercase tracking-tight flex items-center gap-3">
           <Calendar className="w-8 h-8 md:w-10 md:h-10 text-black bg-[#FF6B6B] border-4 border-black shadow-[3px_3px_0px_var(--neo-shadow)] p-1.5 stroke-[2.5px] springy-bounce" />
-          Weekly Routine
+          {t("Weekly Routine")}
         </h1>
         <p className="text-black/70 font-body font-bold text-sm mt-2">
-          Class schedule for <span className="text-[#FF6B6B] font-black underline underline-offset-2">{data?.student_name}</span>
+          {t("Class schedule for")} <span className="text-[#FF6B6B] font-black underline underline-offset-2">{data?.student_name}</span>
         </p>
       </div>
 
@@ -49,7 +51,7 @@ export default function ParentRoutine() {
           <CardHeader className="bg-[#BAE6FD]/20">
             <CardTitle className="flex items-center gap-2.5">
               <BookOpen className="w-6 h-6 text-black stroke-[2.5px]" />
-              Enrolled Batches
+              {t("Enrolled Batches")}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 pt-6">
@@ -74,7 +76,7 @@ export default function ParentRoutine() {
                   <div className="flex gap-1 flex-wrap">
                     {(b.days || []).map((d) => (
                       <span key={d} className="border-2 border-black bg-white text-black px-2 py-0.5 text-[10px] font-black font-mono shadow-[1px_1px_0px_var(--neo-shadow)]">
-                        {d}
+                        {t(d)}
                       </span>
                     ))}
                   </div>
@@ -90,7 +92,7 @@ export default function ParentRoutine() {
         <CardHeader className="bg-[#C4B5FD]/20">
           <CardTitle className="flex items-center gap-2.5">
             <Calendar className="w-6 h-6 text-black stroke-[2.5px]" />
-            Weekly Timetable
+            {t("Weekly Timetable")}
           </CardTitle>
         </CardHeader>
 
@@ -100,8 +102,8 @@ export default function ParentRoutine() {
               <div className="p-4 border-4 border-black bg-[#FFD93D] shadow-[4px_4px_0px_var(--neo-shadow)] mb-4 animate-float">
                 <ClipboardList className="w-10 h-10 text-black stroke-[2.5px]" />
               </div>
-              <div className="text-xl font-heading font-black text-black uppercase tracking-tight">No timetable set yet</div>
-              <div className="text-sm font-bold font-body text-black/60 mt-2">Your tutor hasn't configured the weekly subjects yet.</div>
+              <div className="text-xl font-heading font-black text-black uppercase tracking-tight">{t("No timetable set yet")}</div>
+              <div className="text-sm font-bold font-body text-black/60 mt-2">{t("Your tutor hasn't configured the weekly subjects yet.")}</div>
             </div>
           ) : (
             <div className="flex flex-col gap-3.5">
@@ -121,11 +123,11 @@ export default function ParentRoutine() {
                   >
                     <div className="w-14 shrink-0 flex flex-col items-center">
                       <span className={`font-black font-heading text-lg ${isToday ? 'text-black' : 'text-black/70'}`}>
-                        {day}
+                        {t(day)}
                       </span>
                       {isToday && (
                         <span className="block text-[9px] font-black uppercase font-mono tracking-wider text-white border-2 border-black bg-[#FF6B6B] px-1.5 py-0.5 mt-1 shadow-[1.5px_1.5px_0px_var(--neo-shadow)] text-center">
-                          Today
+                          {t("Today")}
                         </span>
                       )}
                     </div>
@@ -136,7 +138,7 @@ export default function ParentRoutine() {
                       {isOff ? (
                         <div className="flex items-center gap-1.5 text-black/55 text-sm font-bold font-body italic">
                           <Coffee className="w-4 h-4 shrink-0 stroke-[2.2px]" />
-                          <span>Study Break / Off Day</span>
+                          <span>{t("Study Break / Off Day")}</span>
                         </div>
                       ) : (
                         <div className="flex gap-2 flex-wrap">

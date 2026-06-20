@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select } from '../components/Input';
 import { ClipboardList, TrendingUp, BarChart2, PenSquare } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const GRADE_COLORS = {
   'A+': 'var(--success)', // #C4B5FD
@@ -36,6 +37,7 @@ function GradeTag({ grade }) {
 const EXAM_TYPES = ['Class Test', 'Monthly Test', 'Half-Yearly', 'Annual', 'Mock Test'];
 
 export default function Results() {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [batches, setBatches] = useState([]);
   const [results, setResults] = useState([]);
@@ -84,7 +86,7 @@ export default function Results() {
       // Build chart data
       const sorted = [...r.data].sort((a, b) => a.exam_date.localeCompare(b.exam_date));
       setChartData(sorted.map((res) => ({
-        name: `${res.exam_name} (${res.subject})`,
+        name: `${t(res.exam_name)} (${t(res.subject)})`,
         score: Math.round((res.score / res.total_marks) * 100),
         grade: res.grade,
       })));
@@ -105,7 +107,7 @@ export default function Results() {
         score: parseFloat(form.score),
         total_marks: parseFloat(form.total_marks),
       });
-      toast.success('Result added');
+      toast.success(t('Result added'));
       setAddModal(false);
       loadResults(filterStudent);
     } catch {} finally {
@@ -137,7 +139,7 @@ export default function Results() {
         }));
 
       const res = await api.post('/results/bulk', payload);
-      toast.success(`Added ${res.data.created} results`);
+      toast.success(t('Added {count} results').replace('{count}', res.data.created));
       setBulkModal(false);
       loadResults(filterStudent);
     } catch {} finally {
@@ -146,29 +148,29 @@ export default function Results() {
   };
 
   const columns = [
-    { key: 'subject', label: 'Subject' },
-    { key: 'exam_name', label: 'Exam' },
-    { key: 'exam_date', label: 'Date' },
-    { key: 'score', label: 'Score', render: (r) => <span className="font-mono">{r.score} / {r.total_marks}</span> },
+    { key: 'subject', label: t('Subject'), render: (r) => <span>{t(r.subject)}</span> },
+    { key: 'exam_name', label: t('Exam'), render: (r) => <span>{t(r.exam_name)}</span> },
+    { key: 'exam_date', label: t('Date') },
+    { key: 'score', label: t('Score'), render: (r) => <span className="font-mono">{r.score} / {r.total_marks}</span> },
     { key: 'percentage', label: '%', render: (r) => <span className="font-mono">{((r.score / r.total_marks) * 100).toFixed(1)}%</span> },
-    { key: 'grade', label: 'Grade', render: (r) => <GradeTag grade={r.grade} /> },
+    { key: 'grade', label: t('Grade'), render: (r) => <GradeTag grade={r.grade} /> },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
-          <p className="text-stardust text-sm mt-1">Exam scores and academic progress</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">{t("Results")}</h1>
+          <p className="text-stardust text-sm mt-1">{t("Exam scores and academic progress")}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="secondary" onClick={() => setBulkModal(true)}>
             <span className="flex items-center gap-1.5">
               <ClipboardList className="w-4 h-4 stroke-[3px]" />
-              Bulk Entry
+              {t("Bulk Entry")}
             </span>
           </Button>
-          <Button variant="primary" onClick={() => setAddModal(true)}>+ Add Result</Button>
+          <Button variant="primary" onClick={() => setAddModal(true)}>+ {t("Add Result")}</Button>
         </div>
       </div>
 
@@ -176,13 +178,13 @@ export default function Results() {
       <Card className="mb-4">
         <CardContent className="p-6">
           <div className="flex gap-3 items-center flex-wrap">
-            <label className="text-sm font-medium text-stardust whitespace-nowrap">Select Student:</label>
+            <label className="text-sm font-medium text-stardust whitespace-nowrap">{t("Select Student:")}</label>
             <Select
               value={filterStudent}
               onChange={(e) => setFilterStudent(e.target.value)}
               className="w-auto min-w-[240px]"
             >
-              <option value="">Choose a student...</option>
+              <option value="">{t("Choose a student...")}</option>
               {students.map((s) => (
                 <option key={s.id} value={s.id}>{s.name} ({s.class_level})</option>
               ))}
@@ -197,7 +199,7 @@ export default function Results() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-black stroke-[3px]" />
-              Progress Chart
+              {t("Progress Chart")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -209,7 +211,7 @@ export default function Results() {
                 <Tooltip
                   contentStyle={{ background: '#FFFFFF', border: '4px solid #181B20', borderRadius: '0px', boxShadow: '4px 4px 0px 0px var(--neo-shadow)', fontSize: 12, color: '#181B20', fontFamily: 'Space Grotesk' }}
                   itemStyle={{ color: '#FF6B6B', fontWeight: 'bold' }}
-                  formatter={(val) => [`${val}%`, 'Score']}
+                  formatter={(val) => [`${val}%`, t('Score')]}
                 />
                 <Line
                   type="monotone"
@@ -230,16 +232,16 @@ export default function Results() {
           columns={columns}
           data={results}
           loading={loading}
-          emptyTitle="No results yet"
-          emptyDesc="Add exam results using the button above."
-          emptyAction={<Button variant="primary" onClick={() => setAddModal(true)}>Add Result</Button>}
+          emptyTitle={t("No results yet")}
+          emptyDesc={t("Add exam results using the button above.")}
+          emptyAction={<Button variant="primary" onClick={() => setAddModal(true)}>{t("Add Result")}</Button>}
         />
       ) : (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-white border-4 border-black shadow-[8px_8px_0px_var(--neo-shadow)] text-black">
           <div className="text-black mb-4">
             <BarChart2 className="w-12 h-12 stroke-[3px]" />
           </div>
-          <div className="text-lg font-heading font-black uppercase">Select a student to view results</div>
+          <div className="text-lg font-heading font-black uppercase">{t("Select a student to view results")}</div>
         </div>
       )}
 
@@ -247,12 +249,12 @@ export default function Results() {
       <Modal
         isOpen={addModal}
         onClose={() => setAddModal(false)}
-        title="Add Exam Result"
+        title={t("Add Exam Result")}
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setAddModal(false)}>{t("Cancel")}</Button>
             <Button variant="primary" form="result-form" type="submit" disabled={saving}>
-              {saving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} Add Result
+              {saving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} {t("Add Result")}
             </Button>
           </div>
         }
@@ -260,40 +262,40 @@ export default function Results() {
         <form id="result-form" onSubmit={handleAdd} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Student *</label>
+              <label className="text-sm font-medium text-stardust">{t("Student")} *</label>
               <Select
                 value={form.student_id}
                 onChange={(e) => setForm((f) => ({ ...f, student_id: e.target.value }))}
                 required
               >
-                <option value="">Select student...</option>
+                <option value="">{t("Select student...")}</option>
                 {students.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Subject *</label>
+              <label className="text-sm font-medium text-stardust">{t("Subject")} *</label>
               <Input
                 value={form.subject}
                 onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
                 required
-                placeholder="e.g. Mathematics"
+                placeholder={t("e.g. Mathematics")}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Exam Name *</label>
+              <label className="text-sm font-medium text-stardust">{t("Exam Name")} *</label>
               <Input
                 list="exam-types"
                 value={form.exam_name}
                 onChange={(e) => setForm((f) => ({ ...f, exam_name: e.target.value }))}
                 required
-                placeholder="e.g. Class Test 1"
+                placeholder={t("e.g. Class Test 1")}
               />
               <datalist id="exam-types">
                 {EXAM_TYPES.map((t) => <option key={t} value={t} />)}
               </datalist>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Exam Date *</label>
+              <label className="text-sm font-medium text-stardust">{t("Exam Date")} *</label>
               <Input
                 type="date"
                 value={form.exam_date}
@@ -302,7 +304,7 @@ export default function Results() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Score *</label>
+              <label className="text-sm font-medium text-stardust">{t("Score")} *</label>
               <Input
                 type="number"
                 value={form.score}
@@ -315,7 +317,7 @@ export default function Results() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Total Marks *</label>
+              <label className="text-sm font-medium text-stardust">{t("Total Marks")} *</label>
               <Input
                 type="number"
                 value={form.total_marks}
@@ -334,50 +336,50 @@ export default function Results() {
       <Modal
         isOpen={bulkModal}
         onClose={() => setBulkModal(false)}
-        title="Bulk Result Entry"
+        title={t("Bulk Result Entry")}
         size="lg"
         footer={
           <div className="flex gap-3 justify-end w-full">
-            <Button variant="secondary" onClick={() => setBulkModal(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setBulkModal(false)}>{t("Cancel")}</Button>
             <Button variant="primary" onClick={handleBulk} disabled={bulkSaving || !bulkStudents.length}>
-              {bulkSaving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} Save All
+              {bulkSaving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} {t("Save All")}
             </Button>
           </div>
         }
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Batch *</label>
+            <label className="text-sm font-medium text-stardust">{t("Batch")} *</label>
             <Select
               value={bulkBatch}
               onChange={(e) => { setBulkBatch(e.target.value); loadBulkStudents(e.target.value); }}
             >
-              <option value="">Select batch...</option>
+              <option value="">{t("Select batch...")}</option>
               {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </Select>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Subject *</label>
+            <label className="text-sm font-medium text-stardust">{t("Subject")} *</label>
             <Input
               value={bulkSubject}
               onChange={(e) => setBulkSubject(e.target.value)}
-              placeholder="e.g. Mathematics"
+              placeholder={t("e.g. Mathematics")}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Exam Name *</label>
+            <label className="text-sm font-medium text-stardust">{t("Exam Name")} *</label>
             <Input
               list="bulk-exam-types"
               value={bulkExamName}
               onChange={(e) => setBulkExamName(e.target.value)}
-              placeholder="e.g. Class Test 1"
+              placeholder={t("e.g. Class Test 1")}
             />
             <datalist id="bulk-exam-types">
               {EXAM_TYPES.map((t) => <option key={t} value={t} />)}
             </datalist>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Exam Date</label>
+            <label className="text-sm font-medium text-stardust">{t("Exam Date")}</label>
             <Input
               type="date"
               value={bulkDate}
@@ -385,7 +387,7 @@ export default function Results() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Total Marks</label>
+            <label className="text-sm font-medium text-stardust">{t("Total Marks")}</label>
             <Input
               type="number"
               value={bulkTotalMarks}
@@ -406,7 +408,7 @@ export default function Results() {
                 <Input
                   type="number"
                   className="w-24 h-10 shadow-[2px_2px_0px_var(--neo-shadow)] focus-visible:bg-[#FFD93D] focus-visible:shadow-[2px_2px_0px_var(--neo-shadow)]"
-                  placeholder="Score"
+                  placeholder={t("Score")}
                   value={bulkScores[s.id] || ''}
                   onChange={(e) => setBulkScores((prev) => ({ ...prev, [s.id]: e.target.value }))}
                   min="0"
@@ -428,7 +430,7 @@ export default function Results() {
             <div className="text-black mb-2">
               <PenSquare className="w-8 h-8 stroke-[3px]" />
             </div>
-            <div className="text-sm text-black font-heading font-black uppercase">Select a batch to enter scores</div>
+            <div className="text-sm text-black font-heading font-black uppercase">{t("Select a batch to enter scores")}</div>
           </div>
         )}
       </Modal>

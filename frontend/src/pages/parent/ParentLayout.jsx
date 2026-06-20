@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 import ChangePasswordModal from '../../components/ChangePasswordModal';
 import { cn } from '../../utils/cn';
 import {
@@ -30,6 +31,7 @@ const PARENT_NAV = [
 
 export default function ParentLayout() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -76,7 +78,7 @@ export default function ParentLayout() {
               WebKhata
             </span>
             <span className="font-mono text-[9px] font-bold text-black/50 tracking-wider uppercase">
-              Parent Portal
+              {t("Parent Portal")}
             </span>
           </div>
         </div>
@@ -84,7 +86,7 @@ export default function ParentLayout() {
         {/* Sidebar Nav */}
         <nav className="flex-1 p-4 flex flex-col gap-1.5 overflow-y-auto bg-[#1A3329]">
           <span className="text-[10px] font-black uppercase tracking-widest text-[#FAF6EE]/40 px-3 py-1 font-heading">
-            Ledger Index
+            {t("Ledger Index")}
           </span>
           {PARENT_NAV.map((item) => {
             const Icon = item.icon;
@@ -100,7 +102,7 @@ export default function ParentLayout() {
                 onClick={() => setSidebarOpen(false)}
               >
                 <Icon className={cn("w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3 stroke-[2.5px]")} />
-                {item.label}
+                {t(item.label)}
               </NavLink>
             );
           })}
@@ -113,21 +115,21 @@ export default function ParentLayout() {
               {(user?.username || 'P')[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[11px] font-black text-black truncate uppercase tracking-tight">{user?.username || 'Parent'}</div>
-              <div className="text-[9px] text-black/60 font-mono font-bold capitalize">Guardian Access</div>
+              <div className="text-[11px] font-black text-black truncate uppercase tracking-tight">{user?.username || t('Parent')}</div>
+              <div className="text-[9px] text-black/60 font-mono font-bold capitalize">{t("Guardian Access")}</div>
             </div>
             <div className="flex gap-1">
               <button
                 className="text-black hover:bg-[#E5A93B] p-1 border border-transparent hover:border-black transition-all duration-100 cursor-pointer active:scale-90"
                 onClick={() => setIsPasswordModalOpen(true)}
-                title="Change Password"
+                title={t("Change Password")}
               >
                 <Key className="w-3.5 h-3.5 stroke-[2.5px]" />
               </button>
               <button
                 className="text-black hover:bg-[#FF6B6B] p-1 border border-transparent hover:border-black transition-all duration-100 cursor-pointer active:scale-90"
                 onClick={handleLogout}
-                title="Logout"
+                title={t("Logout")}
               >
                 <LogOut className="w-3.5 h-3.5 stroke-[2.5px]" />
               </button>
@@ -166,7 +168,7 @@ export default function ParentLayout() {
             <div className="flex-1 flex justify-center md:justify-start">
               <div className="relative bg-[#E5A93B] text-black font-heading font-black text-sm md:text-base px-5 py-1.5 border-4 border-[#181B20] shadow-[3px_3px_0px_0px_#181B20] -rotate-1 hover:rotate-0 transition-transform duration-300 flex items-center gap-2 select-none uppercase tracking-wider">
                 <Sparkles className="w-4 h-4 text-black stroke-[3.5px]" />
-                <span>Student Portal</span>
+                <span>{t("Student Portal")}</span>
                 <Sparkles className="w-4 h-4 text-black stroke-[3.5px]" />
               </div>
             </div>
@@ -175,7 +177,7 @@ export default function ParentLayout() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:inline-block">
                 <span className="border-4 border-dashed border-[#1B3B6F] text-[#1B3B6F] font-heading font-black text-xs uppercase px-2.5 py-1 rotate-[-2deg] inline-block tracking-widest shadow-2xs">
-                  VERIFIED DIARY
+                  {t("VERIFIED DIARY")}
                 </span>
               </div>
             </div>
@@ -196,9 +198,9 @@ export default function ParentLayout() {
         </main>
       </div>
 
-      <ChangePasswordModal
-        isOpen={isPasswordModalOpen}
-        onClose={() => setIsPasswordModalOpen(false)}
+      <ChangePasswordModal 
+        isOpen={isPasswordModalOpen} 
+        onClose={() => setIsPasswordModalOpen(false)} 
       />
     </div>
   );

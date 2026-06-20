@@ -7,6 +7,7 @@ import { Card, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select, Textarea } from '../components/Input';
 import { Check, X, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const STATUS_OPTS = ['not_submitted', 'submitted', 'late'];
 const STATUS_BADGE = {
@@ -25,6 +26,7 @@ function today() {
 }
 
 export default function Homework() {
+  const { t } = useTranslation();
   const [batches, setBatches] = useState([]);
   const [homework, setHomework] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ export default function Homework() {
         ...form,
         batch_id: parseInt(form.batch_id),
       });
-      toast.success('Homework assigned');
+      toast.success(t('Homework assigned'));
       setCreateModal(false);
       load();
     } catch {} finally {
@@ -100,7 +102,7 @@ export default function Homework() {
         status: s.status,
         feedback: s.feedback,
       })));
-      toast.success('Submissions updated');
+      toast.success(t('Submissions updated'));
       setSubmModal(false);
     } catch {} finally {
       setSubmSaving(false);
@@ -108,10 +110,10 @@ export default function Homework() {
   };
 
   const columns = [
-    { key: 'title', label: 'Title', render: (hw) => (
+    { key: 'title', label: t('Title'), render: (hw) => (
       <span className="font-medium text-pure">{hw.title}</span>
     ) },
-    { key: 'batch_id', label: 'Batch', render: (hw) => {
+    { key: 'batch_id', label: t('Batch'), render: (hw) => {
       const batch = batches.find((b) => b.id === hw.batch_id);
       return batch ? (
         <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
@@ -119,10 +121,10 @@ export default function Homework() {
         </span>
       ) : <span className="text-black/60 font-mono font-bold">—</span>;
     }},
-    { key: 'assigned_date', label: 'Assigned', render: (hw) => (
+    { key: 'assigned_date', label: t('Assigned'), render: (hw) => (
       <span className="text-stardust font-mono text-sm">{hw.assigned_date}</span>
     ) },
-    { key: 'due_date', label: 'Due Date', render: (hw) => {
+    { key: 'due_date', label: t('Due Date'), render: (hw) => {
       const overdue = new Date(hw.due_date) < new Date() && hw.due_date !== today();
       return (
         <span className={`font-mono text-sm flex items-center gap-1.5 font-bold ${overdue ? 'text-[#FF6B6B]' : 'text-black/70'}`}>
@@ -130,14 +132,14 @@ export default function Homework() {
         </span>
       );
     }},
-    { key: 'submission_count', label: 'Submissions', render: (hw) => (
+    { key: 'submission_count', label: t('Submissions'), render: (hw) => (
       <span className="border-2 border-black bg-white text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
-        {hw.submission_count} students
+        {hw.submission_count} {t("students")}
       </span>
     )},
     { key: 'actions', label: '', render: (hw) => (
       <Button variant="secondary" size="sm" onClick={() => openSubmissions(hw)}>
-        Track Submissions
+        {t("Track Submissions")}
       </Button>
     )},
   ];
@@ -146,23 +148,23 @@ export default function Homework() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure tracking-tight">Homework</h1>
-          <p className="text-sm text-stardust mt-1 font-body">Assign and track homework submissions</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure tracking-tight">{t("Homework")}</h1>
+          <p className="text-sm text-stardust mt-1 font-body">{t("Assign and track homework submissions")}</p>
         </div>
-        <Button variant="primary" onClick={() => setCreateModal(true)}>+ Assign Homework</Button>
+        <Button variant="primary" onClick={() => setCreateModal(true)}>+ {t("Assign Homework")}</Button>
       </div>
 
       {/* Filter */}
       <Card>
         <CardContent className="p-4 sm:p-5 pt-4 sm:pt-5">
           <div className="flex flex-wrap gap-4 items-center">
-            <label className="text-sm font-medium text-stardust whitespace-nowrap">Filter by batch:</label>
+            <label className="text-sm font-medium text-stardust whitespace-nowrap">{t("Filter by batch:")}</label>
             <div className="w-full sm:w-auto min-w-[200px]">
               <Select
                 value={filterBatch}
                 onChange={(e) => setFilterBatch(e.target.value)}
               >
-                <option value="">All batches</option>
+                <option value="">{t("All batches")}</option>
                 {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
               </Select>
             </div>
@@ -174,60 +176,60 @@ export default function Homework() {
         columns={columns}
         data={homework}
         loading={loading}
-        searchPlaceholder="Search homework..."
+        searchPlaceholder={t("Search homework...")}
         searchKeys={['title']}
-        emptyTitle="No homework assigned"
-        emptyDesc="Assign homework to a batch to get started."
-        emptyAction={<Button variant="primary" onClick={() => setCreateModal(true)}>Assign Homework</Button>}
+        emptyTitle={t("No homework assigned")}
+        emptyDesc={t("Assign homework to a batch to get started.")}
+        emptyAction={<Button variant="primary" onClick={() => setCreateModal(true)}>{t("Assign Homework")}</Button>}
       />
 
       {/* Create Homework Modal */}
       <Modal
         isOpen={createModal}
         onClose={() => setCreateModal(false)}
-        title="Assign Homework"
+        title={t("Assign Homework")}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setCreateModal(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setCreateModal(false)}>{t("Cancel")}</Button>
             <Button variant="primary" form="hw-form" type="submit" disabled={saving}>
-              {saving ? 'Assigning...' : 'Assign'}
+              {saving ? t('Assigning...') : t('Assign')}
             </Button>
           </>
         }
       >
         <form id="hw-form" onSubmit={handleCreate} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Batch *</label>
+            <label className="text-sm font-medium text-stardust">{t("Batch")} *</label>
             <Select
               value={form.batch_id}
               onChange={(e) => setForm((f) => ({ ...f, batch_id: e.target.value }))}
               required
             >
-              <option value="">Select batch...</option>
+              <option value="">{t("Select batch...")}</option>
               {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </Select>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Title *</label>
+            <label className="text-sm font-medium text-stardust">{t("Title")} *</label>
             <Input
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               required
-              placeholder="e.g. Chapter 3 exercises"
+              placeholder={t("e.g. Chapter 3 exercises")}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-stardust">Description</label>
+            <label className="text-sm font-medium text-stardust">{t("Description")}</label>
             <Textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Additional details..."
+              placeholder={t("Additional details...")}
               rows={3}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Assigned Date</label>
+              <label className="text-sm font-medium text-stardust">{t("Assigned Date")}</label>
               <Input
                 type="date"
                 value={form.assigned_date}
@@ -235,7 +237,7 @@ export default function Homework() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Due Date *</label>
+              <label className="text-sm font-medium text-stardust">{t("Due Date")} *</label>
               <Input
                 type="date"
                 value={form.due_date}
@@ -252,19 +254,19 @@ export default function Homework() {
       <Modal
         isOpen={submModal}
         onClose={() => setSubmModal(false)}
-        title={`Submissions — ${selectedHw?.title}`}
+        title={`${t("Submissions")} — ${selectedHw?.title}`}
         size="lg"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setSubmModal(false)}>Close</Button>
+            <Button variant="ghost" onClick={() => setSubmModal(false)}>{t("Close")}</Button>
             <Button variant="primary" onClick={handleSaveSubmissions} disabled={submSaving}>
-              {submSaving ? 'Saving...' : 'Save'}
+              {submSaving ? t('Saving...') : t('Save')}
             </Button>
           </>
         }
       >
         <div className="text-xs text-stardust mb-4 font-body">
-          Click a student row to cycle through submission statuses. Add feedback below.
+          {t("Click a student row to cycle through submission statuses. Add feedback below.")}
         </div>
         <div className="flex flex-col gap-3">
           {submissions.map((sub, i) => (
@@ -296,7 +298,7 @@ export default function Homework() {
                     >
                       <span className="flex items-center gap-1.5">
                         {STATUS_ICON[s]}
-                        <span>{s.replace('_', ' ')}</span>
+                        <span>{t(s)}</span>
                       </span>
                     </button>
                   ))}
@@ -304,7 +306,7 @@ export default function Homework() {
               </div>
               <Input
                 className="h-10 text-xs shadow-[2px_2px_0px_var(--neo-shadow)] focus-visible:bg-[#FFD93D] focus-visible:shadow-[2px_2px_0px_var(--neo-shadow)]"
-                placeholder="Feedback (optional)..."
+                placeholder={t("Feedback (optional)...")}
                 value={sub.feedback || ''}
                 onChange={(e) => {
                   setSubmissions((prev) => {

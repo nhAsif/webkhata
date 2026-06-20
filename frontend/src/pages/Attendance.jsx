@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/Card';
 import Button from '../components/Button';
 import { Input, Select } from '../components/Input';
 import { CheckCircle2, XCircle, Clock, Loader2, BarChart2, Users, ClipboardList } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 function today() {
   return new Date().toISOString().split('T')[0];
@@ -37,6 +38,7 @@ const STATUS_CFG = {
 const NEXT_STATUS = { present: 'absent', absent: 'late', late: 'present' };
 
 export default function Attendance() {
+  const { t } = useTranslation();
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState('');
   const [sessionDate, setSessionDate] = useState(today());
@@ -122,7 +124,7 @@ export default function Attendance() {
       // We reuse auto-init which is idempotent — topic won't update existing session this way.
       // Just update via a regular sessions endpoint if available, else skip.
       // For now: reload with updated topic awareness.
-      toast.success('Topic noted — will apply on next session creation');
+      toast.success(t('Topic noted — will apply on next session creation'));
     } finally {
       setTopicSaving(false);
     }
@@ -145,15 +147,15 @@ export default function Attendance() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Attendance</h1>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">{t('Attendance')}</h1>
           <p className="text-stardust text-sm mt-1">
-            All students auto-marked <span className="text-[#C4B5FD] font-mono font-bold bg-[#181B20] px-1">present</span> — tap to change status
+            {t('All students auto-marked')} <span className="text-[#C4B5FD] font-mono font-bold bg-[#181B20] px-1">{t('present')}</span> — {t('tap to change status')}
           </p>
         </div>
         <Button variant="secondary" onClick={() => setSummaryModal(true)}>
           <span className="flex items-center gap-2">
             <BarChart2 className="w-4 h-4 stroke-[3px]" />
-            Monthly Summary
+            {t('Monthly Summary')}
           </span>
         </Button>
       </div>
@@ -163,19 +165,19 @@ export default function Attendance() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Batch *</label>
+              <label className="text-sm font-medium text-stardust">{t('Batch *')}</label>
               <Select
                 value={selectedBatch}
                 onChange={(e) => setSelectedBatch(e.target.value)}
               >
-                <option value="">Select batch...</option>
+                <option value="">{t('Select batch...')}</option>
                 {batches.map((b) => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Session Date *</label>
+              <label className="text-sm font-medium text-stardust">{t('Session Date *')}</label>
               <Input
                 type="date"
                 value={sessionDate}
@@ -183,9 +185,9 @@ export default function Attendance() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-stardust">Topic (optional)</label>
+              <label className="text-sm font-medium text-stardust">{t('Topic (optional)')}</label>
               <Input
-                placeholder="What was covered today?"
+                placeholder={t('What was covered today?')}
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
               />
@@ -202,27 +204,27 @@ export default function Attendance() {
             {!loading && students.length > 0 && (
               <div className="flex flex-wrap items-center gap-3 mb-5">
                 <span className="border-2 border-black bg-white text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
-                  {students.length} students
+                  {students.length} {t('students')}
                 </span>
                 <span className="border-2 border-black bg-[#C4B5FD] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 stroke-[3px]" />
-                  {presentCount} present
+                  {presentCount} {t('present')}
                 </span>
                 {absentCount > 0 && (
                   <span className="border-2 border-black bg-[#FF6B6B] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                     <XCircle className="w-3.5 h-3.5 stroke-[3px]" />
-                    {absentCount} absent
+                    {absentCount} {t('absent')}
                   </span>
                 )}
                 {lateCount > 0 && (
                   <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 stroke-[3px]" />
-                    {lateCount} late
+                    {lateCount} {t('late')}
                   </span>
                 )}
                 <div className="flex-1" />
                 <p className="text-xs text-stardust font-body italic hidden sm:block">
-                  Tap to cycle: Present → Absent → Late
+                  {t('Tap to cycle: Present → Absent → Late')}
                 </p>
               </div>
             )}
@@ -236,7 +238,7 @@ export default function Attendance() {
             ) : students.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] text-black">
                 <Users className="w-8 h-8 mb-2 text-black stroke-[3px]" />
-                <div className="text-sm font-heading font-black uppercase">No students in this batch</div>
+                <div className="text-sm font-heading font-black uppercase">{t('No students in this batch')}</div>
               </div>
             ) : (
               <div className="flex flex-col gap-2.5">
@@ -250,7 +252,7 @@ export default function Attendance() {
                       key={student.id}
                       className={`flex items-center p-4 border-4 border-black gap-4 cursor-pointer transition-all duration-100 select-none hover:opacity-95 hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${cfg.card}`}
                       onClick={() => toggleStudent(student.id)}
-                      title="Tap to change status"
+                      title={t("Tap to change status")}
                     >
                       {/* Status dot */}
                       <div className={`h-3 w-3 rounded-full shrink-0 ${cfg.dot} transition-all duration-200`} />
@@ -258,7 +260,7 @@ export default function Attendance() {
                       {/* Student info */}
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-sm font-body text-pure truncate">{student.name}</div>
-                        <div className="text-xs opacity-60 font-mono mt-0.5">{student.class_level}</div>
+                        <div className="text-xs opacity-60 font-mono mt-0.5">{t(student.class_level)}</div>
                       </div>
 
                       {/* Saving spinner or status label */}
@@ -267,7 +269,7 @@ export default function Attendance() {
                           <Loader2 className="w-4 h-4 animate-spin opacity-60" />
                         ) : (
                           <span className="flex items-center gap-1.5 text-xs font-mono font-semibold uppercase">
-                            {cfg.icon} {cfg.label}
+                            {cfg.icon} {t(cfg.label)}
                           </span>
                         )}
                       </div>
@@ -281,10 +283,10 @@ export default function Attendance() {
             {!loading && students.length > 0 && (
               <div className="mt-5 flex items-center gap-2 text-xs text-stardust/60 font-mono">
                 <span className="inline-flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Auto-saved
+                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> {t('Auto-saved')}
                 </span>
                 <span>·</span>
-                <span>Changes save instantly on tap</span>
+                <span>{t('Changes save instantly on tap')}</span>
               </div>
             )}
           </CardContent>
@@ -292,8 +294,8 @@ export default function Attendance() {
       ) : (
         <div className="flex flex-col items-center justify-center p-12 text-center bg-white border-4 border-black shadow-[8px_8px_0px_var(--neo-shadow)] text-black">
           <ClipboardList className="w-12 h-12 mb-4 text-black stroke-[2.5px]" />
-          <div className="text-lg font-heading font-black uppercase">Select a batch to mark attendance</div>
-          <p className="text-sm text-black/60 font-body font-bold mt-1">All students will be auto-marked present</p>
+          <div className="text-lg font-heading font-black uppercase">{t('Select a batch to mark attendance')}</div>
+          <p className="text-sm text-black/60 font-body font-bold mt-1">{t('All students will be auto-marked present')}</p>
         </div>
       )}
 
@@ -301,11 +303,11 @@ export default function Attendance() {
       <Modal
         isOpen={summaryModal}
         onClose={() => setSummaryModal(false)}
-        title="Monthly Attendance Summary"
+        title={t("Monthly Attendance Summary")}
         size="lg"
       >
         <div className="mb-6 space-y-1.5">
-          <label className="text-sm font-medium text-stardust">Select Month</label>
+          <label className="text-sm font-medium text-stardust">{t('Select Month')}</label>
           <div className="flex gap-3">
             <Input
               type="month"
@@ -313,14 +315,14 @@ export default function Attendance() {
               onChange={(e) => setSummaryMonth(e.target.value)}
               className="max-w-[200px]"
             />
-            <Button variant="primary" onClick={loadSummary}>Load</Button>
+            <Button variant="primary" onClick={loadSummary}>{t('Load')}</Button>
           </div>
         </div>
 
         {summary && (
           <div>
             <div className="text-xs text-stardust mb-3 font-mono">
-              {summary.total_sessions} sessions in {summary.month}
+              {summary.total_sessions} {t('sessions in')} {summary.month}
             </div>
             <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-2">
               {summary.summary?.map((row) => (
@@ -330,13 +332,13 @@ export default function Attendance() {
                 >
                   <div className="flex-1 font-bold text-sm text-black">{row.student_name}</div>
                   <span className="border-2 border-black bg-[#C4B5FD] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
-                    {row.present}P
+                    {row.present}{t('P')}
                   </span>
                   <span className="border-2 border-black bg-[#FF6B6B] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
-                    {row.absent}A
+                    {row.absent}{t('A')}
                   </span>
                   <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
-                    {row.late}L
+                    {row.late}{t('L')}
                   </span>
                   <span
                     className={`border-2 border-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] ${

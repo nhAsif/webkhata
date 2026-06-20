@@ -6,6 +6,7 @@ import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { Input, Select, Textarea } from '../components/Input';
 import Button from '../components/Button';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const CLASS_LEVELS = ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'JSC', 'SSC'];
 const SUBJECTS_LIST = ['Math', 'English', 'Science', 'Bangla', 'BGS', 'Religion', 'Physics', 'Chemistry', 'Biology', 'ICT'];
@@ -23,7 +24,7 @@ const EMPTY_FORM = {
   start_date: new Date().toISOString().split('T')[0],
 };
 
-function statusBadge(status) {
+function statusBadge(status, t) {
   const isActive = status === 'active';
   return (
     <span 
@@ -33,12 +34,13 @@ function statusBadge(status) {
           : 'bg-[#FAF6EE] text-black/50'
       }`}
     >
-      {status}
+      {t(status)}
     </span>
   );
 }
 
 export default function Students() {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // 'add' | 'edit' | null
@@ -91,10 +93,10 @@ export default function Students() {
       if (modal === 'add') {
         const res = await api.post('/students', form);
         studentId = res.data.id;
-        toast.success('Student added successfully');
+        toast.success(t('Student added successfully'));
       } else {
         await api.put(`/students/${studentId}`, form);
-        toast.success('Student updated');
+        toast.success(t('Student updated successfully'));
       }
 
       if (photoFile) {
@@ -117,14 +119,14 @@ export default function Students() {
   const toggleStatus = async (s) => {
     const newStatus = s.status === 'active' ? 'inactive' : 'active';
     await api.patch(`/students/${s.id}/status`, { status: newStatus });
-    toast.success(`Student ${newStatus === 'active' ? 'reactivated' : 'archived'}`);
+    toast.success(newStatus === 'active' ? t('Student reactivated') : t('Student archived'));
     load();
   };
 
   const deleteStudent = async (id) => {
-    if (!confirm('Are you sure you want to permanently delete this student? All their records will be lost.')) return;
+    if (!confirm(t('Are you sure you want to permanently delete this student? All their records will be lost.'))) return;
     await api.delete(`/students/${id}`);
-    toast.success('Student deleted permanently');
+    toast.success(t('Student deleted permanently'));
     load();
   };
 
@@ -137,7 +139,7 @@ export default function Students() {
   };
 
   const columns = [
-    { key: 'photo', label: 'Photo', render: (s) => (
+    { key: 'photo', label: t('Photo'), render: (s) => (
       <div className="w-10 h-10 border-2 border-black bg-[#FFD93D] flex items-center justify-center shadow-[2px_2px_0px_var(--neo-shadow)] shrink-0 relative overflow-hidden">
         {s.photo_path ? (
           <img src={`/${s.photo_path}`} alt={s.name} className="w-full h-full object-cover" />
@@ -148,7 +150,7 @@ export default function Students() {
         )}
       </div>
     )},
-    { key: 'name', label: 'Name', render: (s) => (
+    { key: 'name', label: t('Name'), render: (s) => (
       <Button
         variant="link"
         className="font-bold text-bitcoin hover:text-gold text-left justify-start"
@@ -157,48 +159,48 @@ export default function Students() {
         {s.name}
       </Button>
     )},
-    { key: 'class_level', label: 'Class', render: (s) => (
+    { key: 'class_level', label: t('Class'), render: (s) => (
       <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
-        {s.class_level}
+        {t(s.class_level)}
       </span>
     )},
-    { key: 'subjects', label: 'Subjects', className: 'hidden', render: (s) => (
+    { key: 'subjects', label: t('Subjects'), className: 'hidden', render: (s) => (
       <span className="text-xs text-stardust font-body">
-        {(Array.isArray(s.subjects) ? s.subjects : []).join(', ') || '—'}
+        {(Array.isArray(s.subjects) ? s.subjects : []).map(sub => t(sub)).join(', ') || '—'}
       </span>
     )},
-    { key: 'guardian_name', label: 'Guardian', className: 'hidden' },
-    { key: 'guardian_phone', label: 'Phone', className: 'hidden', render: (s) => (
+    { key: 'guardian_name', label: t('Guardian'), className: 'hidden' },
+    { key: 'guardian_phone', label: t('Phone'), className: 'hidden', render: (s) => (
       <span className="font-mono text-sm">{s.guardian_phone}</span>
     ) },
-    { key: 'monthly_fee', label: 'Monthly Fee', render: (s) => (
+    { key: 'monthly_fee', label: t('Monthly Fee'), render: (s) => (
       <span className="font-mono text-sm font-bold text-bitcoin">৳{(s.monthly_fee ?? 0).toLocaleString()}</span>
     ) },
-    { key: 'start_date', label: 'Start Date', render: (s) => (
+    { key: 'start_date', label: t('Start Date'), render: (s) => (
       <span className="font-mono text-xs text-stardust">{s.start_date || '—'}</span>
     ) },
-    { key: 'parent_code', label: 'Parent Login / Code', className: 'hidden', render: (s) => (
+    { key: 'parent_code', label: t('Parent Login / Code'), className: 'hidden', render: (s) => (
       <div className="flex flex-col gap-1">
         <code className="text-xs bg-white border-2 border-black px-2 py-0.5 text-black font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] w-max">
           {s.parent_username || '-'}
         </code>
         <code className="text-[10px] text-black/60 font-mono font-bold">
-          Code: {s.parent_code}
+          {t("Code")}: {s.parent_code}
         </code>
       </div>
     )},
-    { key: 'status', label: 'Status', className: 'hidden', render: (s) => statusBadge(s.status) },
+    { key: 'status', label: t('Status'), className: 'hidden', render: (s) => statusBadge(s.status, t) },
     { key: 'actions', label: '', render: (s) => (
       <div className="flex items-center gap-2 justify-end">
-        <Button variant="secondary" size="sm" onClick={() => openEdit(s)}>Edit</Button>
+        <Button variant="secondary" size="sm" onClick={() => openEdit(s)}>{t('Edit')}</Button>
         <Button
           size="sm"
           variant={s.status === 'active' ? 'secondary' : 'success'}
           onClick={() => toggleStatus(s)}
         >
-          {s.status === 'active' ? 'Archive' : 'Activate'}
+          {s.status === 'active' ? t('Archive') : t('Activate')}
         </Button>
-        <Button variant="danger" size="sm" onClick={() => deleteStudent(s.id)}>Delete</Button>
+        <Button variant="danger" size="sm" onClick={() => deleteStudent(s.id)}>{t('Delete')}</Button>
       </div>
     )},
   ];
@@ -216,37 +218,37 @@ export default function Students() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-body">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">Students</h1>
-          <p className="text-sm text-stardust mt-1">{students.length} students enrolled</p>
+          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">{t('Students')}</h1>
+          <p className="text-sm text-stardust mt-1">{students.length} {t('students enrolled')}</p>
         </div>
-        <Button variant="primary" onClick={openAdd}>+ Add Student</Button>
+        <Button variant="primary" onClick={openAdd}>+ {t('Add Student')}</Button>
       </div>
 
       <DataTable
         columns={columns}
         data={students}
         loading={loading}
-        searchPlaceholder="Search students..."
+        searchPlaceholder={t('Search students...')}
         searchKeys={['name', 'guardian_name', 'guardian_phone']}
-        emptyTitle="No students yet"
-        emptyDesc="Add your first student to get started."
+        emptyTitle={t('No students yet')}
+        emptyDesc={t('Add your first student to get started.')}
         emptyAction={
-          <Button variant="primary" onClick={openAdd}>Add Student</Button>
+          <Button variant="primary" onClick={openAdd}>{t('Add Student')}</Button>
         }
       />
 
       <Modal
         isOpen={!!modal}
         onClose={() => setModal(null)}
-        title={modal === 'add' ? 'Add New Student' : 'Edit Student'}
+        title={modal === 'add' ? t('Add New Student') : t('Edit Student')}
         footer={
           <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setModal(null)}>{t('Cancel')}</Button>
             <Button variant="primary" form="student-form" type="submit" disabled={saving}>
               {saving ? (
                 <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
               ) : null}
-              {modal === 'add' ? 'Add Student' : 'Save Changes'}
+              {modal === 'add' ? t('Add Student') : t('Save Changes')}
             </Button>
           </div>
         }
@@ -262,7 +264,7 @@ export default function Students() {
                 </svg>
               )}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Upload</span>
+                <span className="text-xs font-bold text-white uppercase tracking-wider">{t('Upload')}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -271,39 +273,39 @@ export default function Students() {
                 />
               </div>
             </div>
-            <p className="text-xs text-black/60 font-bold uppercase font-heading tracking-wider">Profile Picture (Optional)</p>
+            <p className="text-xs text-black/60 font-bold uppercase font-heading tracking-wider">{t('Profile Picture (Optional)')}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Full Name *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Full Name *')}</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
-                placeholder="Student's full name"
+                placeholder={t("Student's full name")}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Class Level *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Class Level *')}</label>
               <Select
                 value={form.class_level}
                 onChange={(e) => setForm((f) => ({ ...f, class_level: e.target.value }))}
               >
-                {CLASS_LEVELS.map((c) => <option key={c} value={c}>{c}</option>)}
+                {CLASS_LEVELS.map((c) => <option key={c} value={c}>{t(c)}</option>)}
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Guardian Name *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Guardian Name *')}</label>
               <Input
                 value={form.guardian_name}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_name: e.target.value }))}
                 required
-                placeholder="Parent/Guardian name"
+                placeholder={t('Parent/Guardian name')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Guardian Phone *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Guardian Phone *')}</label>
               <Input
                 value={form.guardian_phone}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_phone: e.target.value }))}
@@ -312,17 +314,17 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Parent Username *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Parent Username *')}</label>
               <Input
                 value={form.parent_username}
                 onChange={(e) => setForm((f) => ({ ...f, parent_username: e.target.value }))}
                 required
-                placeholder="Parent login username"
+                placeholder={t('Parent login username')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-black text-black font-heading uppercase tracking-wider">
-                Parent Password {modal === 'edit' && '(Leave blank to keep current)'}
+                {t('Parent Password')} {modal === 'edit' && `(${t('Leave blank to keep current')})`}
               </label>
               <Input
                 type="password"
@@ -330,14 +332,14 @@ export default function Students() {
                 onChange={(e) => setForm((f) => ({ ...f, parent_password: e.target.value }))}
                 required={modal === 'add'}
                 minLength={6}
-                placeholder={modal === 'add' ? "Min 6 characters" : "New password (optional)"}
+                placeholder={modal === 'add' ? t('Min 6 characters') : t('New password (optional)')}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Monthly Fee (৳) *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Monthly Fee (৳) *')}</label>
               <Input
                 type="number"
                 min="1"
@@ -348,7 +350,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Start Date *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Start Date *')}</label>
               <Input
                 type="date"
                 value={form.start_date}
@@ -359,7 +361,7 @@ export default function Students() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Subjects *</label>
+            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Subjects *')}</label>
             <div className="flex flex-wrap gap-2 mt-1">
               {SUBJECTS_LIST.map((sub) => {
                 const isSelected = form.subjects.includes(sub);
@@ -372,7 +374,7 @@ export default function Students() {
                     className={isSelected ? 'h-9 px-3.5' : 'h-9 px-3.5 opacity-80'}
                     onClick={() => subjectToggle(sub)}
                   >
-                    {sub}
+                    {t(sub)}
                   </Button>
                 );
               })}
@@ -380,11 +382,11 @@ export default function Students() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Address</label>
+            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">{t('Address')}</label>
             <Textarea
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-              placeholder="Home address (optional)"
+              placeholder={t('Home address (optional)')}
               rows={2}
             />
           </div>

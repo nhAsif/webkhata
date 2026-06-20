@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardContent } from '../../components/Card';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { CheckCircle2, XCircle, AlertTriangle, Calendar, Clock, ClipboardList } from 'lucide-react';
 
 const STATUS_BADGE = {
@@ -10,6 +11,7 @@ const STATUS_BADGE = {
 };
 
 export default function ParentHomework() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,7 @@ export default function ParentHomework() {
     return (
       <div className="space-y-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">Homework</h1>
+          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">{t("Homework")}</h1>
         </div>
         <div className="flex flex-col gap-3">
           {[...Array(4)].map((_, i) => (
@@ -44,12 +46,12 @@ export default function ParentHomework() {
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">Homework</h1>
-          <p className="text-black/60 font-body font-bold mt-1">Assignments and submission status</p>
+          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">{t("Homework")}</h1>
+          <p className="text-black/60 font-body font-bold mt-1">{t("Assignments and submission status")}</p>
         </div>
         <div className="flex gap-2">
-          <span className="inline-flex px-2.5 py-0.5 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{pending.length} pending</span>
-          <span className="inline-flex px-2.5 py-0.5 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{submitted.length} submitted</span>
+          <span className="inline-flex px-2.5 py-0.5 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{pending.length} {t("pending")}</span>
+          <span className="inline-flex px-2.5 py-0.5 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{submitted.length} {t("submitted")}</span>
         </div>
       </div>
 
@@ -59,7 +61,7 @@ export default function ParentHomework() {
             <div className="text-black mb-4">
               <ClipboardList className="w-12 h-12 stroke-[2px]" />
             </div>
-            <div className="text-black font-heading font-black text-lg uppercase tracking-tight">No homework assigned yet</div>
+            <div className="text-black font-heading font-black text-lg uppercase tracking-tight">{t("No homework assigned yet")}</div>
           </CardContent>
         </Card>
       ) : (
@@ -87,21 +89,21 @@ export default function ParentHomework() {
                       <div className="flex gap-4 mt-2 flex-wrap text-xs font-mono font-bold">
                         <span className="text-black/60 flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 stroke-[2.5px]" />
-                          Assigned: {hw.assigned_date}
+                          {t("Assigned")}: {hw.assigned_date}
                         </span>
                         <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 font-bold' : 'text-black/60 font-bold'}`}>
                           <Clock className="w-3.5 h-3.5 stroke-[2.5px]" />
-                          Due: {hw.due_date} {isOverdue ? '(Overdue!)' : ''}
+                          {t("Due")}: {hw.due_date} {isOverdue ? t('(Overdue!)') : ''}
                         </span>
                       </div>
                       {hw.feedback && (
                         <div className="mt-3 p-3 bg-[#FAF6EE] border-2 border-black text-sm text-black font-body shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                          <strong className="text-[#FF6B6B] font-heading font-black uppercase tracking-tight mr-1">Feedback:</strong> {hw.feedback}
+                          <strong className="text-[#FF6B6B] font-heading font-black uppercase tracking-tight mr-1">{t("Feedback:")}</strong> {hw.feedback}
                         </div>
                       )}
                     </div>
                     <span className={`inline-flex px-2.5 py-0.5 text-xs font-mono border flex-shrink-0 items-center gap-1.5 ${statusInfo.cls}`}>
-                      {statusInfo.icon} {statusInfo.label}
+                      {statusInfo.icon} {t(statusInfo.label)}
                     </span>
                   </div>
                 </CardContent>

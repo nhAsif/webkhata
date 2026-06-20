@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -31,12 +32,13 @@ import ParentVocabulary from './pages/parent/ParentVocabulary';
 
 export default function App() {
   return (
-    <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/parent/login" element={<ParentLogin />} />
+    <LanguageProvider>
+      <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/parent/login" element={<ParentLogin />} />
 
             {/* Tutor routes */}
             <Route
@@ -103,5 +105,6 @@ export default function App() {
           }}
         />
       </AuthProvider>
+    </LanguageProvider>
   );
 }

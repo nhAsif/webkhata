@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import ChangePasswordModal from './ChangePasswordModal';
 import { cn } from '../utils/cn';
 import { 
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { language, t } = useTranslation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -76,7 +78,7 @@ export default function Layout() {
 
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto bg-white">
           <span className="text-[11px] font-black uppercase tracking-widest text-black/50 px-3 py-1 font-heading">
-            Tutor Menu
+            {t("Tutor Menu")}
           </span>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
@@ -91,7 +93,7 @@ export default function Layout() {
                 onClick={closeSidebar}
               >
                 <Icon className={cn("w-5 h-5 transition-transform duration-100 group-hover:scale-110 text-black stroke-[2.5px]")} />
-                {item.label}
+                {t(item.label)}
               </NavLink>
             );
           })}
@@ -103,20 +105,20 @@ export default function Layout() {
               {(user?.username || 'U')[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-black text-black truncate uppercase tracking-tight">{user?.username || 'User'}</div>
+              <div className="text-xs font-black text-black truncate uppercase tracking-tight">{user?.username || t('User')}</div>
               <div className="text-[10px] text-black/60 font-mono font-bold capitalize">{user?.role || 'tutor'}</div>
             </div>
             <button
               className="text-black hover:bg-[#FFD93D] p-1.5 border-2 border-transparent hover:border-black transition-all duration-100 cursor-pointer"
               onClick={() => setIsPasswordModalOpen(true)}
-              title="Change Password"
+              title={t("Change Password")}
             >
               <Key className="w-4 h-4 stroke-[3px]" />
             </button>
             <button
               className="text-black hover:bg-[#FF6B6B] p-1.5 border-2 border-transparent hover:border-black transition-all duration-100 cursor-pointer"
               onClick={handleLogout}
-              title="Logout"
+              title={t("Logout")}
             >
               <LogOut className="w-4 h-4 stroke-[3px]" />
             </button>
@@ -142,7 +144,7 @@ export default function Layout() {
               <div className="relative bg-[#FFD93D] text-black font-heading font-black text-sm md:text-base px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_var(--neo-shadow)] -rotate-1 hover:rotate-0 transition-transform duration-200">
                 <span className="relative z-10 select-none uppercase tracking-wider font-black flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-black stroke-[3px]" />
-                  WebKhata Ledger
+                  {t("WebKhata Ledger")}
                   <BookOpen className="w-5 h-5 text-black stroke-[3px]" />
                 </span>
               </div>
@@ -151,7 +153,7 @@ export default function Layout() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 text-black text-xs font-heading font-black uppercase tracking-wider border-4 border-black bg-white px-3 py-1.5 shadow-[3px_3px_0px_0px_var(--neo-shadow)]">
                 <Calendar className="w-4 h-4 text-black stroke-[3px]" />
-                {new Date().toLocaleDateString('en-BD', {
+                {new Date().toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-BD', {
                   weekday: 'short',
                   year: 'numeric',
                   month: 'short',

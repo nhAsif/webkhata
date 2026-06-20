@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { Card, CardContent } from '../../components/Card';
 import { Input } from '../../components/Input';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { CheckCircle2, XCircle, Clock, Calendar, BarChart2 } from 'lucide-react';
 
 const STATUS_COLORS = {
@@ -19,6 +20,7 @@ function getFirstDayOfMonth(year, month) {
 }
 
 export default function ParentAttendance() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [loading, setLoading] = useState(true);
@@ -39,8 +41,8 @@ export default function ParentAttendance() {
     <div className="space-y-6">
       <div className="mb-8 flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">Attendance</h1>
-          <p className="text-black/60 font-body mt-1">Monthly attendance calendar</p>
+          <h1 className="text-3xl font-heading text-black font-black uppercase tracking-tight">{t("Attendance")}</h1>
+          <p className="text-black/60 font-body mt-1">{t("Monthly attendance calendar")}</p>
         </div>
         <div className="w-auto min-w-[150px]">
           <Input
@@ -55,19 +57,19 @@ export default function ParentAttendance() {
         <div className="flex flex-wrap gap-2.5 mb-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#4ADE80] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             <CheckCircle2 className="w-3.5 h-3.5 stroke-[3px]" />
-            Present: {data.summary.present}
+            {t("Present")}: {data.summary.present}
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FF6B6B] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             <XCircle className="w-3.5 h-3.5 stroke-[3px]" />
-            Absent: {data.summary.absent}
+            {t("Absent")}: {data.summary.absent}
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#FFD93D] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             <Clock className="w-3.5 h-3.5 stroke-[3px]" />
-            Late: {data.summary.late}
+            {t("Late")}: {data.summary.late}
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold border-2 border-black bg-[#C4B5FD] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             <Calendar className="w-3.5 h-3.5 stroke-[2.5px]" />
-            Sessions: {data.summary.total_sessions}
+            {t("Sessions")}: {data.summary.total_sessions}
           </span>
           <span
             className={`inline-flex px-3 py-1 text-xs font-mono font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
@@ -78,7 +80,7 @@ export default function ParentAttendance() {
           >
             <span className="flex items-center gap-1.5">
               <BarChart2 className="w-3.5 h-3.5 stroke-[3px]" />
-              {data.summary.attendance_rate}% Rate
+              {data.summary.attendance_rate}% {t("Rate")}
             </span>
           </span>
         </div>
@@ -94,7 +96,7 @@ export default function ParentAttendance() {
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {DAY_LABELS.map((d) => (
                   <div key={d} className="text-center text-xs text-black font-heading font-black uppercase p-1">
-                    {d}
+                    {t(d)}
                   </div>
                 ))}
               </div>
@@ -121,7 +123,7 @@ export default function ParentAttendance() {
                           ? `${style.bg} ${style.color} ${style.border} font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
                           : 'bg-[#FAF6EE] text-black/55 border-neutral-300 font-normal hover:bg-neutral-100'
                       }`}
-                      title={status ? `${dateStr}: ${status}` : dateStr}
+                      title={status ? `${dateStr}: ${t(status)}` : dateStr}
                     >
                       <div className="font-mono text-sm">{day}</div>
                       {status && <div className="text-[9px] opacity-75 mt-0.5 font-mono uppercase font-black">{style.label}</div>}
@@ -135,7 +137,7 @@ export default function ParentAttendance() {
                 {Object.entries(STATUS_COLORS).map(([s, style]) => (
                   <div key={s} className="flex items-center gap-1.5 text-xs font-mono font-bold">
                     <div className={`w-4 h-4 ${style.bg} ${style.border} shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]`} />
-                    <span className="text-black capitalize">{s}</span>
+                    <span className="text-black capitalize">{t(s)}</span>
                   </div>
                 ))}
               </div>

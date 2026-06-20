@@ -116,3 +116,39 @@ async def refetch_words(db: Session = Depends(get_db), current_user: User = Depe
     get_daily_vocabulary(db, current_user)
     
     return {"message": "Words refetched instantly"}
+
+import json
+
+SETTINGS_FILE = "./system_settings.json"
+
+def get_system_settings():
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"language": "en"}
+
+def save_system_settings(data):
+    try:
+        with open(SETTINGS_FILE, "w") as f:
+            json.dump(data, f)
+    except Exception as e:
+        print(f"Failed to save system settings: {e}")
+
+@router.get("/language")
+async def get_language():
+    cfg = get_system_settings()
+    return {"language": cfg.get("language", "en")}
+
+@router.put("/language")
+async def update_language(payload: dict, current_user: User = Depends(require_tutor)):
+    lang = payload.get("language")
+    if lang not in ["en", "bn"]:
+        raise HTTPException(status_code=400, detail="Invalid language")
+    
+    cfg = get_system_settings()
+    cfg["language"] = lang
+    save_system_settings(cfg)
+    return {"message": "Language updated successfully", "language": lang}

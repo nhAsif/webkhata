@@ -4,9 +4,11 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { Input } from '../../components/Input';
 import Button from '../../components/Button';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { Users, ShieldAlert, TrendingUp, GraduationCap } from 'lucide-react';
 
 export default function ParentLogin() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,11 +22,11 @@ export default function ParentLogin() {
     setLoading(true);
     try {
       await parentLogin(username, password);
-      toast.success('Welcome!');
+      toast.success(t('Welcome!'));
       navigate('/parent');
     } catch (err) {
       const msg = err.response?.data?.error || err.response?.data?.detail || 'Invalid username or code';
-      setError(msg);
+      setError(t(msg));
     } finally {
       setLoading(false);
     }
@@ -35,12 +37,12 @@ export default function ParentLogin() {
       {/* Floating details for visual interest (Stickers) */}
       <div className="absolute top-[15%] right-[10%] bg-[#FFD93D] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] rotate-6 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
         <span className="flex items-center gap-2">
-          PARENT ACCESS <Users className="w-6 h-6 text-black stroke-[3px]" />
+          {t("PARENT ACCESS")} <Users className="w-6 h-6 text-black stroke-[3px]" />
         </span>
       </div>
       <div className="absolute bottom-[20%] left-[8%] bg-[#C4B5FD] border-4 border-black px-6 py-4 shadow-[8px_8px_0px_0px_var(--neo-shadow)] -rotate-12 hidden md:block font-heading font-black text-2xl uppercase tracking-tighter">
         <span className="flex items-center gap-2">
-          KIDS PROGRESS <TrendingUp className="w-6 h-6 text-black stroke-[3px]" />
+          {t("KIDS PROGRESS")} <TrendingUp className="w-6 h-6 text-black stroke-[3px]" />
         </span>
       </div>
 
@@ -57,7 +59,7 @@ export default function ParentLogin() {
             </span>
           </div>
           <p className="text-[12px] font-black text-black/60 font-heading uppercase tracking-widest bg-[#FFD93D] px-3 py-1 border-2 border-black rotate-1 shadow-[2px_2px_0px_0px_var(--neo-shadow)] mt-1">
-            Parent Portal Access
+            {t("Parent Portal Access")}
           </p>
         </div>
 
@@ -70,11 +72,11 @@ export default function ParentLogin() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="username">Username</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="username">{t("Username")}</label>
             <Input
               id="username"
               type="text"
-              placeholder="Enter your username"
+              placeholder={t("Enter your username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -83,11 +85,11 @@ export default function ParentLogin() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="parent-password">Password</label>
+            <label className="text-sm font-black text-black font-heading uppercase tracking-wider" htmlFor="parent-password">{t("Password")}</label>
             <Input
               id="parent-password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={t("Enter your password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -101,7 +103,7 @@ export default function ParentLogin() {
             className="w-full mt-2 cursor-pointer"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : "View Child's Progress"}
+            {loading ? t('Signing in...') : t("View Child's Progress")}
           </Button>
         </form>
 
@@ -110,7 +112,7 @@ export default function ParentLogin() {
             <div className="w-full border-t-4 border-black"></div>
           </div>
           <span className="relative px-4 bg-white border-2 border-black text-xs font-black text-black font-heading uppercase tracking-wider shadow-[2px_2px_0px_0px_var(--neo-shadow)]">
-            or
+            {t("or")}
           </span>
         </div>
 
@@ -121,7 +123,7 @@ export default function ParentLogin() {
           >
             <span className="flex items-center justify-center gap-2">
               <GraduationCap className="w-4 h-4 text-black stroke-[3px]" />
-              Switch to Tutor Login
+              {t("Switch to Tutor Login")}
             </span>
           </a>
         </div>

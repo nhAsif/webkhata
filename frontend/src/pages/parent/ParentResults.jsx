@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import api from '../../api/client';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { TrendingUp, BarChart2 } from 'lucide-react';
 
 const GRADE_COLORS = {
@@ -29,6 +30,7 @@ function GradeTag({ grade }) {
 }
 
 export default function ParentResults() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -49,7 +51,7 @@ export default function ParentResults() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">{t("Results")}</h1>
         </div>
         <div className="h-[300px] bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] animate-pulse" />
       </div>
@@ -60,8 +62,8 @@ export default function ParentResults() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
-          <p className="text-stardust text-sm mt-1">Exam scores and grades for {data?.student_name}</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">{t("Results")}</h1>
+          <p className="text-stardust text-sm mt-1">{t("Exam scores and grades for")} {data?.student_name}</p>
         </div>
       </div>
 
@@ -71,7 +73,7 @@ export default function ParentResults() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-black stroke-[3px]" />
-              Performance Trend
+              {t("Performance Trend")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -83,7 +85,7 @@ export default function ParentResults() {
                 <Tooltip
                   contentStyle={{ background: '#FFFFFF', border: '4px solid #181B20', borderRadius: '0px', boxShadow: '4px 4px 0px 0px var(--neo-shadow)', fontSize: 12, color: '#181B20', fontFamily: 'Space Grotesk' }}
                   itemStyle={{ color: '#FF6B6B', fontWeight: 'bold' }}
-                  formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
+                  formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, t('Score')]}
                 />
                 <Line
                   type="monotone"
@@ -102,8 +104,8 @@ export default function ParentResults() {
       {/* Results Table */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>All Results</CardTitle>
-          <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">{results.length} exams</span>
+          <CardTitle>{t("All Results")}</CardTitle>
+          <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">{results.length} {t("exams")}</span>
         </CardHeader>
         <CardContent className="p-0 sm:p-6 sm:pt-0">
           {results.length === 0 ? (
@@ -111,19 +113,19 @@ export default function ParentResults() {
               <div className="text-black mb-4">
                 <BarChart2 className="w-12 h-12 stroke-[3px]" />
               </div>
-              <div className="text-lg font-heading font-black text-black uppercase">No results yet</div>
+              <div className="text-lg font-heading font-black text-black uppercase">{t("No results yet")}</div>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="border-b-4 border-black text-black text-sm uppercase tracking-wider font-heading font-black">
-                    <th className="p-4 font-medium">Exam</th>
-                    <th className="p-4 font-medium">Subject</th>
-                    <th className="p-4 font-medium">Date</th>
-                    <th className="p-4 font-medium">Score</th>
+                    <th className="p-4 font-medium">{t("Exam")}</th>
+                    <th className="p-4 font-medium">{t("Subject")}</th>
+                    <th className="p-4 font-medium">{t("Date")}</th>
+                    <th className="p-4 font-medium">{t("Score")}</th>
                     <th className="p-4 font-medium">%</th>
-                    <th className="p-4 font-medium">Grade</th>
+                    <th className="p-4 font-medium">{t("Grade")}</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm font-body">

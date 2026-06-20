@@ -5,30 +5,32 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import Button from '../components/Button';
 import { Input } from '../components/Input';
 import { BarChart2, Download, Search, Users, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
-function statusBadge(outstanding, totalDue) {
+function statusBadge(outstanding, totalDue, t) {
   if (outstanding === 0) {
     return (
       <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#4ADE80] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-        Paid
+        {t("Paid")}
       </span>
     );
   }
   if (outstanding === totalDue && totalDue > 0) {
     return (
       <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#FF6B6B] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-        Unpaid
+        {t("Unpaid")}
       </span>
     );
   }
   return (
     <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase font-mono bg-[#FFD93D] text-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-      Partial
+      {t("Partial")}
     </span>
   );
 }
 
 export default function Reports() {
+  const { t } = useTranslation();
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [search, setSearch] = useState('');
   const [data, setData] = useState([]);
@@ -83,19 +85,19 @@ export default function Reports() {
         <div>
           <h1 className="text-3xl font-heading font-bold text-pure tracking-tight flex items-center gap-3">
             <BarChart2 className="w-7 h-7 text-bitcoin" />
-            Monthly Report
+            {t("Monthly Report")}
           </h1>
-          <p className="text-sm text-stardust mt-1">Collection & fee status for {month}</p>
+          <p className="text-sm text-stardust mt-1">{t("Collection & fee status for")} {month}</p>
         </div>
         <Button variant="secondary" onClick={exportCSV} disabled={filtered.length === 0}>
-          <Download className="w-4 h-4 mr-2" /> Export CSV
+          <Download className="w-4 h-4 mr-2" /> {t("Export CSV")}
         </Button>
       </div>
 
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex flex-col gap-1.5 flex-1 max-w-xs">
-          <label className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Month</label>
+          <label className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">{t("Month")}</label>
           <Input
             type="month"
             value={month}
@@ -103,12 +105,12 @@ export default function Reports() {
           />
         </div>
         <div className="flex flex-col gap-1.5 flex-1">
-          <label className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Search Student</label>
+          <label className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">{t("Search Student")}</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stardust pointer-events-none" />
             <Input
               className="pl-9"
-              placeholder="Search by name..."
+              placeholder={t("Search by name...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -128,25 +130,25 @@ export default function Reports() {
         ) : (
           <>
             <StatCard
-              label="Students in Report"
+              label={t("Students in Report")}
               value={filtered.length}
               icon={<Users className="w-5 h-5 text-black" />}
               color="#FFD93D"
             />
             <StatCard
-              label="Total Due"
+              label={t("Total Due")}
               value={`৳${totalDue.toLocaleString()}`}
               icon={<TrendingUp className="w-5 h-5 text-black" />}
               color="#FF6B6B"
             />
             <StatCard
-              label="Total Collected"
+              label={t("Total Collected")}
               value={`৳${totalPaid.toLocaleString()}`}
               icon={<DollarSign className="w-5 h-5 text-black" />}
               color="#4ADE80"
             />
             <StatCard
-              label="Outstanding"
+              label={t("Outstanding")}
               value={`৳${totalOutstanding.toLocaleString()}`}
               icon={<AlertTriangle className="w-5 h-5 text-black" />}
               color={totalOutstanding > 0 ? '#FF6B6B' : '#4ADE80'}
@@ -159,7 +161,7 @@ export default function Reports() {
       <Card hover={false}>
         <CardHeader className="border-b-4 border-black bg-[#C4B5FD]/10 pb-4">
           <CardTitle className="text-lg font-heading font-black text-black flex items-center gap-2">
-            <BarChart2 className="w-5 h-5 text-black stroke-[2.5px]" /> Collection Report — {month}
+            <BarChart2 className="w-5 h-5 text-black stroke-[2.5px]" /> {t("Collection Report")} — {month}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -174,20 +176,20 @@ export default function Reports() {
               <div className="text-black mb-3">
                 <BarChart2 className="w-12 h-12 stroke-[2px]" />
               </div>
-              <div className="text-lg font-heading font-black text-black mb-1">No data for this period</div>
-              <div className="text-sm text-black/60 font-bold">Try selecting a different month or adding students with fees.</div>
+              <div className="text-lg font-heading font-black text-black mb-1">{t("No data for this period")}</div>
+              <div className="text-sm text-black/60 font-bold">{t("Try selecting a different month or adding students with fees.")}</div>
             </div>
           ) : (
             <div className="overflow-x-auto bg-white">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-[#FAF6EE] border-b-4 border-black">
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Student Name</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Monthly Fee</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Total Due</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Total Paid</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Outstanding</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">Status</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Student Name")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Monthly Fee")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Total Due")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Total Paid")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Outstanding")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Status")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-black bg-white">
@@ -212,7 +214,7 @@ export default function Reports() {
                           ৳{outstanding.toLocaleString()}
                         </td>
                         <td className="px-6 py-3.5">
-                          {statusBadge(outstanding, due)}
+                          {statusBadge(outstanding, due, t)}
                         </td>
                       </tr>
                     );
@@ -220,7 +222,7 @@ export default function Reports() {
                   {/* Totals row */}
                   <tr className="bg-[#FAF6EE] border-t-4 border-black font-bold">
                     <td className="px-6 py-3.5 text-sm font-black text-black font-heading uppercase tracking-wider">
-                      TOTALS ({filtered.length} students)
+                      {t("TOTALS")} ({filtered.length} {t("students")})
                     </td>
                     <td className="px-6 py-3.5 text-sm font-mono text-black/60">—</td>
                     <td className="px-6 py-3.5 text-sm font-mono font-bold text-red-600">

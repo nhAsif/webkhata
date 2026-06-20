@@ -6,6 +6,7 @@ import Modal from '../components/Modal';
 import { Input, Select } from '../components/Input';
 import Button from '../components/Button';
 import { Calendar, Trash2, Edit2, Users, BookOpen, Clock, AlertTriangle, Plus, X } from 'lucide-react';
+import { useTranslation } from '../contexts/LanguageContext';
 
 const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
@@ -72,6 +73,7 @@ const buildEmptyTimetable = () =>
   Object.fromEntries(DAYS.map((d) => [d, []]));
 
 export default function Batches() {
+  const { t } = useTranslation();
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null); // 'add' | 'edit' | 'students' | 'timetable' | null
@@ -176,10 +178,10 @@ export default function Batches() {
     try {
       if (modal === 'add') {
         await api.post('/batches', form);
-        toast.success('Batch created');
+        toast.success(t('Batch created successfully'));
       } else {
         await api.put(`/batches/${editId}`, form);
-        toast.success('Batch updated');
+        toast.success(t('Batch updated successfully'));
       }
       setModal(null);
       load();
@@ -191,16 +193,16 @@ export default function Batches() {
   };
 
   const archiveBatch = async (id) => {
-    if (!confirm('Archive this batch?')) return;
+    if (!confirm(t('Are you sure you want to archive this batch?'))) return;
     await api.delete(`/batches/${id}`);
-    toast.success('Batch archived');
+    toast.success(t('Batch archived successfully'));
     load();
   };
 
   const deleteBatch = async (id) => {
-    if (!confirm('Are you sure you want to permanently delete this batch? This action cannot be undone.')) return;
+    if (!confirm(t('Are you sure you want to permanently delete this batch? This action cannot be undone.'))) return;
     await api.delete(`/batches/${id}/permanent`);
-    toast.success('Batch deleted permanently');
+    toast.success(t('Batch deleted permanently'));
     load();
   };
 
@@ -208,7 +210,7 @@ export default function Batches() {
     if (!addStudentId) return;
     try {
       await api.post(`/batches/${selectedBatch.id}/students`, { student_id: parseInt(addStudentId) });
-      toast.success('Student added to batch');
+      toast.success(t('Student added to batch'));
       const res = await api.get(`/batches/${selectedBatch.id}/students`);
       setBatchStudents(res.data);
       setAddStudentId('');
@@ -217,7 +219,7 @@ export default function Batches() {
 
   const removeStudent = async (studentId) => {
     await api.delete(`/batches/${selectedBatch.id}/students/${studentId}`);
-    toast.success('Student removed');
+    toast.success(t('Student removed'));
     const res = await api.get(`/batches/${selectedBatch.id}/students`);
     setBatchStudents(res.data);
   };
@@ -235,7 +237,7 @@ export default function Batches() {
     const subject = (val ?? ttInputs[day]).trim();
     if (!subject) return;
     if (timetable[day].includes(subject)) {
-      toast.error(`"${subject}" already added for ${day}`);
+      toast.error(t('Subject already added for this day'));
       return;
     }
     setTimetable((tt) => ({ ...tt, [day]: [...tt[day], subject] }));
@@ -275,7 +277,7 @@ export default function Batches() {
     setTtSaving(true);
     try {
       await api.put(`/batches/${selectedBatch.id}/timetable`, { weekly_timetable: timetable });
-      toast.success('Timetable saved');
+      toast.success(t('Timetable saved successfully'));
       setModal(null);
     } catch {
       // handled by interceptor
@@ -291,43 +293,43 @@ export default function Batches() {
     : [];
 
   const columns = [
-    { key: 'name', label: 'Batch Name', render: (b) => (
+    { key: 'name', label: t('Batch Name'), render: (b) => (
       <span className="font-semibold text-pure">{b.name}</span>
     ) },
-    { key: 'subject', label: 'Subject' },
-    { key: 'schedule', label: 'Schedule Days', render: (b) => (
+    { key: 'subject', label: t('Subject'), render: (b) => t(b.subject) },
+    { key: 'schedule', label: t('Schedule Days'), render: (b) => (
       <div className="flex gap-1.5 flex-wrap">
         {(Array.isArray(b.schedule) ? b.schedule : []).map((d) => (
           <span key={d} className="inline-flex px-2 py-0.5 border-2 border-black text-black bg-[#C4B5FD]/30 font-mono text-[10px] uppercase font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-            {d}
+            {t(d)}
           </span>
         ))}
       </div>
     )},
-    { key: 'time_slot', label: 'Time', render: (b) => (
+    { key: 'time_slot', label: t('Time'), render: (b) => (
       <span className="font-mono text-xs text-stardust flex items-center gap-1">
         <Clock className="w-3.5 h-3.5 text-bitcoin" /> {b.time_slot}
       </span>
     ) },
-    { key: 'student_count', label: 'Students', render: (b) => (
+    { key: 'student_count', label: t('Students'), render: (b) => (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 border-2 border-black text-black bg-[#C4B5FD] font-mono text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
         <Users className="w-3.5 h-3.5" /> {b.student_count ?? 0}
       </span>
     )},
-    { key: 'status', label: 'Status', render: (b) => (
+    { key: 'status', label: t('Status'), render: (b) => (
       <span className={`inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
         b.status === 'active' ? 'bg-[#4ADE80]' : 'bg-[#E2E8F0] text-black/60'
       }`}>
-        {b.status}
+        {t(b.status)}
       </span>
     )},
     { key: 'actions', label: '', render: (b) => (
       <div className="flex items-center gap-2 justify-end">
-        <Button variant="secondary" size="sm" onClick={() => openStudents(b)}>Roster</Button>
-        <Button variant="secondary" size="sm" onClick={() => openTimetable(b)}>Timetable</Button>
-        <Button variant="secondary" size="sm" onClick={() => openEdit(b)}>Edit</Button>
-        <Button variant="secondary" size="sm" onClick={() => archiveBatch(b.id)}>Archive</Button>
-        <Button variant="danger" size="sm" onClick={() => deleteBatch(b.id)}>Delete</Button>
+        <Button variant="secondary" size="sm" onClick={() => openStudents(b)}>{t('Roster')}</Button>
+        <Button variant="secondary" size="sm" onClick={() => openTimetable(b)}>{t('Timetable')}</Button>
+        <Button variant="secondary" size="sm" onClick={() => openEdit(b)}>{t('Edit')}</Button>
+        <Button variant="secondary" size="sm" onClick={() => archiveBatch(b.id)}>{t('Archive')}</Button>
+        <Button variant="danger" size="sm" onClick={() => deleteBatch(b.id)}>{t('Delete')}</Button>
       </div>
     )},
   ];
@@ -339,36 +341,36 @@ export default function Batches() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-body">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">Batches</h1>
-          <p className="text-sm text-stardust mt-1">Manage class groups and student rosters</p>
+          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">{t('Batches')}</h1>
+          <p className="text-sm text-stardust mt-1">{t('Manage student batches and class schedules')}</p>
         </div>
-        <Button variant="primary" onClick={openAdd}>+ Create Batch</Button>
+        <Button variant="primary" onClick={openAdd}>+ {t('Create Batch')}</Button>
       </div>
 
       <DataTable
         columns={columns}
         data={batches}
         loading={loading}
-        searchPlaceholder="Search batches..."
+        searchPlaceholder={t('Search batches...')}
         searchKeys={['name', 'subject']}
-        emptyTitle="No batches yet"
-        emptyDesc="Create your first batch to organize students."
-        emptyAction={<Button variant="primary" onClick={openAdd}>Create Batch</Button>}
+        emptyTitle={t('No batches yet')}
+        emptyDesc={t('Create your first batch to organize students.')}
+        emptyAction={<Button variant="primary" onClick={openAdd}>{t('Create Batch')}</Button>}
       />
 
       {/* Add/Edit Batch Modal */}
       <Modal
         isOpen={modal === 'add' || modal === 'edit'}
         onClose={() => setModal(null)}
-        title={modal === 'add' ? 'Create Batch' : 'Edit Batch'}
+        title={modal === 'add' ? t('Create Batch') : t('Edit Batch')}
         footer={
           <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setModal(null)}>{t('Cancel')}</Button>
             <Button variant="primary" form="batch-form" type="submit" disabled={saving}>
               {saving ? (
                 <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
               ) : null}
-              Save
+              {t('Save')}
             </Button>
           </div>
         }
@@ -376,25 +378,25 @@ export default function Batches() {
         <form id="batch-form" onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5 col-span-2">
-              <label className="text-sm font-medium text-stardust">Batch Name *</label>
+              <label className="text-sm font-medium text-stardust">{t('Batch Name *')}</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
-                placeholder="e.g. SSC Math — Batch A"
+                placeholder={t('e.g. SSC Math — Batch A')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Subject *</label>
+              <label className="text-sm font-medium text-stardust">{t('Subject *')}</label>
               <Input
                 value={form.subject}
                 onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
                 required
-                placeholder="e.g. Mathematics"
+                placeholder={t('e.g. Mathematics')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Time Slot *</label>
+              <label className="text-sm font-medium text-stardust">{t('Time Slot *')}</label>
               <Input
                 value={form.time_slot}
                 onChange={(e) => setForm((f) => ({ ...f, time_slot: e.target.value }))}
@@ -405,7 +407,7 @@ export default function Batches() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Schedule Days *</label>
+            <label className="text-sm font-medium text-stardust">{t('Schedule Days *')}</label>
             <div className="flex flex-wrap gap-2 mt-1">
               {DAYS.map((day) => {
                 const isSelected = form.schedule.includes(day);
@@ -418,7 +420,7 @@ export default function Batches() {
                     className={isSelected ? 'h-9 px-4 font-semibold' : 'h-9 px-4 opacity-80'}
                     onClick={() => toggleDay(day)}
                   >
-                    {day}
+                    {t(day)}
                   </Button>
                 );
               })}
@@ -431,7 +433,7 @@ export default function Batches() {
       <Modal
         isOpen={modal === 'students'}
         onClose={() => setModal(null)}
-        title={`Roster — ${selectedBatch?.name}`}
+        title={`${t('Roster')} — ${selectedBatch?.name}`}
         size="lg"
       >
         <div className="space-y-5">
@@ -441,15 +443,15 @@ export default function Batches() {
               onChange={(e) => setAddStudentId(e.target.value)}
               className="flex-1"
             >
-              <option value="">Select student to add...</option>
+              <option value="">{t('Select student to add...')}</option>
               {notEnrolled.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.name} ({s.class_level})
+                  {s.name} ({t(s.class_level)})
                 </option>
               ))}
             </Select>
             <Button variant="primary" onClick={addStudent} disabled={!addStudentId}>
-              Add
+              {t('Add')}
             </Button>
           </div>
 
@@ -458,8 +460,8 @@ export default function Batches() {
               <div className="mb-2">
                 <Users className="w-8 h-8 stroke-[2px]" />
               </div>
-              <div className="text-sm font-semibold">No students yet</div>
-              <div className="text-xs text-black/65 mt-1">Select a student from the dropdown above to add them.</div>
+              <div className="text-sm font-semibold">{t('No students yet')}</div>
+              <div className="text-xs text-black/65 mt-1">{t('Select a student from the dropdown above to add them.')}</div>
             </div>
           ) : (
             <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
@@ -470,14 +472,14 @@ export default function Batches() {
                 >
                   <div>
                     <div className="font-semibold text-black text-sm">{s.name}</div>
-                    <div className="text-xs text-black/60 font-mono mt-0.5">{s.class_level} · {s.guardian_phone}</div>
+                    <div className="text-xs text-black/60 font-mono mt-0.5">{t(s.class_level)} · {s.guardian_phone}</div>
                   </div>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={() => removeStudent(s.id)}
                   >
-                    Remove
+                    {t('Remove')}
                   </Button>
                 </div>
               ))}
@@ -490,16 +492,16 @@ export default function Batches() {
       <Modal
         isOpen={modal === 'timetable'}
         onClose={() => setModal(null)}
-        title={`Weekly Timetable — ${selectedBatch?.name}`}
+        title={`${t('Weekly Timetable')} — ${selectedBatch?.name}`}
         size="lg"
         footer={
           <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setModal(null)}>{t('Cancel')}</Button>
             <Button variant="primary" onClick={saveTimetable} disabled={ttSaving || ttLoading}>
               {ttSaving ? (
                 <span className="w-4 h-4 border-2 border-pure/30 border-t-pure rounded-full animate-spin mr-2" />
               ) : null}
-              Save Timetable
+              {t('Save Timetable')}
             </Button>
           </div>
         }
@@ -515,11 +517,11 @@ export default function Batches() {
               <div className="p-3 bg-[#FAF6EE] border-2 border-black text-xs text-black/75 flex items-center gap-2 flex-wrap">
                 <span className="font-mono uppercase font-bold text-black flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 stroke-[2.5px]" />
-                  Active days:
+                  {t('Active days:')}
                 </span>
                 {schedule.map((d) => (
                   <span key={d} className="inline-flex px-2 py-0.5 border-2 border-black bg-[#FFD93D] text-black font-mono text-[10px] uppercase font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                    {DAY_LABELS[d] || d}
+                    {t(DAY_LABELS[d]) || t(d)}
                   </span>
                 ))}
               </div>
@@ -544,12 +546,12 @@ export default function Batches() {
                     }`}>
                       <div className="flex items-center gap-2">
                         <span className="font-heading font-semibold text-sm text-black">
-                          {DAY_LABELS[day]}
+                          {t(DAY_LABELS[day])}
                         </span>
                         <span className={`text-[10px] font-bold uppercase tracking-wider font-mono ${
                           isActive ? 'text-black' : 'text-black/55'
                         }`}>
-                          {isActive ? '● Active' : '○ Off'}
+                          {isActive ? t('● Active') : t('○ Off')}
                         </span>
                       </div>
                       <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 text-[10px] font-bold font-mono border border-black bg-white text-black">
@@ -571,12 +573,12 @@ export default function Batches() {
                                   : 'bg-[#E2E8F0] text-black/70'
                               }`}
                             >
-                              {subj}
+                              {t(subj)}
                               <button
                                 type="button"
                                 onClick={() => removeSubject(day, idx)}
                                 className="text-[10px] opacity-60 hover:opacity-100 hover:text-red-400 transition-colors"
-                                title={`Remove ${subj}`}
+                                title={`Remove ${t(subj)}`}
                               >
                                 <X className="w-3 h-3 stroke-[3px]" />
                               </button>
@@ -590,7 +592,7 @@ export default function Batches() {
                         <input
                           ref={(el) => { inputRefs.current[day] = el; }}
                           className="flex h-9 flex-1 bg-white border-2 border-black px-3 text-xs text-black transition-all duration-200 placeholder:text-black/30 focus-visible:border-black focus-visible:outline-none"
-                          placeholder={`Add subject for ${day}…`}
+                          placeholder={`${t('Add subject for')} ${t(DAY_LABELS[day])}...`}
                           value={ttInputs[day]}
                           onChange={(e) => setTtInputs((inp) => ({ ...inp, [day]: e.target.value }))}
                           onKeyDown={(e) => handleTtKeyDown(e, day)}
@@ -604,7 +606,7 @@ export default function Batches() {
                           onClick={() => addSubject(day)}
                           disabled={!ttInputs[day].trim()}
                         >
-                          Add
+                          {t('Add')}
                         </Button>
 
                         {/* Dropdown */}
@@ -617,7 +619,7 @@ export default function Batches() {
                                 onClick={() => addSubject(day, s)}
                                 className="w-full text-left px-3 py-1.5 text-xs text-black hover:bg-neutral-100 transition-colors font-body"
                               >
-                                {s}
+                                {t(s)}
                               </button>
                             ))}
                           </div>

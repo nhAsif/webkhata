@@ -23,8 +23,10 @@ import {
   getVocabularyHistory
 } from '../../api/vocabulary';
 import toast from 'react-hot-toast';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 function WordCard({ item, onBookmarkToggle, isBookmarked }) {
+  const { t } = useTranslation();
   const word = item.word || item; // handles both DailyVocabularyResponse and VocabularyWordResponse
   return (
     <div className="bg-white border-4 border-black p-6 relative group overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 flex flex-col justify-between">
@@ -51,7 +53,7 @@ function WordCard({ item, onBookmarkToggle, isBookmarked }) {
           </h3>
           <div className="mt-2">
             <span className="inline-block px-2.5 py-0.5 border-2 border-black bg-[#C4B5FD]/30 text-black text-[10px] uppercase tracking-wider font-mono font-black shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)]">
-              {word.part_of_speech}
+              {t(word.part_of_speech)}
             </span>
           </div>
         </div>
@@ -60,21 +62,21 @@ function WordCard({ item, onBookmarkToggle, isBookmarked }) {
         <div className="space-y-4 text-sm mt-6 font-body font-bold text-black border-t-2 border-black/10 pt-4">
           {word.synonyms && (
             <div>
-              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">Synonyms</span>
+              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">{t("Synonyms")}</span>
               <p className="text-black font-semibold">{word.synonyms}</p>
             </div>
           )}
           
           {word.antonyms && (
             <div>
-              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">Antonyms</span>
+              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">{t("Antonyms")}</span>
               <p className="text-black font-semibold">{word.antonyms}</p>
             </div>
           )}
 
           {word.example_sentence && (
             <div className="mt-4 pt-3 border-t border-dashed border-black/10">
-              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">Example</span>
+              <span className="text-black/55 block text-[10px] uppercase tracking-wider font-mono font-black mb-1">{t("Example")}</span>
               <p className="text-black/85 font-semibold italic">"{word.example_sentence}"</p>
               {word.bangla_sentence_meaning && (
                 <p className="text-black/60 mt-1 text-sm font-semibold">{word.bangla_sentence_meaning}</p>
@@ -88,6 +90,7 @@ function WordCard({ item, onBookmarkToggle, isBookmarked }) {
 }
 
 export default function ParentVocabulary() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'daily'); // daily, practice, saved, search
   
@@ -151,7 +154,7 @@ export default function ParentVocabulary() {
       const words = await getVocabularyHistory(date);
       setHistoryWords(words);
     } catch (err) {
-      toast.error('Failed to load history');
+      toast.error(t('Failed to load history'));
     } finally {
       setLoading(false);
     }
@@ -175,7 +178,7 @@ export default function ParentVocabulary() {
         markViewed(words[0].word_id);
       }
     } catch (err) {
-      toast.error('Failed to load daily words');
+      toast.error(t('Failed to load daily words'));
     } finally {
       setLoading(false);
     }
@@ -215,7 +218,7 @@ export default function ParentVocabulary() {
       const saved = await getBookmarkedWords();
       setSavedWords(saved);
     } catch (err) {
-      toast.error('Failed to update bookmark');
+      toast.error(t('Failed to update bookmark'));
     }
   };
 
@@ -253,7 +256,7 @@ export default function ParentVocabulary() {
     }
     
     if (eligibleWords.length < 4) {
-      toast('Not enough daily words with this property to generate practice!', { icon: <Info className="w-5 h-5 text-blue-500 stroke-[3px]" /> });
+      toast(t('Not enough daily words with this property to generate practice!'), { icon: <Info className="w-5 h-5 text-blue-500 stroke-[3px]" /> });
       setPracticeMode(null);
       setPracticeQuestions([]);
       return;
@@ -350,7 +353,7 @@ export default function ParentVocabulary() {
       const results = await searchVocabulary(searchQuery);
       setSearchResults(results);
     } catch (err) {
-      toast.error('Search failed');
+      toast.error(t('Search failed'));
     } finally {
       setLoading(false);
     }
@@ -362,24 +365,24 @@ export default function ParentVocabulary() {
         <div>
           <h1 className="text-3xl font-heading font-bold text-black tracking-tight flex items-center gap-3 uppercase">
             <BookOpen className="w-8 h-8 text-black stroke-[3px]" />
-            Daily Vocabulary
+            {t("Daily Vocabulary")}
           </h1>
-          <p className="text-black/60 font-body font-bold mt-1">Learn 20 new words every day to improve your English.</p>
+          <p className="text-black/60 font-body font-bold mt-1">{t("Learn 20 new words every day to improve your English.")}</p>
         </div>
         
         {stats && (
           <div className="flex gap-4">
             <div className="bg-white border-4 border-black px-4 py-2.5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <div className="text-2xl font-display font-black text-black">{stats.today_viewed}/{stats.today_total}</div>
-              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">Today</div>
+              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">{t("Today")}</div>
             </div>
             <div className="bg-white border-4 border-black px-4 py-2.5 text-center hidden sm:block shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <div className="text-2xl font-display font-black text-black">{stats.words_learned_this_week}</div>
-              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">This Week</div>
+              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">{t("This Week")}</div>
             </div>
             <div className="bg-white border-4 border-black px-4 py-2.5 text-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <div className="text-2xl font-display font-black text-black">{stats.total_words_learned}</div>
-              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">Total Learned</div>
+              <div className="text-[10px] text-black/60 uppercase tracking-wider font-mono font-bold">{t("Total Learned")}</div>
             </div>
           </div>
         )}
@@ -394,7 +397,7 @@ export default function ParentVocabulary() {
               : 'border-transparent text-black hover:bg-neutral-100 hover:border-black'
           }`}
         >
-          Today's Words
+          {t("Today's Words")}
         </button>
         <button
           onClick={() => setActiveTab('history')}
@@ -404,7 +407,7 @@ export default function ParentVocabulary() {
               : 'border-transparent text-black hover:bg-neutral-100 hover:border-black'
           }`}
         >
-          <span className="flex items-center gap-2"><Calendar className="w-4 h-4 stroke-[2.5px]"/> History</span>
+          <span className="flex items-center gap-2"><Calendar className="w-4 h-4 stroke-[2.5px]"/> {t("History")}</span>
         </button>
         <button
           onClick={() => { setActiveTab('practice'); setPracticeMode(null); }}
@@ -414,7 +417,7 @@ export default function ParentVocabulary() {
               : 'border-transparent text-black hover:bg-neutral-100 hover:border-black'
           }`}
         >
-          <span className="flex items-center gap-2"><Shuffle className="w-4 h-4 stroke-[2.5px]"/> Practice</span>
+          <span className="flex items-center gap-2"><Shuffle className="w-4 h-4 stroke-[2.5px]"/> {t("Practice")}</span>
         </button>
         <button
           onClick={() => setActiveTab('saved')}
@@ -424,7 +427,7 @@ export default function ParentVocabulary() {
               : 'border-transparent text-black hover:bg-neutral-100 hover:border-black'
           }`}
         >
-          <span className="flex items-center gap-2"><Bookmark className="w-4 h-4 stroke-[2.5px]"/> Saved ({savedWords.length})</span>
+          <span className="flex items-center gap-2"><Bookmark className="w-4 h-4 stroke-[2.5px]"/> {t("Saved")} ({savedWords.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('search')}
@@ -434,7 +437,7 @@ export default function ParentVocabulary() {
               : 'border-transparent text-black hover:bg-neutral-100 hover:border-black'
           }`}
         >
-          <span className="flex items-center gap-2"><Search className="w-4 h-4 stroke-[2.5px]"/> Search</span>
+          <span className="flex items-center gap-2"><Search className="w-4 h-4 stroke-[2.5px]"/> {t("Search")}</span>
         </button>
       </div>
 
@@ -448,7 +451,7 @@ export default function ParentVocabulary() {
             {activeTab === 'daily' && dailyWords.length > 0 && (
               <div className="max-w-2xl mx-auto">
                 <div className="text-center text-black/60 font-mono text-sm font-bold mb-4">
-                  Word {currentIndex + 1} of {dailyWords.length}
+                  {t("Word")} {currentIndex + 1} {t("of")} {dailyWords.length}
                 </div>
                 <WordCard 
                   item={dailyWords[currentIndex]} 
@@ -462,14 +465,14 @@ export default function ParentVocabulary() {
                     disabled={currentIndex === 0}
                     className="px-4 py-2 border-4 border-black bg-white hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-black font-heading font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none flex items-center gap-2 transition-all cursor-pointer"
                   >
-                    <ChevronLeft className="w-5 h-5 stroke-[2.5px]" /> Previous
+                    <ChevronLeft className="w-5 h-5 stroke-[2.5px]" /> {t("Previous")}
                   </button>
                   <button
                     onClick={nextDaily}
                     disabled={currentIndex === dailyWords.length - 1}
                     className="px-6 py-2 border-4 border-black bg-[#FFD93D] hover:bg-[#FFD93D]/95 text-black font-heading font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
                   >
-                    Next <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
+                    {t("Next")} <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
                   </button>
                 </div>
               </div>
@@ -477,7 +480,7 @@ export default function ParentVocabulary() {
             
             {activeTab === 'daily' && dailyWords.length === 0 && !loading && (
               <div className="text-center py-20 text-black/60 font-bold bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <p>No words available today. Please check back later.</p>
+                <p>{t("No words available today. Please check back later.")}</p>
               </div>
             )}
 
@@ -491,7 +494,7 @@ export default function ParentVocabulary() {
                       onChange={(e) => setSelectedDate(e.target.value)}
                       className="bg-transparent border-none text-black font-mono font-bold text-sm focus:ring-0 outline-none cursor-pointer"
                     >
-                      {dates.length === 0 && <option value="">No dates available</option>}
+                      {dates.length === 0 && <option value="">{t("No dates available")}</option>}
                       {dates.map((d) => (
                         <option key={d} value={d} className="bg-white text-black">
                           {d}
@@ -515,7 +518,7 @@ export default function ParentVocabulary() {
                 ) : (
                   <div className="text-center py-20 text-black/60 font-bold bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                     <BookOpen className="w-12 h-12 text-black/35 mx-auto mb-4 stroke-[2.5px]" />
-                    <p>No vocabulary words found for this date.</p>
+                    <p>{t("No vocabulary words found for this date.")}</p>
                   </div>
                 )}
               </div>
@@ -525,43 +528,43 @@ export default function ParentVocabulary() {
               <div className="max-w-2xl mx-auto">
                 {!practiceMode ? (
                   <div className="bg-white border-4 border-black p-10 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                    <h2 className="text-3xl font-heading font-black text-black uppercase tracking-tight mb-6">Choose Practice Mode</h2>
+                    <h2 className="text-3xl font-heading font-black text-black uppercase tracking-tight mb-6">{t("Choose Practice Mode")}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <button onClick={() => startPractice('meaning')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">Meaning</button>
-                      <button onClick={() => startPractice('synonym')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">Synonyms</button>
-                      <button onClick={() => startPractice('antonym')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">Antonyms</button>
-                      <button onClick={() => startPractice('pos')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">Parts of Speech</button>
+                      <button onClick={() => startPractice('meaning')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">{t("Meaning")}</button>
+                      <button onClick={() => startPractice('synonym')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">{t("Synonyms")}</button>
+                      <button onClick={() => startPractice('antonym')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">{t("Antonyms")}</button>
+                      <button onClick={() => startPractice('pos')} className="p-6 bg-[#FAF6EE] border-4 border-black hover:bg-[#C4B5FD]/20 hover:-translate-y-0.5 transition-all duration-100 text-lg font-heading font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer">{t("Parts of Speech")}</button>
                     </div>
                   </div>
                 ) : practiceQuestions.length > 0 ? (
                   practiceFinished ? (
                     <div className="bg-white border-4 border-black p-10 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                      <h2 className="text-3xl font-heading font-black text-black uppercase tracking-tight mb-2">Practice Complete!</h2>
-                      <p className="text-xl text-black/70 font-semibold mb-6">You scored <span className="text-[#FF6B6B] font-black font-mono">{score}</span> out of {practiceQuestions.length}</p>
+                      <h2 className="text-3xl font-heading font-black text-black uppercase tracking-tight mb-2">{t("Practice Complete!")}</h2>
+                      <p className="text-xl text-black/70 font-semibold mb-6">{t("You scored")} <span className="text-[#FF6B6B] font-black font-mono">{score}</span> {t("out of")} {practiceQuestions.length}</p>
                       <div className="flex justify-center gap-4">
                         <button
                           onClick={() => startPractice(practiceMode)}
                           className="px-6 py-3 border-4 border-black bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 text-black font-heading font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer"
                         >
-                          Practice Again
+                          {t("Practice Again")}
                         </button>
                         <button
                           onClick={() => setPracticeMode(null)}
                           className="px-6 py-3 border-4 border-black bg-white hover:bg-neutral-100 text-black font-heading font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all cursor-pointer"
                         >
-                          Change Mode
+                          {t("Change Mode")}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div className="bg-white border-4 border-black p-8 relative shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                       <div className="text-center text-black/60 font-mono text-sm font-bold mb-6 flex justify-between items-center">
-                        <span>Question {practiceIndex + 1} of {practiceQuestions.length}</span>
-                        <span>Score: {score}</span>
+                        <span>{t("Question")} {practiceIndex + 1} {t("of")} {practiceQuestions.length}</span>
+                        <span>{t("Score")}: {score}</span>
                       </div>
                       
                       <div className="mb-8 text-center">
-                        <p className="text-black/55 text-xs uppercase tracking-widest mb-2 font-mono font-bold">{practiceQuestions[practiceIndex].questionPrefix}</p>
+                        <p className="text-black/55 text-xs uppercase tracking-widest mb-2 font-mono font-bold">{t(practiceQuestions[practiceIndex].questionPrefix)}</p>
                         <h3 className="text-4xl font-heading font-black text-black uppercase tracking-tight">
                           {practiceQuestions[practiceIndex].word.word}
                           {practiceQuestions[practiceIndex].word.bangla_pronunciation && (
@@ -611,14 +614,14 @@ export default function ParentVocabulary() {
                               : "bg-[#FFD93D] hover:bg-[#FFD93D]/95 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer"
                           }`}
                         >
-                          {practiceIndex < practiceQuestions.length - 1 ? 'Next Question' : 'View Results'} <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
+                          {practiceIndex < practiceQuestions.length - 1 ? t('Next Question') : t('View Results')} <ChevronRight className="w-5 h-5 stroke-[2.5px]" />
                         </button>
                       </div>
                     </div>
                   )
                 ) : (
                   <div className="text-center py-20 text-black/60 font-bold bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                    <p>Not enough daily words available yet. Check today's words first!</p>
+                    <p>{t("Not enough daily words available yet. Check today's words first!")}</p>
                   </div>
                 )}
               </div>
@@ -640,7 +643,7 @@ export default function ParentVocabulary() {
                 ) : (
                   <div className="text-center py-20 text-black/60 font-bold bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                     <Bookmark className="w-12 h-12 text-black/35 mx-auto mb-4 stroke-[2.5px]" />
-                    <p>You haven't saved any words yet.</p>
+                    <p>{t("You haven't saved any words yet.")}</p>
                   </div>
                 )}
               </div>
@@ -653,7 +656,7 @@ export default function ParentVocabulary() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by english word, meaning or part of speech..."
+                    placeholder={t("Search by english word, meaning or part of speech...")}
                     className="w-full bg-white border-4 border-black py-4 pl-12 pr-4 text-black font-body font-semibold placeholder:text-black/35 focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                   />
                   <Search className="w-5 h-5 text-black absolute left-4 top-1/2 -translate-y-1/2 stroke-[2.5px]" />
@@ -661,7 +664,7 @@ export default function ParentVocabulary() {
                     type="submit" 
                     className="absolute right-3 top-1/2 -translate-y-1/2 border-2 border-black bg-[#FFD93D] hover:bg-[#FFD93D]/90 text-black font-heading font-black text-xs uppercase px-4 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
                   >
-                    Search
+                    {t("Search")}
                   </button>
                 </form>
 
@@ -684,7 +687,7 @@ export default function ParentVocabulary() {
                 
                 {!loading && searchResults.length === 0 && searchQuery && (
                   <div className="text-center py-10 text-black/60 font-bold bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                    No results found for "{searchQuery}"
+                    {t("No results found for")} "{searchQuery}"
                   </div>
                 )}
               </div>
