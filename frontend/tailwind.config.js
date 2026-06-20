@@ -88,10 +88,11 @@ export default {
         'border-success': 'var(--border-success)',
       },
       fontFamily: {
-        heading: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
-        body: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
-        display: ["'Space Grotesk'", "'Noto Sans Bengali'", "sans-serif"],
+        heading: ["'Space Grotesk'", "'Hind Siliguri'", "'Noto Sans Bengali'", "sans-serif"],
+        body: ["'Space Grotesk'", "'Hind Siliguri'", "'Noto Sans Bengali'", "sans-serif"],
+        display: ["'Space Grotesk'", "'Hind Siliguri'", "'Noto Sans Bengali'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
+        hind: ["'Hind Siliguri'", "'Noto Sans Bengali'", "sans-serif"],
       },
       animation: {
         'spin-slow': 'spin 10s linear infinite',
