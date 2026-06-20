@@ -61,7 +61,7 @@ export default function Reports() {
   const totalOutstanding = filtered.reduce((s, r) => s + (r.outstanding_balance || 0), 0);
 
   const exportCSV = () => {
-    const headers = ['Student Name', 'Monthly Fee (৳)', 'Total Due (৳)', 'Total Paid (৳)', 'Outstanding (৳)', 'Status'];
+    const headers = ['Student Name', 'Monthly Fee (৳)', 'Total Billed (৳)', 'Total Paid (৳)', 'Outstanding (৳)', 'Status'];
     const rows = filtered.map((r) => {
       const outstanding = r.outstanding_balance ?? 0;
       const due = r.total_due ?? 0;
@@ -136,7 +136,7 @@ export default function Reports() {
               color="#FFD93D"
             />
             <StatCard
-              label={t("Total Due")}
+              label={t("Total Billed")}
               value={`৳${totalDue.toLocaleString()}`}
               icon={<TrendingUp className="w-5 h-5 text-black" />}
               color="#FF6B6B"
@@ -186,7 +186,7 @@ export default function Reports() {
                   <tr className="bg-[#FAF6EE] border-b-4 border-black">
                     <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Student Name")}</th>
                     <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Monthly Fee")}</th>
-                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Total Due")}</th>
+                    <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Total Billed")}</th>
                     <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Total Paid")}</th>
                     <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Outstanding")}</th>
                     <th className="px-6 py-3.5 text-xs font-black text-black uppercase font-heading">{t("Status")}</th>

@@ -549,6 +549,8 @@ class MonthlyCollectionRow(BaseModel):
     student_name: str
     class_level: str
     monthly_fee: float
+    total_due: float = 0.0
+    total_paid: float = 0.0
     total_paid_this_month: float
     outstanding_balance: float
     status: str  # 'paid' | 'partial' | 'overdue'

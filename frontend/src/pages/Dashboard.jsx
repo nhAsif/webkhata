@@ -112,7 +112,7 @@ export default function Dashboard() {
               color="#C4B5FD"
             />
             <StatCard
-              label={t("Total Due")}
+              label={t("Total Billed")}
               value={`৳${(stats.total_due ?? 0).toLocaleString()}`}
               icon={<TrendingUp className="w-5 h-5" />}
               color="#FF6B6B"

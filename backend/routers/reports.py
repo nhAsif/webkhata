@@ -128,6 +128,8 @@ def monthly_collection_report(
             student_name=student.name,
             class_level=student.class_level,
             monthly_fee=student.monthly_fee,
+            total_due=total_due,
+            total_paid=total_paid_all,
             total_paid_this_month=total_paid_this_month,
             outstanding_balance=outstanding_balance,
             status=pay_status,

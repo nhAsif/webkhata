@@ -39,6 +39,7 @@ export const translations = {
     "Today's Sessions": "আজকের সেশন",
     "Attendance Rate": "উপস্থিতির হার",
     "Monthly Expected": "মাসিক প্রত্যাশিত",
+    "Total Billed": "মোট বিল",
     "Total Due": "মোট বকেয়া",
     "Total Paid": "মোট পরিশোধিত",
     "Outstanding": "বকেয়া পরিমাণ",
