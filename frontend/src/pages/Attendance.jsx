@@ -15,21 +15,21 @@ function today() {
 const STATUS_CFG = {
   present: {
     label: 'Present',
-    icon: <CheckCircle2 className="w-4 h-4" />,
-    card: 'bg-green-500/10 border-green-500/30 text-green-400',
-    dot: 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]',
+    icon: <CheckCircle2 className="w-4 h-4 stroke-[3px]" />,
+    card: 'bg-[#C4B5FD] border-4 border-black text-black shadow-[3px_3px_0px_0px_var(--neo-shadow)] font-bold',
+    dot: 'bg-white border-2 border-black',
   },
   absent: {
     label: 'Absent',
-    icon: <XCircle className="w-4 h-4" />,
-    card: 'bg-red-500/10 border-red-500/30 text-red-400',
-    dot: 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]',
+    icon: <XCircle className="w-4 h-4 stroke-[3px]" />,
+    card: 'bg-[#FF6B6B] border-4 border-black text-black shadow-[3px_3px_0px_0px_var(--neo-shadow)] font-bold',
+    dot: 'bg-white border-2 border-black',
   },
   late: {
     label: 'Late',
-    icon: <Clock className="w-4 h-4" />,
-    card: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
-    dot: 'bg-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.5)]',
+    icon: <Clock className="w-4 h-4 stroke-[3px]" />,
+    card: 'bg-[#FFD93D] border-4 border-black text-black shadow-[3px_3px_0px_0px_var(--neo-shadow)] font-bold',
+    dot: 'bg-white border-2 border-black',
   },
 };
 
@@ -147,7 +147,7 @@ export default function Attendance() {
         <div>
           <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Attendance</h1>
           <p className="text-stardust text-sm mt-1">
-            All students auto-marked <span className="text-green-400 font-mono">present</span> — tap to change status
+            All students auto-marked <span className="text-[#C4B5FD] font-mono font-bold bg-[#181B20] px-1">present</span> — tap to change status
           </p>
         </div>
         <Button variant="secondary" onClick={() => setSummaryModal(true)}>
@@ -201,21 +201,21 @@ export default function Attendance() {
             {/* Summary bar */}
             {!loading && students.length > 0 && (
               <div className="flex flex-wrap items-center gap-3 mb-5">
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/5 text-stardust border-white/10">
+                <span className="border-2 border-black bg-white text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
                   {students.length} students
                 </span>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30 flex items-center gap-1.5">
+                <span className="border-2 border-black bg-[#C4B5FD] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 stroke-[3px]" />
                   {presentCount} present
                 </span>
                 {absentCount > 0 && (
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1.5">
+                  <span className="border-2 border-black bg-[#FF6B6B] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                     <XCircle className="w-3.5 h-3.5 stroke-[3px]" />
                     {absentCount} absent
                   </span>
                 )}
                 {lateCount > 0 && (
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30 flex items-center gap-1.5">
+                  <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 stroke-[3px]" />
                     {lateCount} late
                   </span>
@@ -230,13 +230,13 @@ export default function Attendance() {
             {loading ? (
               <div className="flex flex-col gap-2.5">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-16 bg-white/5 animate-pulse rounded-xl border border-white/10" />
+                  <div key={i} className="h-16 bg-white border-4 border-black shadow-[3px_3px_0px_var(--neo-shadow)] animate-pulse" />
                 ))}
               </div>
             ) : students.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10 text-stardust">
-                <Users className="w-8 h-8 mb-2 text-stardust stroke-[2px]" />
-                <div className="text-sm font-heading text-pure">No students in this batch</div>
+              <div className="flex flex-col items-center justify-center p-8 text-center bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] text-black">
+                <Users className="w-8 h-8 mb-2 text-black stroke-[3px]" />
+                <div className="text-sm font-heading font-black uppercase">No students in this batch</div>
               </div>
             ) : (
               <div className="flex flex-col gap-2.5">
@@ -248,7 +248,7 @@ export default function Attendance() {
                   return (
                     <div
                       key={student.id}
-                      className={`flex items-center p-4 rounded-xl border gap-4 cursor-pointer transition-all duration-200 select-none hover:opacity-90 active:scale-[0.99] ${cfg.card}`}
+                      className={`flex items-center p-4 border-4 border-black gap-4 cursor-pointer transition-all duration-100 select-none hover:opacity-95 hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${cfg.card}`}
                       onClick={() => toggleStudent(student.id)}
                       title="Tap to change status"
                     >
@@ -290,10 +290,10 @@ export default function Attendance() {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10 text-stardust">
-          <ClipboardList className="w-12 h-12 mb-4 text-stardust stroke-[1.5px]" />
-          <div className="text-lg font-heading text-pure">Select a batch to mark attendance</div>
-          <p className="text-sm text-stardust mt-1">All students will be auto-marked present</p>
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white border-4 border-black shadow-[8px_8px_0px_var(--neo-shadow)] text-black">
+          <ClipboardList className="w-12 h-12 mb-4 text-black stroke-[2.5px]" />
+          <div className="text-lg font-heading font-black uppercase">Select a batch to mark attendance</div>
+          <p className="text-sm text-black/60 font-body font-bold mt-1">All students will be auto-marked present</p>
         </div>
       )}
 
@@ -326,23 +326,23 @@ export default function Attendance() {
               {summary.summary?.map((row) => (
                 <div
                   key={row.student_id}
-                  className="flex items-center gap-4 py-2.5 px-4 bg-white/5 rounded-xl border border-white/10"
+                  className="flex items-center gap-4 py-2.5 px-4 bg-white border-2 border-black shadow-[3px_3px_0px_var(--neo-shadow)]"
                 >
-                  <div className="flex-1 font-medium text-sm text-pure">{row.student_name}</div>
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-green-500/20 text-green-400 border-green-500/30">
+                  <div className="flex-1 font-bold text-sm text-black">{row.student_name}</div>
+                  <span className="border-2 border-black bg-[#C4B5FD] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
                     {row.present}P
                   </span>
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-red-500/20 text-red-400 border-red-500/30">
+                  <span className="border-2 border-black bg-[#FF6B6B] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
                     {row.absent}A
                   </span>
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                  <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
                     {row.late}L
                   </span>
                   <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-mono border ${
+                    className={`border-2 border-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] ${
                       row.attendance_rate >= 75
-                        ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                        : 'bg-red-500/20 text-red-400 border-red-500/30'
+                        ? 'bg-[#C4B5FD] text-black'
+                        : 'bg-[#FF6B6B] text-black'
                     }`}
                   >
                     {row.attendance_rate}%

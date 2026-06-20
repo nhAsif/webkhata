@@ -5,19 +5,22 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card'
 import { TrendingUp, BarChart2 } from 'lucide-react';
 
 const GRADE_COLORS = {
-  'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
-  'B': '#3b82f6', 'C': '#f59e0b', 'D': '#f97316', 'F': '#ef4444',
+  'A+': 'var(--success)', // #C4B5FD
+  'A': 'var(--success)',
+  'A-': 'var(--success)',
+  'B': 'var(--warning)', // #FFD93D
+  'C': 'var(--warning)',
+  'D': 'var(--danger)', // #FF6B6B
+  'F': 'var(--danger)',
 };
 
 function GradeTag({ grade }) {
-  const color = GRADE_COLORS[grade] || '#8b92a8';
+  const bg = GRADE_COLORS[grade] || 'var(--neutral-primary-medium)';
   return (
     <span 
-      className="rounded-full px-2.5 py-0.5 text-xs font-mono border font-bold"
+      className="inline-flex px-2 py-0.5 border-2 border-black font-mono font-bold text-xs shadow-[1.5px_1.5px_0px_var(--neo-shadow)] text-black"
       style={{
-        color,
-        backgroundColor: color + '22',
-        borderColor: color + '50'
+        backgroundColor: bg
       }}
     >
       {grade}
@@ -48,7 +51,7 @@ export default function ParentResults() {
         <div>
           <h1 className="text-2xl md:text-3xl font-heading font-semibold text-pure">Results</h1>
         </div>
-        <div className="h-[300px] bg-white/5 animate-pulse rounded-2xl border border-white/10" />
+        <div className="h-[300px] bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] animate-pulse" />
       </div>
     );
   }
@@ -74,12 +77,12 @@ export default function ParentResults() {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#8b92a8' }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#8b92a8' }} unit="%" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#181B20', fontWeight: 'bold' }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#181B20', fontWeight: 'bold' }} unit="%" />
                 <Tooltip
-                  contentStyle={{ background: '#0F1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, color: '#fff' }}
-                  itemStyle={{ color: '#F7931A' }}
+                  contentStyle={{ background: '#FFFFFF', border: '4px solid #181B20', borderRadius: '0px', boxShadow: '4px 4px 0px 0px var(--neo-shadow)', fontSize: 12, color: '#181B20', fontFamily: 'Space Grotesk' }}
+                  itemStyle={{ color: '#FF6B6B', fontWeight: 'bold' }}
                   formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
                 />
                 <Line
@@ -100,21 +103,21 @@ export default function ParentResults() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>All Results</CardTitle>
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/10 text-pure border-white/20">{results.length} exams</span>
+          <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">{results.length} exams</span>
         </CardHeader>
         <CardContent className="p-0 sm:p-6 sm:pt-0">
           {results.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10 m-6">
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] m-6">
               <div className="text-black mb-4">
-                <BarChart2 className="w-12 h-12 stroke-[2px]" />
+                <BarChart2 className="w-12 h-12 stroke-[3px]" />
               </div>
-              <div className="text-lg font-heading text-pure">No results yet</div>
+              <div className="text-lg font-heading font-black text-black uppercase">No results yet</div>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
-                  <tr className="border-b border-white/10 text-stardust text-sm uppercase tracking-wider font-heading">
+                  <tr className="border-b-4 border-black text-black text-sm uppercase tracking-wider font-heading font-black">
                     <th className="p-4 font-medium">Exam</th>
                     <th className="p-4 font-medium">Subject</th>
                     <th className="p-4 font-medium">Date</th>
@@ -125,15 +128,13 @@ export default function ParentResults() {
                 </thead>
                 <tbody className="text-sm font-body">
                   {results.map((r) => (
-                    <tr key={r.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-4 font-medium text-pure">{r.exam_name}</td>
-                      <td className="p-4 text-stardust">{r.subject}</td>
-                      <td className="p-4 text-stardust">{r.exam_date}</td>
-                      <td className="p-4 font-mono text-pure">{r.score} / {r.total_marks}</td>
-                      <td className="p-4 font-mono">
-                        <span className={r.percentage >= 80 ? 'text-green-400' : r.percentage >= 50 ? 'text-yellow-400' : 'text-red-400'}>
-                          {r.percentage}%
-                        </span>
+                    <tr key={r.id} className="border-b-2 border-black hover:bg-neutral-50 transition-colors">
+                      <td className="p-4 font-bold text-black">{r.exam_name}</td>
+                      <td className="p-4 text-black/70 font-semibold">{r.subject}</td>
+                      <td className="p-4 text-black/70 font-mono font-semibold">{r.exam_date}</td>
+                      <td className="p-4 font-mono font-bold text-black">{r.score} / {r.total_marks}</td>
+                      <td className="p-4 font-mono font-bold text-black">
+                        {r.percentage}%
                       </td>
                       <td className="p-4"><GradeTag grade={r.grade} /></td>
                     </tr>

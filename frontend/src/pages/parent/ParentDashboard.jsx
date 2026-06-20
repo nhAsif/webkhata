@@ -56,11 +56,11 @@ export default function ParentDashboard() {
         <Card className="bg-neutral-primary-soft border-2 border-border-default mb-6">
           <CardContent className="p-6">
             <div className="flex gap-6 items-center flex-wrap">
-              <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-brand-softer border-2 border-border-brand-subtle shadow-sm flex-shrink-0">
+              <div className="w-24 h-24 border-4 border-black bg-[#FF6B6B] flex items-center justify-center shadow-[4px_4px_0px_var(--neo-shadow)] flex-shrink-0 relative overflow-hidden">
                 {student.photo_path ? (
                   <img src={`/${student.photo_path}`} alt={student.name} className="w-full h-full object-cover" />
                 ) : (
-                  <svg className="w-12 h-12 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-12 h-12 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 )}
@@ -72,7 +72,7 @@ export default function ParentDashboard() {
                 </div>
                 <div className="flex gap-2 mt-3 flex-wrap">
                   {(student.subjects || []).map((sub) => (
-                    <span key={sub} className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-brand-softer text-fg-brand-strong border-border-brand-subtle">
+                    <span key={sub} className="border-2 border-black bg-[#C4B5FD] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
                       {sub}
                     </span>
                   ))}
@@ -117,13 +117,13 @@ export default function ParentDashboard() {
               {profile.batches.map((b) => (
                 <div
                   key={b.id}
-                  className="flex items-center gap-4 py-3 px-4 bg-neutral-primary-medium/20 rounded-base border border-border-muted hover:border-brand transition-colors duration-200"
+                  className="flex items-center gap-4 py-3 px-4 bg-white border-2 border-black shadow-[3px_3px_0px_var(--neo-shadow)] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_var(--neo-shadow)] transition-all duration-100"
                 >
                   <div className="flex-1">
                     <div className="font-heading text-heading font-bold">{b.name}</div>
                     <div className="text-xs text-body-subtle font-body mt-1 font-bold">{b.subject}</div>
                   </div>
-                  <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-neutral-primary text-body border-border-default">
+                  <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
                     {b.time_slot}
                   </span>
                 </div>
@@ -149,7 +149,7 @@ export default function ParentDashboard() {
 
               return (
                 <div
-                  className="flex items-center gap-4 p-4 rounded-base border border-border-brand-subtle bg-brand-softer"
+                  className="flex items-center gap-4 p-4 border-2 border-black bg-[#FF6B6B]/10 shadow-[4px_4px_0px_var(--neo-shadow)]"
                 >
                   <div className="w-12 font-bold font-heading text-base text-brand text-center shrink-0">
                     {today}
@@ -163,7 +163,7 @@ export default function ParentDashboard() {
                   ) : (
                     <div className="flex gap-2 flex-wrap">
                       {subjects.map((sub, idx) => (
-                        <span key={idx} className="rounded-full px-3 py-1 text-sm font-mono border bg-neutral-primary-soft text-body border-border-default">
+                        <span key={idx} className="border-2 border-black bg-[#C4B5FD] text-black px-3 py-1 text-sm font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
                           {sub}
                         </span>
                       ))}
@@ -183,7 +183,7 @@ export default function ParentDashboard() {
               <BookOpen className="w-5 h-5 text-brand" />
               Today's Vocabulary
             </CardTitle>
-            <div className="text-xs font-heading font-bold text-body-subtle bg-neutral-primary-medium px-2 py-1 rounded-default border border-border-default">
+            <div className="text-xs font-heading font-black text-black bg-[#FFD93D] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_var(--neo-shadow)]">
               Progress: {vocabStats.today_viewed}/{vocabStats.today_total}
             </div>
           </CardHeader>
@@ -195,14 +195,14 @@ export default function ParentDashboard() {
               <div className="flex gap-3 mt-4 sm:mt-0 flex-wrap">
                 <Link 
                   to="/parent/vocabulary"
-                  className="inline-flex items-center justify-center h-10 px-5 bg-[#FF6B6B] text-black rounded-full font-heading font-bold text-sm shadow-sm hover:scale-[1.04] active:scale-[0.98] transition-transform duration-200 select-none cursor-pointer"
+                  className="inline-flex items-center justify-center h-12 px-[26px] bg-[#FF6B6B] text-black border-4 border-black font-heading font-black text-sm uppercase tracking-tight shadow-[4px_4px_0px_var(--neo-shadow)] hover:bg-[#FF6B6B]/90 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-100 select-none cursor-pointer"
                 >
                   View Today's Vocabulary
                 </Link>
                 <Link 
                   to="/parent/vocabulary"
                   state={{ tab: 'practice' }}
-                  className="inline-flex items-center justify-center h-10 px-5 bg-neutral-primary-soft border-2 border-border-default-strong text-heading rounded-full font-heading font-bold text-sm shadow-sm hover:scale-[1.04] active:scale-[0.98] transition-transform duration-200 select-none cursor-pointer"
+                  className="inline-flex items-center justify-center h-12 px-[26px] bg-[#FFD93D] text-black border-4 border-black font-heading font-black text-sm uppercase tracking-tight shadow-[4px_4px_0px_var(--neo-shadow)] hover:bg-[#FFD93D]/90 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all duration-100 select-none cursor-pointer"
                 >
                   Practice
                 </Link>

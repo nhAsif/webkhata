@@ -27,10 +27,10 @@ function statusBadge(status) {
   const isActive = status === 'active';
   return (
     <span 
-      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono border capitalize ${
+      className={`inline-flex px-2.5 py-0.5 border-2 border-black text-xs font-mono font-bold capitalize shadow-[2.5px_2.5px_0px_var(--neo-shadow)] ${
         isActive 
-          ? 'bg-green-500/15 border-green-500/30 text-green-400' 
-          : 'bg-white/5 border-white/10 text-stardust'
+          ? 'bg-[#C4B5FD] text-black' 
+          : 'bg-[#FAF6EE] text-black/50'
       }`}
     >
       {status}
@@ -138,12 +138,12 @@ export default function Students() {
 
   const columns = [
     { key: 'photo', label: 'Photo', render: (s) => (
-      <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 shrink-0">
+      <div className="w-10 h-10 border-2 border-black bg-[#FFD93D] flex items-center justify-center shadow-[2px_2px_0px_var(--neo-shadow)] shrink-0 relative overflow-hidden">
         {s.photo_path ? (
           <img src={`/${s.photo_path}`} alt={s.name} className="w-full h-full object-cover" />
         ) : (
-          <svg className="w-5 h-5 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         )}
       </div>
@@ -158,7 +158,7 @@ export default function Students() {
       </Button>
     )},
     { key: 'class_level', label: 'Class', render: (s) => (
-      <span className="inline-flex px-2 py-0.5 rounded-lg text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono">
+      <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
         {s.class_level}
       </span>
     )},
@@ -168,7 +168,7 @@ export default function Students() {
       </span>
     )},
     { key: 'guardian_name', label: 'Guardian', className: 'hidden' },
-    { key: 'guardian_phone', label: 'Phone', render: (s) => (
+    { key: 'guardian_phone', label: 'Phone', className: 'hidden', render: (s) => (
       <span className="font-mono text-sm">{s.guardian_phone}</span>
     ) },
     { key: 'monthly_fee', label: 'Monthly Fee', render: (s) => (
@@ -179,15 +179,15 @@ export default function Students() {
     ) },
     { key: 'parent_code', label: 'Parent Login / Code', className: 'hidden', render: (s) => (
       <div className="flex flex-col gap-1">
-        <code className="text-xs bg-white/5 border border-white/10 px-2 py-0.5 rounded text-bitcoin font-mono w-max">
+        <code className="text-xs bg-white border-2 border-black px-2 py-0.5 text-black font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] w-max">
           {s.parent_username || '-'}
         </code>
-        <code className="text-[10px] text-stardust font-mono">
+        <code className="text-[10px] text-black/60 font-mono font-bold">
           Code: {s.parent_code}
         </code>
       </div>
     )},
-    { key: 'status', label: 'Status', render: (s) => statusBadge(s.status) },
+    { key: 'status', label: 'Status', className: 'hidden', render: (s) => statusBadge(s.status) },
     { key: 'actions', label: '', render: (s) => (
       <div className="flex items-center gap-2 justify-end">
         <Button variant="secondary" size="sm" onClick={() => openEdit(s)}>Edit</Button>
@@ -252,17 +252,17 @@ export default function Students() {
         }
       >
         <form id="student-form" onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex flex-col items-center gap-3 pb-2 border-b border-white/5">
-            <div className="relative group w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-blue-500/10 to-purple-500/10 border-2 border-dashed border-white/10 flex items-center justify-center transition-colors hover:border-bitcoin/50">
+          <div className="flex flex-col items-center gap-3 pb-3 border-b-4 border-black">
+            <div className="relative group w-24 h-24 border-4 border-black bg-white flex items-center justify-center shadow-[4px_4px_0px_var(--neo-shadow)] transition-colors hover:border-black overflow-hidden">
               {photoPreview ? (
                 <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <svg className="w-8 h-8 text-stardust/50 group-hover:text-bitcoin/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg className="w-8 h-8 text-black/40 group-hover:text-black transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               )}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                <span className="text-xs font-medium text-white">Upload</span>
+                <span className="text-xs font-bold text-white uppercase tracking-wider">Upload</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -271,12 +271,12 @@ export default function Students() {
                 />
               </div>
             </div>
-            <p className="text-xs text-stardust">Profile Picture (Optional)</p>
+            <p className="text-xs text-black/60 font-bold uppercase font-heading tracking-wider">Profile Picture (Optional)</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Full Name *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Full Name *</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -285,7 +285,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Class Level *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Class Level *</label>
               <Select
                 value={form.class_level}
                 onChange={(e) => setForm((f) => ({ ...f, class_level: e.target.value }))}
@@ -294,7 +294,7 @@ export default function Students() {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Guardian Name *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Guardian Name *</label>
               <Input
                 value={form.guardian_name}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_name: e.target.value }))}
@@ -303,7 +303,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Guardian Phone *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Guardian Phone *</label>
               <Input
                 value={form.guardian_phone}
                 onChange={(e) => setForm((f) => ({ ...f, guardian_phone: e.target.value }))}
@@ -312,7 +312,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Parent Username *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Parent Username *</label>
               <Input
                 value={form.parent_username}
                 onChange={(e) => setForm((f) => ({ ...f, parent_username: e.target.value }))}
@@ -321,7 +321,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">
                 Parent Password {modal === 'edit' && '(Leave blank to keep current)'}
               </label>
               <Input
@@ -337,7 +337,7 @@ export default function Students() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Monthly Fee (৳) *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Monthly Fee (৳) *</label>
               <Input
                 type="number"
                 min="1"
@@ -348,7 +348,7 @@ export default function Students() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stardust">Start Date *</label>
+              <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Start Date *</label>
               <Input
                 type="date"
                 value={form.start_date}
@@ -359,7 +359,7 @@ export default function Students() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Subjects *</label>
+            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Subjects *</label>
             <div className="flex flex-wrap gap-2 mt-1">
               {SUBJECTS_LIST.map((sub) => {
                 const isSelected = form.subjects.includes(sub);
@@ -380,7 +380,7 @@ export default function Students() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stardust">Address</label>
+            <label className="text-xs font-black text-black font-heading uppercase tracking-wider">Address</label>
             <Textarea
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}

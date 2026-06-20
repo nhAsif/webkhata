@@ -10,9 +10,9 @@ import { Check, X, AlertTriangle } from 'lucide-react';
 
 const STATUS_OPTS = ['not_submitted', 'submitted', 'late'];
 const STATUS_BADGE = {
-  submitted: 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
-  not_submitted: 'bg-red-500/20 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]',
-  late: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
+  submitted: 'bg-[#C4B5FD] text-black border-2 border-black font-bold shadow-[2px_2px_0px_var(--neo-shadow)]',
+  not_submitted: 'bg-[#FF6B6B] text-black border-2 border-black font-bold shadow-[2px_2px_0px_var(--neo-shadow)]',
+  late: 'bg-[#FFD93D] text-black border-2 border-black font-bold shadow-[2px_2px_0px_var(--neo-shadow)]',
 };
 const STATUS_ICON = {
   submitted: <Check className="w-3.5 h-3.5 stroke-[3px]" />,
@@ -114,10 +114,10 @@ export default function Homework() {
     { key: 'batch_id', label: 'Batch', render: (hw) => {
       const batch = batches.find((b) => b.id === hw.batch_id);
       return batch ? (
-        <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-blue-500/10 text-blue-400 border-blue-500/30">
+        <span className="border-2 border-black bg-[#FFD93D] text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
           {batch.name}
         </span>
-      ) : <span className="text-stardust">—</span>;
+      ) : <span className="text-black/60 font-mono font-bold">—</span>;
     }},
     { key: 'assigned_date', label: 'Assigned', render: (hw) => (
       <span className="text-stardust font-mono text-sm">{hw.assigned_date}</span>
@@ -125,13 +125,13 @@ export default function Homework() {
     { key: 'due_date', label: 'Due Date', render: (hw) => {
       const overdue = new Date(hw.due_date) < new Date() && hw.due_date !== today();
       return (
-        <span className={`font-mono text-sm flex items-center gap-1.5 ${overdue ? 'text-red-400 font-medium' : 'text-stardust'}`}>
-          {hw.due_date} {overdue && <AlertTriangle className="w-4 h-4 text-red-400 stroke-[3px]" />}
+        <span className={`font-mono text-sm flex items-center gap-1.5 font-bold ${overdue ? 'text-[#FF6B6B]' : 'text-black/70'}`}>
+          {hw.due_date} {overdue && <AlertTriangle className="w-4 h-4 text-[#FF6B6B] stroke-[3px]" />}
         </span>
       );
     }},
     { key: 'submission_count', label: 'Submissions', render: (hw) => (
-      <span className="rounded-full px-2.5 py-0.5 text-xs font-mono border bg-white/5 text-stardust border-white/10">
+      <span className="border-2 border-black bg-white text-black px-2.5 py-0.5 text-xs font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">
         {hw.submission_count} students
       </span>
     )},
@@ -270,10 +270,10 @@ export default function Homework() {
           {submissions.map((sub, i) => (
             <div
               key={sub.id}
-              className="p-4 bg-white/5 rounded-xl border border-white/10 transition-colors hover:border-white/20"
+              className="p-4 bg-white border-2 border-black shadow-[4px_4px_0px_var(--neo-shadow)] mb-3"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                <div className="font-medium text-sm text-pure flex-1">
+                <div className="font-bold text-sm text-black flex-1">
                   {sub.student_name}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -281,10 +281,10 @@ export default function Homework() {
                     <button
                       key={s}
                       type="button"
-                      className={`rounded-full px-3 py-1 text-xs font-mono font-medium transition-all duration-200 border ${
+                      className={`border-2 border-black px-3 py-1 text-xs font-mono font-bold transition-all duration-100 shadow-[1px_1px_0px_var(--neo-shadow)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer ${
                         sub.status === s 
                           ? STATUS_BADGE[s] 
-                          : 'bg-transparent text-stardust border-white/10 hover:border-white/30 hover:text-pure hover:bg-white/5'
+                          : 'bg-white text-black hover:bg-neutral-50'
                       }`}
                       onClick={() => {
                         setSubmissions((prev) => {
@@ -303,7 +303,7 @@ export default function Homework() {
                 </div>
               </div>
               <Input
-                className="h-10 text-xs bg-black/30 border-white/10 focus-visible:border-bitcoin/50"
+                className="h-10 text-xs shadow-[2px_2px_0px_var(--neo-shadow)] focus-visible:bg-[#FFD93D] focus-visible:shadow-[2px_2px_0px_var(--neo-shadow)]"
                 placeholder="Feedback (optional)..."
                 value={sub.feedback || ''}
                 onChange={(e) => {

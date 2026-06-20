@@ -10,19 +10,22 @@ import { Input, Select } from '../components/Input';
 import { ClipboardList, TrendingUp, BarChart2, PenSquare } from 'lucide-react';
 
 const GRADE_COLORS = {
-  'A+': '#10b981', 'A': '#34d399', 'A-': '#6ee7b7',
-  'B': '#3b82f6', 'C': '#f59e0b', 'D': '#f97316', 'F': '#ef4444',
+  'A+': 'var(--success)', // #C4B5FD
+  'A': 'var(--success)',
+  'A-': 'var(--success)',
+  'B': 'var(--warning)', // #FFD93D
+  'C': 'var(--warning)',
+  'D': 'var(--danger)', // #FF6B6B
+  'F': 'var(--danger)',
 };
 
 function GradeTag({ grade }) {
-  const color = GRADE_COLORS[grade] || '#8b92a8';
+  const bg = GRADE_COLORS[grade] || 'var(--neutral-primary-medium)';
   return (
     <span 
-      className="rounded-full px-2.5 py-0.5 text-xs font-mono border font-bold"
+      className="inline-flex px-2 py-0.5 border-2 border-black font-mono font-bold text-xs shadow-[1.5px_1.5px_0px_var(--neo-shadow)] text-black"
       style={{
-        color,
-        backgroundColor: color + '22',
-        borderColor: color + '50'
+        backgroundColor: bg
       }}
     >
       {grade}
@@ -200,21 +203,21 @@ export default function Results() {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#8b92a8' }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#8b92a8' }} unit="%" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#181B20', fontWeight: 'bold' }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#181B20', fontWeight: 'bold' }} unit="%" />
                 <Tooltip
-                  contentStyle={{ background: '#0F1115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, color: '#fff' }}
-                  itemStyle={{ color: '#F7931A' }}
+                  contentStyle={{ background: '#FFFFFF', border: '4px solid #181B20', borderRadius: '0px', boxShadow: '4px 4px 0px 0px var(--neo-shadow)', fontSize: 12, color: '#181B20', fontFamily: 'Space Grotesk' }}
+                  itemStyle={{ color: '#FF6B6B', fontWeight: 'bold' }}
                   formatter={(val) => [`${val}%`, 'Score']}
                 />
                 <Line
                   type="monotone"
                   dataKey="score"
-                  stroke="#F7931A"
-                  strokeWidth={2}
-                  dot={{ fill: '#F7931A', r: 4 }}
-                  activeDot={{ r: 6, fill: '#FFD600' }}
+                  stroke="#FF6B6B"
+                  strokeWidth={2.5}
+                  dot={{ fill: '#FFD93D', stroke: '#181B20', r: 4 }}
+                  activeDot={{ r: 6, fill: '#FFD93D', stroke: '#181B20' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -232,11 +235,11 @@ export default function Results() {
           emptyAction={<Button variant="primary" onClick={() => setAddModal(true)}>Add Result</Button>}
         />
       ) : (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-white/5 rounded-2xl border border-white/10">
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white border-4 border-black shadow-[8px_8px_0px_var(--neo-shadow)] text-black">
           <div className="text-black mb-4">
-            <BarChart2 className="w-12 h-12 stroke-[2px]" />
+            <BarChart2 className="w-12 h-12 stroke-[3px]" />
           </div>
-          <div className="text-lg font-heading text-pure">Select a student to view results</div>
+          <div className="text-lg font-heading font-black uppercase">Select a student to view results</div>
         </div>
       )}
 
@@ -249,7 +252,7 @@ export default function Results() {
           <div className="flex gap-3 justify-end w-full">
             <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
             <Button variant="primary" form="result-form" type="submit" disabled={saving}>
-              {saving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null} Add Result
+              {saving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} Add Result
             </Button>
           </div>
         }
@@ -337,7 +340,7 @@ export default function Results() {
           <div className="flex gap-3 justify-end w-full">
             <Button variant="secondary" onClick={() => setBulkModal(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleBulk} disabled={bulkSaving || !bulkStudents.length}>
-              {bulkSaving ? <span className="animate-pulse bg-white/20 w-4 h-4 rounded-full mr-2" /> : null} Save All
+              {bulkSaving ? <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" /> : null} Save All
             </Button>
           </div>
         }
@@ -397,12 +400,12 @@ export default function Results() {
             {bulkStudents.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center gap-4 py-2 px-3 bg-white/5 rounded-xl border border-white/10"
+                className="flex items-center gap-4 py-2 px-3 bg-white border-2 border-black shadow-[3px_3px_0px_var(--neo-shadow)] mb-2"
               >
-                <div className="flex-1 font-medium text-sm text-pure">{s.name}</div>
+                <div className="flex-1 font-bold text-sm text-black">{s.name}</div>
                 <Input
                   type="number"
-                  className="w-24 h-10"
+                  className="w-24 h-10 shadow-[2px_2px_0px_var(--neo-shadow)] focus-visible:bg-[#FFD93D] focus-visible:shadow-[2px_2px_0px_var(--neo-shadow)]"
                   placeholder="Score"
                   value={bulkScores[s.id] || ''}
                   onChange={(e) => setBulkScores((prev) => ({ ...prev, [s.id]: e.target.value }))}
@@ -411,7 +414,7 @@ export default function Results() {
                   step="0.5"
                 />
                 {bulkScores[s.id] && bulkTotalMarks && (
-                  <span className="text-xs font-mono text-stardust w-10 text-right">
+                  <span className="text-xs font-mono font-bold text-black w-10 text-right">
                     {((parseFloat(bulkScores[s.id]) / parseFloat(bulkTotalMarks)) * 100).toFixed(0)}%
                   </span>
                 )}
@@ -421,11 +424,11 @@ export default function Results() {
         )}
 
         {!bulkBatch && (
-          <div className="flex flex-col items-center justify-center p-8 text-center bg-white/5 rounded-xl border border-white/10 mt-4">
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-white border-4 border-black shadow-[4px_4px_0px_var(--neo-shadow)] mt-4">
             <div className="text-black mb-2">
-              <PenSquare className="w-8 h-8 stroke-[2px]" />
+              <PenSquare className="w-8 h-8 stroke-[3px]" />
             </div>
-            <div className="text-sm text-pure font-heading">Select a batch to enter scores</div>
+            <div className="text-sm text-black font-heading font-black uppercase">Select a batch to enter scores</div>
           </div>
         )}
       </Modal>

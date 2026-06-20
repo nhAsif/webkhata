@@ -61,9 +61,9 @@ export default function StudentProfile() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-16 bg-white/5 rounded-2xl w-1/3" />
-        <div className="h-48 bg-white/5 rounded-2xl w-full" />
-        <div className="h-64 bg-white/5 rounded-2xl w-full" />
+        <div className="h-16 bg-white border-4 border-black shadow-[4px_4px_0px_var(--neo-shadow)] w-1/3" />
+        <div className="h-48 bg-white border-4 border-black shadow-[6px_6px_0px_var(--neo-shadow)] w-full" />
+        <div className="h-64 bg-white border-4 border-black shadow-[8px_8px_0px_var(--neo-shadow)] w-full" />
       </div>
     );
   }
@@ -101,28 +101,28 @@ export default function StudentProfile() {
         <Button 
           variant="secondary" 
           size="sm" 
-          className="h-9 w-9 p-0 rounded-lg flex items-center justify-center shrink-0"
+          className="h-9 w-9 p-0 flex items-center justify-center shrink-0"
           onClick={() => navigate('/students')}
         >
-          <ArrowLeft className="w-4 h-4 text-pure" />
+          <ArrowLeft className="w-4 h-4 text-black" />
         </Button>
-        <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border-2 border-white/10 shrink-0">
+        <div className="w-24 h-24 border-4 border-black bg-[#FFD93D] flex items-center justify-center shadow-[4px_4px_0px_var(--neo-shadow)] shrink-0 relative overflow-hidden">
           {student.photo_path ? (
             <img src={`/${student.photo_path}`} alt={student.name} className="w-full h-full object-cover" />
           ) : (
-            <svg className="w-12 h-12 text-stardust/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-12 h-12 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           )}
         </div>
         <div>
-          <h1 className="text-3xl font-heading font-bold text-pure tracking-tight">{student.name}</h1>
-          <p className="text-xs text-stardust mt-0.5 flex items-center gap-1.5 uppercase tracking-wider font-mono">
-            <span className="inline-flex px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+          <h1 className="text-3xl font-heading font-bold text-black tracking-tight">{student.name}</h1>
+          <p className="text-xs text-black mt-0.5 flex items-center gap-1.5 uppercase tracking-wider font-mono">
+            <span className="border-2 border-black bg-[#FFD93D] text-black px-2 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)]">
               {student.class_level}
             </span>
-            <span className={`inline-flex px-1.5 py-0.5 rounded capitalize ${
-              student.status === 'active' ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-white/5 border border-white/10 text-stardust'
+            <span className={`border-2 border-black px-2 py-0.5 text-xs font-mono font-bold uppercase shadow-[2px_2px_0px_var(--neo-shadow)] ${
+              student.status === 'active' ? 'bg-[#C4B5FD] text-black' : 'bg-[#FAF6EE] text-black/50'
             }`}>
               {student.status}
             </span>
@@ -132,41 +132,41 @@ export default function StudentProfile() {
 
       {/* Student Personal Info */}
       <Card hover={false}>
-        <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
+        <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FF6B6B]/10">
           <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
-            <User className="w-5 h-5 text-bitcoin" /> Personal Information
+            <User className="w-5 h-5 text-black stroke-[2.5px]" /> Personal Information
           </CardTitle>
-          <code className="text-xs bg-white/5 border border-white/10 px-2.5 py-0.5 rounded text-bitcoin font-mono">
+          <code className="text-xs bg-white border-2 border-black px-2.5 py-1 font-mono font-bold shadow-[2px_2px_0px_var(--neo-shadow)] text-black">
             Parent Username: {student.parent_username || '—'}
           </code>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Guardian Name</span>
-              <span className="text-sm font-medium text-pure">{student.guardian_name}</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Guardian Name</span>
+              <span className="text-sm font-bold text-black">{student.guardian_name}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Guardian Phone</span>
-              <span className="text-sm font-medium text-pure font-mono">{student.guardian_phone}</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Guardian Phone</span>
+              <span className="text-sm font-bold text-black font-mono">{student.guardian_phone}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Parent Username</span>
-              <span className="text-sm font-medium text-pure font-mono">{student.parent_username || '—'}</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Parent Username</span>
+              <span className="text-sm font-bold text-black font-mono">{student.parent_username || '—'}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Address</span>
-              <span className="text-sm font-medium text-pure">{student.address || '—'}</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Address</span>
+              <span className="text-sm font-bold text-black">{student.address || '—'}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Enrolled Since</span>
-              <span className="text-sm font-medium text-pure font-mono">{student.enrollment_date}</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Enrolled Since</span>
+              <span className="text-sm font-bold text-black font-mono">{student.enrollment_date}</span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Subjects</span>
+              <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Subjects</span>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 {(Array.isArray(student.subjects) ? student.subjects : []).map((s) => (
-                  <span key={s} className="inline-flex px-1.5 py-0.5 rounded text-[10px] bg-white/5 border border-white/10 text-pure font-mono uppercase">
+                  <span key={s} className="border-2 border-black bg-[#C4B5FD] text-black px-2 py-0.5 text-[10px] font-mono font-bold shadow-[1.5px_1.5px_0px_var(--neo-shadow)] uppercase">
                     {s}
                   </span>
                 ))}
@@ -188,24 +188,16 @@ export default function StudentProfile() {
 
       {/* Financial Dashboard */}
       {financial && (() => {
-        const statusColor =
-          financial.status === 'paid' ? 'border-green-500/40'
-          : financial.status === 'partial' ? 'border-yellow-500/40'
-          : 'border-red-500/40';
-        const badgeClass =
-          financial.status === 'paid'
-            ? 'bg-green-500/15 border-green-500/30 text-green-400'
-            : financial.status === 'partial'
-            ? 'bg-yellow-500/15 border-yellow-500/30 text-yellow-400'
-            : 'bg-red-500/15 border-red-500/30 text-red-400';
         return (
-          <Card hover={false} className={`border-2 ${statusColor}`}>
-            <CardHeader className="flex-row items-center justify-between border-b border-white/10 pb-4">
+          <Card hover={false}>
+            <CardHeader className="flex-row items-center justify-between border-b-4 border-black pb-4 bg-[#FF6B6B]/10">
               <CardTitle className="flex items-center gap-2 text-lg font-heading font-semibold text-pure">
-                <Wallet className="w-5 h-5 text-bitcoin" /> Financial Overview
+                <Wallet className="w-5 h-5 text-black stroke-[2.5px]" /> Financial Overview
               </CardTitle>
               <div className="flex items-center gap-3">
-                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border uppercase ${badgeClass}`}>
+                <span className={`border-2 border-black px-2.5 py-0.5 text-xs font-mono font-bold uppercase shadow-[2px_2px_0px_var(--neo-shadow)] ${
+                  financial.status === 'paid' ? 'bg-[#C4B5FD] text-black' : financial.status === 'partial' ? 'bg-[#FFD93D] text-black' : 'bg-[#FF6B6B] text-black'
+                }`}>
                   {financial.status}
                 </span>
                 <Button
@@ -220,30 +212,30 @@ export default function StudentProfile() {
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Monthly Fee</span>
-                  <span className="text-lg font-bold text-bitcoin font-mono">৳{(financial.monthly_fee ?? 0).toLocaleString()}</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Monthly Fee</span>
+                  <span className="text-lg font-bold text-black font-mono">৳{(financial.monthly_fee ?? 0).toLocaleString()}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Start Date</span>
-                  <span className="text-sm font-medium text-pure font-mono">{financial.start_date || '—'}</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Start Date</span>
+                  <span className="text-sm font-bold text-black font-mono">{financial.start_date || '—'}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Completed Cycles</span>
-                  <span className="text-lg font-bold text-gold font-mono">{totalCycles}</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Completed Cycles</span>
+                  <span className="text-lg font-bold text-black font-mono">{totalCycles}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Paid Cycles</span>
-                  <span className="text-lg font-bold text-green-400 font-mono">{paidCycles}</span>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Paid Cycles</span>
+                  <span className="text-lg font-bold text-green-700 font-mono">{paidCycles}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Pending Cycles</span>
-                  <span className={`text-lg font-bold font-mono ${unpaidCycles === 0 ? 'text-green-400' : unpaidCycles === 1 ? 'text-yellow-400' : 'text-red-400'}`}>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Pending Cycles</span>
+                  <span className={`text-lg font-bold font-mono ${unpaidCycles === 0 ? 'text-green-700' : 'text-red-600'}`}>
                     {unpaidCycles}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-stardust uppercase tracking-wider font-mono">Pending Amount</span>
-                  <span className={`text-lg font-bold font-mono ${(financial.outstanding_balance ?? 0) === 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className="text-xs font-bold text-black/60 uppercase tracking-wider font-mono">Pending Amount</span>
+                  <span className={`text-lg font-bold font-mono ${(financial.outstanding_balance ?? 0) === 0 ? 'text-green-700' : 'text-red-600'}`}>
                     ৳{(financial.outstanding_balance ?? 0).toLocaleString()}
                   </span>
                 </div>
@@ -265,26 +257,28 @@ export default function StudentProfile() {
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#94A3B8' }} stroke="rgba(255, 255, 255, 0.1)" />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94A3B8' }} unit="%" stroke="rgba(255, 255, 255, 0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.1)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#181B20', fontWeight: 'bold' }} stroke="rgba(0, 0, 0, 0.2)" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#181B20', fontWeight: 'bold' }} unit="%" stroke="rgba(0, 0, 0, 0.2)" />
                   <Tooltip
                     contentStyle={{ 
-                      background: '#0F1115', 
-                      border: '1px solid rgba(255, 255, 255, 0.1)', 
-                      borderRadius: '12px', 
+                      background: '#FFFFFF', 
+                      border: '4px solid #181B20', 
+                      borderRadius: '0px', 
+                      boxShadow: '4px 4px 0px 0px var(--neo-shadow)', 
                       fontSize: '12px',
-                      color: '#FFFFFF'
+                      color: '#181B20',
+                      fontFamily: 'Space Grotesk'
                     }}
                     formatter={(val, name, props) => [`${val}% (${props.payload.grade})`, 'Score']}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#F7931A" 
+                    stroke="#FF6B6B" 
                     strokeWidth={2.5} 
-                    dot={{ fill: '#FFD600', stroke: '#F7931A', r: 4 }} 
-                    activeDot={{ r: 6, fill: '#FFD600', stroke: '#FFFFFF' }}
+                    dot={{ fill: '#FFD93D', stroke: '#181B20', r: 4 }} 
+                    activeDot={{ r: 6, fill: '#FFD93D', stroke: '#181B20' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -305,26 +299,26 @@ export default function StudentProfile() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
-                  <tr className="bg-void/40 border-y border-white/10">
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Cycle</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Period</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Amount</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-stardust uppercase font-mono">Paid On</th>
+                  <tr className="bg-[#FAF6EE] border-b-4 border-black text-black">
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Cycle</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Period</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Amount</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Status</th>
+                    <th className="px-6 py-3.5 text-xs font-black uppercase font-mono">Paid On</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y-2 divide-black bg-white">
                   {fees.map((c) => (
-                    <tr key={c.id} className="hover:bg-white/5 transition-all">
-                      <td className="px-6 py-3 text-sm font-bold text-pure font-mono">#{c.cycle_number}</td>
-                      <td className="px-6 py-3 text-sm text-stardust font-mono">
+                    <tr key={c.id} className="hover:bg-neutral-50 transition-all">
+                      <td className="px-6 py-3 text-sm font-bold text-black font-mono">#{c.cycle_number}</td>
+                      <td className="px-6 py-3 text-sm text-black/75 font-mono">
                         {c.cycle_start_date} → {c.cycle_end_date}
                       </td>
-                      <td className="px-6 py-3 text-sm text-pure font-mono">৳{c.fee_amount.toLocaleString()}</td>
+                      <td className="px-6 py-3 text-sm text-black font-mono font-bold">৳{c.fee_amount.toLocaleString()}</td>
                       <td className="px-6 py-3">
                         {c.is_paid
-                          ? <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border bg-green-500/15 border-green-500/30 text-green-400">Paid</span>
-                          : <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border bg-red-500/15 border-red-500/30 text-red-400">Unpaid</span>
+                          ? <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#C4B5FD] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">Paid</span>
+                          : <span className="inline-flex px-2 py-0.5 border-2 border-black text-[10px] font-bold uppercase tracking-wider font-mono bg-[#FF6B6B] text-black shadow-[1.5px_1.5px_0px_var(--neo-shadow)]">Unpaid</span>
                         }
                       </td>
                       <td className="px-6 py-3 text-sm text-stardust font-mono">{c.payment_date || '—'}</td>
